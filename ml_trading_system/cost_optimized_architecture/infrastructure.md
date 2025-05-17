@@ -3,7 +3,7 @@
 
 ## 共通の設計方針
 
-| 項目          | 方針                                 |
+| 機能          | 方針                                 |
 | ----------- | ---------------------------------- |
 | **IaC**     | 全クラウドでTerraform利用                  |
 | **GPUリソース** | スポットインスタンス/割引インスタンス活用              |
@@ -15,7 +15,7 @@
 
 ## awsのシステム構成
 
-| 機能        | サービス                                                                 |
+| レイヤー        | サービス                                                                 |
 | --------- | -------------------------------------------------------------------- |
 | データ保存     | Amazon S3 + Intelligent Tiering                                      |
 | モデル学習     | Amazon SageMaker (Spot対応)、or EC2 + Kubernetes (EKS)                  |
@@ -32,7 +32,7 @@
 + EC2インスタンスはSavings Plan/Spot活用
 
 ## Azureのシステム構成
-| 機能        | サービス                                                   |
+| レイヤー        | サービス                                                   |
 | --------- | ------------------------------------------------------ |
 | データ保存     | Azure Blob Storage (Hot + Archive Tier)                |
 | モデル学習     | Azure Machine Learning + Azure Batch (低優先度VM)          |
@@ -49,7 +49,7 @@
 + Azure ReservationsやSavings Plan活用
 
 ## GoogleCloudのシステム構成
-| 機能        | サービス                                                       |
+| レイヤー        | サービス                                                       |
 | --------- | ---------------------------------------------------------- |
 | データ保存     | Cloud Storage + Autoclass                                  |
 | モデル学習     | Vertex AI Training (Preemptible GPU) or AI Platform on GKE |

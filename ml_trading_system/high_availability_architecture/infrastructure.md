@@ -3,7 +3,7 @@
 
 ## 設計方針（全クラウド共通）
 
-| 要件分類        | 方針                                      |
+| 機能        | 方針                                      |
 | ----------- | --------------------------------------- |
 | **可用性**     | マルチAZ & マルチリージョン対応、ヘルスチェック + 自動フェイルオーバー |
 | **推論**      | GPU対応、低レイテンシ、スケーラブルなエンドポイント構成           |
@@ -16,7 +16,7 @@
 
 ## AWS のシステム構成
 
-| 構成要素 | 実装内容 |
+| レイヤー | サービス |
 |---------|---------|
 | **推論・サービス** | • Amazon SageMaker Endpoint (Multi-AZ + AutoScaling)<br>• GPU インスタンス対応 (ml.g5)<br>• Elastic Inference でコスト最適化<br>• API Gateway + Lambda or ALB (ALB if internal VPC inference) |
 | **可用性設計** | • Route 53 + Health Check → 複数リージョンのエンドポイント切替（フェイルオーバー）<br>• CloudWatch Alarms + Lambda → 異常時に再デプロイ or リージョン切替<br>• AutoScaling Group (ECS Fargate or EC2 backup) → 推論バックアップ冗長化 |
@@ -25,7 +25,7 @@
 
 ## Azureのシステム構成
 
-| 構成要素 | 実装内容 |
+| レイヤー | サービス |
 |---------|---------|
 | **推論・サービス** | • Azure Kubernetes Service (AKS) + NVIDIA GPUノードプール<br>• 推論API（FastAPIなど）をKubernetes上でスケーリング運用<br>• Azure Front Door or Traffic Manager<br>• グローバルロードバランサ（リージョン切替対応） |
 | **可用性設計** | • ゾーン冗長AKS + Availability Zone<br>• Azure Load Balancer (Internal) + Azure Application Gateway (外部)<br>• Azure Monitor Alerts + Logic App → 自動修復 or 通知 |
@@ -34,7 +34,7 @@
 
 ## GoogleCloudのシステム構成
 
-| 構成要素 | 実装内容 |
+| レイヤー | サービス |
 |---------|---------|
 | **推論・サービス** | • Vertex AI Endpoint (GPU対応 + AutoScaling)<br>• Global Load Balancer + Cloud Armor (WAF)<br>• マルチリージョン構成とヘルスチェック付き |
 | **可用性設計** | • Multi-region Endpoint with Regional Failover<br>• Cloud Monitoringの異常検知でCloud Functionsが切替実施<br>• Vertex AI Prediction + GKE backup構成（予備構成をGKE上に置く） |
