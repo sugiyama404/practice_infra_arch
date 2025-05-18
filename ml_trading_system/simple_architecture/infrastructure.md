@@ -13,7 +13,6 @@
 | **学習済みモデル保存**     | Amazon S3（h5ファイルをアップロード・APIで使用）                       |
 | **認証・認可（必要最低限）**  | IAMロール（Lambda・S3アクセス用の最小構成）                           |
 | **ログ・監視（簡易）**     | Amazon CloudWatch Logs（Lambdaのログ確認）                   |
-| **CI/CD（任意、簡易）**  | GitHub Actions or AWS CodeBuild（必要に応じてUI/API自動デプロイ）   |
 | **ネットワーク・セキュリティ** | デフォルトVPC（最小構成）、IAMポリシーでのアクセス制御                        |
 
 ### 特徴
