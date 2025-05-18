@@ -12,16 +12,16 @@
 | **インフラ管理**  | Terraformベース、IaCによる再現性と自動復旧性            |
 | **セキュリティ**  | VPC内完結、IAM・KMS・WAF連携、DoS対策有り            |
 
-
-
 ## AWS のシステム構成
 
-| レイヤー | サービス |
-|---------|---------|
-| **推論・サービス** | • Amazon SageMaker Endpoint (Multi-AZ + AutoScaling)<br>• GPU インスタンス対応 (ml.g5)<br>• Elastic Inference でコスト最適化<br>• API Gateway + Lambda or ALB (ALB if internal VPC inference) |
-| **可用性設計** | • Route 53 + Health Check → 複数リージョンのエンドポイント切替（フェイルオーバー）<br>• CloudWatch Alarms + Lambda → 異常時に再デプロイ or リージョン切替<br>• AutoScaling Group (ECS Fargate or EC2 backup) → 推論バックアップ冗長化 |
-| **モデル更新** | • SageMaker Model Registry + Lambda → モデルバージョン切替ワークフロー<br>• CodePipeline + CodeDeploy（ブルーグリーン） |
-| **監視・監査** | • CloudWatch + CloudTrail + Amazon GuardDuty<br>• S3 ログバケット（監査用）+ AWS Backup |
+| レイヤー         | サービス・設計                                | 詳細                                                                                                                      |
+| ------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **推論・サービス**  | SageMaker Endpoint + EKS + ALB         | - 推論: Multi-AZ, AutoScaling<br>- 高速軽量モデル: Lambda + API Gateway or EKSでgRPC展開<br>- Elastic Inferenceでコスト最適化（特にCPU主成分モデル） |
+| **フェイルオーバー** | Route 53 + Global Accelerator          | - Route 53 + ヘルスチェックで複数リージョン切替<br>- Global Acceleratorで低遅延・障害時切替<br>- 異常時: CloudWatch Alarm + Lambdaで再起動 or 再デプロイ       |
+| **バックアップ冗長** | ECS Fargate or Lambda 冗長推論             | - ECS Fargate（バックアップエンドポイント）をAutoScaling起動<br>- 定期バッチも兼ねる                                                               |
+| **モデル更新**    | CodePipeline + Model Registry + Lambda | - CodePipelineで自動CI/CD<br>- Lambdaで承認ワークフロー（Model Registry）                                                             |
+| **監視・監査**    | CloudWatch + X-Ray + CloudTrail        | - X-Rayでレイテンシ可視化<br>- GuardDuty + CloudTrail + Security Hubで攻撃検知                                                        |
+
 
 ## Azureのシステム構成
 

@@ -15,16 +15,16 @@
 
 ## AWSのシステム構成
 
-| レイヤー       | サービス                                                                     |
-| ---------- | ------------------------------------------------------------------------ |
-| 推論エンドポイント  | **EKS with GPUノード** + ALB + HPA（Auto Scaling）                            |
-| 学習基盤       | **SageMaker Training (Managed Spot Training)**                           |
-| 分散学習スケジューラ | **Amazon MWAA**（Airflow） or EKS上のKubeFlow                                |
-| フェイルオーバー   | **Route 53 + ALBヘルスチェック**                                                |
-| モニタリング     | **CloudWatch + Prometheus on EKS + SNS > Slack**                         |
-| ストレージ      | **S3（バージョニング＋暗号化）**                                                      |
-| 障害検知/復旧    | **AWS Auto Healing, EKS Node Auto Recovery, Node Group Diversification** |
-| ログ・監査      | CloudTrail + CloudWatch Logs + S3 Glacier                                |
+| レイヤー          | サービス                                                                           |
+| ------------- | ------------------------------------------------------------------------------ |
+| **推論エンドポイント** | EKS on Fargate（GPUノード含む）+ ALB + HPA（水平スケーリング）<br>Fargate Spotも併用               |
+| **学習基盤**      | SageMaker Training + Spot + Retryロジック（再学習中断対策）                                 |
+| **スケジューラー**   | Amazon MWAA or Managed Workflows for Apache Airflow<br>Kubeflow on EKS（リソース管理） |
+| **フェイルオーバー**  | Route 53 + ALB Health Check + Global Accelerator                               |
+| **モニタリング**    | CloudWatch + Prometheus/Grafana on EKS + SNS（Slack通知）                          |
+| **ストレージ**     | S3（バージョニング + KMS暗号化 + Intelligent-Tiering or Glacier Deep Archive）             |
+| **自己回復設計**    | EKS Managed Node Groups（Auto Healing）<br>AZ分散 + Spot Diversification           |
+| **ログ・監査**     | CloudTrail + CloudWatch Logs + S3 Glacier + AWS Config                         |
 
 
 ## Azureのシステム構成

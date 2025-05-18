@@ -15,15 +15,16 @@
 
 ## awsのシステム構成
 
-| レイヤー        | サービス                                                                 |
-| --------- | -------------------------------------------------------------------- |
-| データ保存     | Amazon S3                                      |
-| モデル学習     | Amazon SageMaker (Spot対応)                  |
-| 推論API     | AWS Lambda + API Gateway（軽量モデル）                       |
-| モデル管理     | SageMaker Model Registry + Amazon ECR                                |
-| パイプライン自動化 | Step Functions + EventBridge                                         |
-| コスト可視化    | AWS Cost Explorer + Budgets + CloudWatch                             |
-| セキュリティ    | IAM、KMS、VPC、Security Hub、PrivateLink                                 |
+| レイヤー       | サービス・設計                                                        |
+| ---------- | -------------------------------------------------------------- |
+| **データ保存**  | S3（Intelligent-Tiering） + S3 Lifecycle（Glacier移行）              |
+| **学習**     | SageMaker Spot + マルチアルゴリズムハイパーパラメータ探索                          |
+| **推論**     | Lambda（軽量）/ SageMaker Serverless Inference（推論頻度低）              |
+| **モデル管理**  | Model Registry + SageMaker Model Package Group + ECR（Docker活用） |
+| **自動化**    | Step Functions + EventBridge + Lambda（コスト効率良い）                 |
+| **可視化/監視** | Cost Explorer + AWS Budgets + CloudWatch Dashboards            |
+| **セキュリティ** | IAM + KMS + VPC + PrivateLink + Security Hub                   |
+
 
 ### コスト最適化ポイント
 + SageMakerのManaged Spot Training
