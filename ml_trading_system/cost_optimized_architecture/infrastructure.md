@@ -17,9 +17,9 @@
 
 | レイヤー        | サービス                                                                 |
 | --------- | -------------------------------------------------------------------- |
-| データ保存     | Amazon S3 + Intelligent Tiering                                      |
-| モデル学習     | Amazon SageMaker (Spot対応)、or EC2 + Kubernetes (EKS)                  |
-| 推論API     | AWS Lambda + API Gateway（軽量モデル） or SageMaker Endpoint (Auto-scaling) |
+| データ保存     | Amazon S3                                      |
+| モデル学習     | Amazon SageMaker (Spot対応)                  |
+| 推論API     | AWS Lambda + API Gateway（軽量モデル）                       |
 | モデル管理     | SageMaker Model Registry + Amazon ECR                                |
 | パイプライン自動化 | Step Functions + EventBridge                                         |
 | コスト可視化    | AWS Cost Explorer + Budgets + CloudWatch                             |
