@@ -12,13 +12,13 @@
 
 ## awsのシステム構成
 
-| 段階             | コンポーネント                                               | 詳細                                                                                                                                                                                             |
-| -------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **モデル開発・実験**   | SageMaker Studio / SageMaker Experiments / CodeCommit | - S3でデータ・モデル・ログ管理（バージョニング + KMS暗号化）<br>- Experimentsでメタデータ/トライアル管理<br>- IaC: Terraform + SageMaker SDK<br>- Git: CodeCommit/CodeCatalyst連携で再現性担保                                               |
-| **学習パイプライン**   | SageMaker Pipelines / Spot Instances                  | - `SageMaker Pipelines`で再学習・前処理・登録を一元化<br>- Spotインスタンスでコスト最適化（失敗時オンデマンドにフォールバック）<br>- Step Functions + EventBridge: 精度劣化・日次・週次再学習トリガー<br>- CloudWatch Logs + S3（Glacier/Intelligent Tiering）保管 |
-| **デプロイ & 推論**  | SageMaker Endpoint + ALB/API Gateway + Lambda         | - GPU対応（ml.g5/inf1） + AutoScaling<br>- Canary/ブルーグリーン対応: Model Registry + Approval Workflow + CodeDeploy<br>- 通信: ALB (VPC) or API Gateway + Lambda（外部連携用）                                     |
-| **モニタリング・再学習** | Model Monitor + CloudWatch + Lambda                   | - データ・コンセプトドリフト監視（Model Monitor）<br>- CloudWatch Anomaly Detectionで精度監視<br>- SNS + Slack通知 + Lambdaで再学習 or 承認依頼                                                                                |
-| **セキュリティ・監査**  | IAM + KMS + VPC + CloudTrail                          | - IAM最小権限（ABAC/SCP制御）<br>- KMS暗号化 + S3バージョニング + VPCエンドポイント<br>- CloudTrail + GuardDuty + Security Hub連携                                                                                        |
+| 段階             | コンポーネント                                      | 詳細                                                                                                                                                                                |
+| -------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **モデル開発・実験**   | EKS + JupyterHub + CodeCommit                | - S3でデータ・モデル・ログ管理（バージョニング + KMS暗号化）<br>- Kubeflow Experimentsでメタデータ/トライアル管理<br>- IaC: Terraform + Helm<br>- Git: CodeCommit連携で再現性担保<br>- JupyterHub上で分析・モデル開発                          |
+| **学習パイプライン**   | EKS + Kubeflow Pipelines + Spot Nodes        | - Kubeflow Pipelinesで再学習・前処理・登録を一元化<br>- EKSのSpotノードでコスト最適化（失敗時オンデマンドにフォールバック）<br>- AWS EventBridge: 精度劣化・日次・週次再学習トリガー<br>- K8s CronJobsでスケジュール実行<br>- S3（Glacier/Intelligent Tiering）保管 |
+| **デプロイ & 推論**  | EKS + KServe + API Gateway + ALB              | - トレーディング実行環境としてEKS活用<br>- KServe/KFServingでモデルサービング<br>- Argo CDでCanary/ブルーグリーンデプロイ<br>- 操作画面はEKS上のWebアプリ<br>- 外部連携: ALB (VPC) or API Gateway + Lambda                           |
+| **モニタリング・再学習** | Prometheus + Grafana + CloudWatch + FluentBit | - Prometheusでメトリクス収集（Kubernetes + カスタム指標）<br>- Grafanaでダッシュボード<br>- FluentBitでログ収集 → CloudWatch Logs<br>- CloudWatch Alarms + SNS + Slack通知<br>- Argo Workflowsで再学習自動化                 |
+| **セキュリティ・監査**  | IAM + KMS + VPC + Pod Security + Network Policy | - IAMロール for Service Account<br>- Pod Security Policies/Standards<br>- Network Policies制限<br>- KMS暗号化 + S3バージョニング<br>- CloudTrail + GuardDuty + Security Hub連携                     |
 
 
 ## Azureのシステム構成

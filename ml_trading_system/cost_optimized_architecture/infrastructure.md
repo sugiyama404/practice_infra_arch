@@ -15,20 +15,24 @@
 
 ## awsのシステム構成
 
-| レイヤー       | サービス・設計                                                        |
-| ---------- | -------------------------------------------------------------- |
-| **データ保存**  | S3（Intelligent-Tiering） + S3 Lifecycle（Glacier移行）              |
-| **学習**     | SageMaker Spot + マルチアルゴリズムハイパーパラメータ探索                          |
-| **推論**     | Lambda（軽量）/ SageMaker Serverless Inference（推論頻度低）              |
-| **モデル管理**  | Model Registry + SageMaker Model Package Group + ECR（Docker活用） |
-| **自動化**    | Step Functions + EventBridge + Lambda（コスト効率良い）                 |
-| **可視化/監視** | Cost Explorer + AWS Budgets + CloudWatch Dashboards            |
-| **セキュリティ** | IAM + KMS + VPC + PrivateLink + Security Hub                   |
+| レイヤー       | サービス・設計                                                   |
+| ---------- | --------------------------------------------------------- |
+| **データ保存**  | S3（Intelligent-Tiering） + S3 Lifecycle（Glacier移行）         |
+| **学習**     | ローカル環境で学習 + h5ファイルをS3にアップロード                            |
+| **推論/実行** | Lambda（トレーディング実行/軽量推論）                                  |
+| **UI**     | ECS Fargate（コスト最適化された操作画面）                               |
+| **API**    | API Gateway HTTP API（RESTful APIよりコスト効率良い）                |
+| **モデル管理**  | S3 + バージョニング（シンプルで低コスト）                                |
+| **自動化**    | Step Functions + EventBridge + Lambda（コスト効率良い）            |
+| **可視化/監視** | Cost Explorer + AWS Budgets + CloudWatch Dashboards       |
+| **セキュリティ** | IAM + KMS + VPC + PrivateLink + Security Hub              |
 
 
 ### コスト最適化ポイント
-+ SageMakerのManaged Spot Training
-+ LambdaやFargateのサーバレス推論
++ ローカル学習によるSageMakerコスト削減
++ ECS Fargateは使用時のみ課金（オートスケーリング設定）
++ API Gateway HTTP APIはREST APIより約70%コスト削減
++ Lambdaによるサーバレス実行で使用分のみ課金
 + S3 Intelligent Tieringでデータ保存コスト削減
 + EC2インスタンスはSavings Plan/Spot活用
 

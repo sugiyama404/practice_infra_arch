@@ -16,11 +16,12 @@
 
 | レイヤー         | サービス・設計                                | 詳細                                                                                                                      |
 | ------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **推論・サービス**  | SageMaker Endpoint + EKS + ALB         | - 推論: Multi-AZ, AutoScaling<br>- 高速軽量モデル: Lambda + API Gateway or EKSでgRPC展開<br>- Elastic Inferenceでコスト最適化（特にCPU主成分モデル） |
-| **フェイルオーバー** | Route 53 + Global Accelerator          | - Route 53 + ヘルスチェックで複数リージョン切替<br>- Global Acceleratorで低遅延・障害時切替<br>- 異常時: CloudWatch Alarm + Lambdaで再起動 or 再デプロイ       |
-| **バックアップ冗長** | ECS Fargate or Lambda 冗長推論             | - ECS Fargate（バックアップエンドポイント）をAutoScaling起動<br>- 定期バッチも兼ねる                                                               |
-| **モデル更新**    | CodePipeline + Model Registry + Lambda | - CodePipelineで自動CI/CD<br>- Lambdaで承認ワークフロー（Model Registry）                                                             |
-| **監視・監査**    | CloudWatch + X-Ray + CloudTrail        | - X-Rayでレイテンシ可視化<br>- GuardDuty + CloudTrail + Security Hubで攻撃検知                                                        |
+| **推論・サービス**  | ECS Fargate + ALB + Auto Scaling         | - トレーディング実行環境: ECS Fargate (Multi-AZ) + ALB<br>- 操作画面: ECS Fargate (Multi-AZ) + CloudFront<br>- 高可用性: Service Auto Scaling + ヘルスチェック |
+| **学習環境**     | ECS on EC2 + Auto Scaling                | - GPU対応EC2インスタンス (g4dn/g5) + Auto Scaling<br>- スポットインスタンス活用でコスト削減<br>- 複数AZにまたがるクラスタ構成                                      |
+| **フェイルオーバー** | Route 53 + Global Accelerator          | - Route 53 + ヘルスチェックで複数リージョン切替<br>- Global Acceleratorで低遅延・障害時切替<br>- 異常時: CloudWatch Alarm + Lambdaで再起動 or スケールアウト       |
+| **バックアップ冗長** | マルチリージョンECSクラスタ + S3レプリケーション           | - セカンダリリージョンのECS Fargateクラスタをスタンバイ状態で維持<br>- S3クロスリージョンレプリケーションでモデルとデータを同期<br>- Auto Scaling EventsでCloudWatch Alarmsトリガー      |
+| **モデル更新**    | CodePipeline + ECR + CodeDeploy        | - CodePipelineで自動CI/CD<br>- Blue/Green Deploymentによる無停止更新<br>- ECRでコンテナイメージ管理とバージョニング                                      |
+| **監視・監査**    | CloudWatch + Container Insights + X-Ray | - Container Insightsでコンテナレベル監視<br>- X-Rayでサービス間トレーシング<br>- GuardDuty + CloudTrail + Security Hubで攻撃検知                     |
 
 
 ## Azureのシステム構成
