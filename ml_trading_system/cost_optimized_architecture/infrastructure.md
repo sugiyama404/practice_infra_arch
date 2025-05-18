@@ -15,17 +15,19 @@
 
 ## awsのシステム構成
 
-| レイヤー       | サービス・設計                                                   |
-| ---------- | --------------------------------------------------------- |
-| **データ保存**  | S3（Intelligent-Tiering） + S3 Lifecycle（Glacier移行）         |
-| **学習**     | ローカル環境で学習 + h5ファイルをS3にアップロード                            |
-| **推論/実行** | Lambda（トレーディング実行/軽量推論）                                  |
-| **UI**     | ECS Fargate（コスト最適化された操作画面）                               |
-| **API**    | API Gateway HTTP API（RESTful APIよりコスト効率良い）                |
-| **モデル管理**  | S3 + バージョニング（シンプルで低コスト）                                |
-| **自動化**    | Step Functions + EventBridge + Lambda（コスト効率良い）            |
-| **可視化/監視** | Cost Explorer + AWS Budgets + CloudWatch Dashboards       |
-| **セキュリティ** | IAM + KMS + VPC + PrivateLink + Security Hub              |
+| レイヤー                    | 使用サービス                                                     |
+| ----------------------- | ---------------------------------------------------------- |
+| **操作画面（フロントエンド）**       | Amazon ECS Fargate（SPAまたはUIアプリのホスティング）                     |
+| **API / バックエンド**        | Amazon API Gateway（HTTP API） + AWS Lambda（軽量でスケーラブルなAPI処理） |
+| **トレーディング実行環境**         | AWS Lambda（イベント駆動・従量課金でコスト効率よくトレード実行）                      |
+| **学習環境**                | ローカル環境（学習） + Amazon S3（h5モデルファイルのアップロード先）                  |
+| **学習用データ保存**            | Amazon S3（構造化または非構造化のデータ保存）                                |
+| **学習済みモデル保存**           | Amazon S3（h5ファイルなどのモデルアーティファクト保存）                          |
+| **CI/CD（API・UIデプロイ）**   | AWS CodePipeline + CodeBuild + Fargate / Lambda デプロイ       |
+| **認証・認可（UIやAPIアクセス制御）** | Amazon Cognito（ユーザー管理） または IAM（Lambda/APIへのアクセス制御）         |
+| **監視・ロギング**             | Amazon CloudWatch（ログ収集、アラーム） + AWS X-Ray（トレース）             |
+| **ネットワーク・セキュリティ**       | AWS VPC（Fargate用） + Security Groups + IAM Roles（最小権限の付与）   |
+
 
 
 ### コスト最適化ポイント

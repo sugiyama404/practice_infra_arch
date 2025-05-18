@@ -12,13 +12,19 @@
 
 ## awsのシステム構成
 
-| 段階             | コンポーネント                                      | 詳細                                                                                                                                                                                |
-| -------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **モデル開発・実験**   | EKS + JupyterHub + CodeCommit                | - S3でデータ・モデル・ログ管理（バージョニング + KMS暗号化）<br>- Kubeflow Experimentsでメタデータ/トライアル管理<br>- IaC: Terraform + Helm<br>- Git: CodeCommit連携で再現性担保<br>- JupyterHub上で分析・モデル開発                          |
-| **学習パイプライン**   | EKS + Kubeflow Pipelines + Spot Nodes        | - Kubeflow Pipelinesで再学習・前処理・登録を一元化<br>- EKSのSpotノードでコスト最適化（失敗時オンデマンドにフォールバック）<br>- AWS EventBridge: 精度劣化・日次・週次再学習トリガー<br>- K8s CronJobsでスケジュール実行<br>- S3（Glacier/Intelligent Tiering）保管 |
-| **デプロイ & 推論**  | EKS + KServe + API Gateway + ALB              | - トレーディング実行環境としてEKS活用<br>- KServe/KFServingでモデルサービング<br>- Argo CDでCanary/ブルーグリーンデプロイ<br>- 操作画面はEKS上のWebアプリ<br>- 外部連携: ALB (VPC) or API Gateway + Lambda                           |
-| **モニタリング・再学習** | Prometheus + Grafana + CloudWatch + FluentBit | - Prometheusでメトリクス収集（Kubernetes + カスタム指標）<br>- Grafanaでダッシュボード<br>- FluentBitでログ収集 → CloudWatch Logs<br>- CloudWatch Alarms + SNS + Slack通知<br>- Argo Workflowsで再学習自動化                 |
-| **セキュリティ・監査**  | IAM + KMS + VPC + Pod Security + Network Policy | - IAMロール for Service Account<br>- Pod Security Policies/Standards<br>- Network Policies制限<br>- KMS暗号化 + S3バージョニング<br>- CloudTrail + GuardDuty + Security Hub連携                     |
+| レイヤー                    | 使用サービス                                             |
+| ----------------------- | -------------------------------------------------- |
+| **操作画面（フロントエンド）**       | Amazon EKS（Kubernetes上にUIアプリをホスティング）               |
+| **API / バックエンド**        | Amazon EKS（APIサーバー、オーケストレーション処理）                   |
+| **トレーディング実行環境**         | Amazon EKS（取引アルゴリズムのリアルタイム実行）                      |
+| **学習環境**                | Amazon EKS + Kubeflow Pipelines（学習・チューニング）         |
+| **学習用データ保存**            | Amazon RDS（PostgreSQLなど、構造化データ保存）                  |
+| **学習済みモデル保存**           | Amazon S3（モデルアーティファクトの永続化）                         |
+| **MLOpsパイプライン管理**       | Amazon EKS（Kubeflow上のPipeline）                     |
+| **CI/CD（アプリ・モデル）**      | AWS CodePipeline + CodeBuild + EKS デプロイ            |
+| **モニタリング・ログ管理**         | Amazon CloudWatch, AWS X-Ray, Prometheus + Grafana |
+| **認証・認可（UIやAPIアクセス制御）** | AWS IAM, AWS Cognito                               |
+| **ネットワーク制御・セキュリティ**     | Amazon VPC, AWS Security Groups, AWS WAF           |
 
 
 ## Azureのシステム構成

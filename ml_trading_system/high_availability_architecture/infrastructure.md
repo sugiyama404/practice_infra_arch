@@ -14,14 +14,21 @@
 
 ## AWS のシステム構成
 
-| レイヤー         | サービス・設計                                | 詳細                                                                                                                      |
-| ------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| **推論・サービス**  | ECS Fargate + ALB + Auto Scaling         | - トレーディング実行環境: ECS Fargate (Multi-AZ) + ALB<br>- 操作画面: ECS Fargate (Multi-AZ) + CloudFront<br>- 高可用性: Service Auto Scaling + ヘルスチェック |
-| **学習環境**     | ECS on EC2 + Auto Scaling                | - GPU対応EC2インスタンス (g4dn/g5) + Auto Scaling<br>- スポットインスタンス活用でコスト削減<br>- 複数AZにまたがるクラスタ構成                                      |
-| **フェイルオーバー** | Route 53 + Global Accelerator          | - Route 53 + ヘルスチェックで複数リージョン切替<br>- Global Acceleratorで低遅延・障害時切替<br>- 異常時: CloudWatch Alarm + Lambdaで再起動 or スケールアウト       |
-| **バックアップ冗長** | マルチリージョンECSクラスタ + S3レプリケーション           | - セカンダリリージョンのECS Fargateクラスタをスタンバイ状態で維持<br>- S3クロスリージョンレプリケーションでモデルとデータを同期<br>- Auto Scaling EventsでCloudWatch Alarmsトリガー      |
-| **モデル更新**    | CodePipeline + ECR + CodeDeploy        | - CodePipelineで自動CI/CD<br>- Blue/Green Deploymentによる無停止更新<br>- ECRでコンテナイメージ管理とバージョニング                                      |
-| **監視・監査**    | CloudWatch + Container Insights + X-Ray | - Container Insightsでコンテナレベル監視<br>- X-Rayでサービス間トレーシング<br>- GuardDuty + CloudTrail + Security Hubで攻撃検知                     |
+| レイヤー                    | 使用サービス                                                               |
+| ----------------------- | -------------------------------------------------------------------- |
+| **操作画面（フロントエンド）**       | Amazon ECS Fargate（ALB配下、マルチAZ対応）                                    |
+| **API / バックエンド**        | Amazon ECS Fargate（API・バッチ処理用） + ALB（高可用なルーティング）                     |
+| **トレーディング実行環境**         | Amazon ECS Fargate（マルチAZ配置、Auto Scaling、障害耐性の高い構成）                   |
+| **学習環境**                | Amazon SageMaker Training + SageMaker Pipeline（学習の自動化と再現性）           |
+| **学習用データ保存（元データ）**      | Amazon RDS（マルチAZ構成、ストレージ自動バックアップ）                                    |
+| **ETL（前処理）**            | AWS Glue（RDS→S3へのETL処理、サーバーレスでスケーラブル）                                |
+| **学習用データ保存（ETL後）**      | Amazon S3（SageMakerと連携、耐久性・可用性の高いストレージ）                              |
+| **学習済みモデル保存**           | Amazon S3（モデルアーティファクト保存、バージョン管理）                                     |
+| **CI/CD（アプリ・MLパイプライン）** | AWS CodePipeline + CodeBuild + ECS Fargate & SageMaker Pipelineのトリガー |
+| **認証・認可（UI/API/学習）**    | AWS IAM（サービス間アクセス制御） + Amazon Cognito（ユーザー認証）                        |
+| **モニタリング・ロギング**         | Amazon CloudWatch（ログ・メトリクス） + AWS X-Ray（分散トレース）                      |
+| **ネットワーク・セキュリティ**       | Amazon VPC（マルチAZ構成） + Security Groups + NACLs + WAF + Shield         |
+| **障害対応・自動復旧**           | ECS Auto Recovery、ALBヘルスチェック、SageMaker Retry、Glueリトライ設定              |
 
 
 ## Azureのシステム構成

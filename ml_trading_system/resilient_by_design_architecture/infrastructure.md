@@ -29,17 +29,20 @@
 
 
 ## Azureのシステム構成
-
-| レイヤー       | サービス                                                      |
-| ---------- | --------------------------------------------------------- |
-| 推論エンドポイント  | **Azure Kubernetes Service (AKS) + GPU VMSS**             |
-| 学習基盤       | **Azure ML（GPUトレーニング、スポット優先）**                            |
-| 分散学習スケジューラ | Azure ML Pipelines or AKS + KubeFlow                      |
-| フェイルオーバー   | **Azure Traffic Manager + ヘルスプローブ**                       |
-| モニタリング     | **Azure Monitor + Log Analytics + Action Group（Slack連携）** |
-| ストレージ      | **Azure Blob（immutable blob + バージョン管理）**                  |
-| 障害検知/復旧    | AKS Auto Healing + VMSS自動修復                               |
-| ログ・監査      | **Azure Activity Logs + Diagnostic Logs + Sentinel連携**    |
+| レイヤー                    | 使用サービス                                                          |
+| ----------------------- | --------------------------------------------------------------- |
+| **操作画面（フロントエンド）**       | Amazon ECS Fargate（ALB配下、マルチAZ構成、Auto Scaling対応）                |
+| **API / バックエンド**        | Amazon ECS Fargate + ALB（ヘルスチェックと自動復旧設定付き）                      |
+| **トレーディング実行環境**         | Amazon ECS Fargate（マルチAZ対応、Circuit Breaker有効化、Auto Recovery）    |
+| **学習環境**                | Amazon SageMaker Training + SageMaker Pipelines（ステップ失敗時のリカバリ対応） |
+| **学習用データ保存**            | Amazon S3（高耐久・バージョニング・クロスリージョンレプリケーション）                         |
+| **学習済みモデル保存**           | Amazon S3（ライフサイクル管理・バージョニング・冗長構成）                               |
+| **CI/CD（アプリ・MLパイプライン）** | AWS CodePipeline + CodeBuild（再実行可能・段階的デプロイ）                     |
+| **モニタリング・アラート**         | Amazon CloudWatch（アラーム、メトリクス）、AWS X-Ray（障害の可視化）                 |
+| **ログ・障害分析**             | Amazon CloudWatch Logs + AWS S3（長期保存、Athenaによる障害解析）             |
+| **認証・認可**               | AWS IAM（きめ細かいアクセス制御）、Amazon Cognito（UI/APIアクセス制御）               |
+| **ネットワーク・セキュリティ**       | Amazon VPC（マルチAZ構成） + Security Groups + WAF + Shield + NACL     |
+| **フェイルオーバー / 冗長化**      | ALB + ECSのAuto Recovery、SageMaker retry、S3クロスリージョンレプリケーション      |
 
 
 ## GoogleCloudのシステム構成
