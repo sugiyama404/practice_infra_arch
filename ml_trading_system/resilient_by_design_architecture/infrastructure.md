@@ -17,13 +17,13 @@
 | レイヤー          | 使用サービス                                            |
 | ------------- | ------------------------------------------------- |
 | **操作画面**      | ECS Fargate + ALB + Auto Scaling + CloudFront     |
-| **推論エンドポイント** | ECS Fargate（+ Spot） + ALB + Auto Scaling          |
-| **学習基盤**      | SageMaker Training + Pipelines + Spot             |
+| **推論エンドポイント** | ECS Fargate + ALB + Auto Scaling          |
+| **学習基盤**      | SageMaker Training + Pipelines             |
 | **スケジューラー**   | EventBridge + Lambda                              |
-| **フェイルオーバー**  | Route 53 + ALB Health Check + ECS Circuit Breaker |
-| **モニタリング**    | CloudWatch + SNS（Slack通知）                         |
+| **フェイルオーバー**  | Route 53 + ALB Health Check |
+| **モニタリング**    | CloudWatch                         |
 | **ストレージ**     | S3（バージョニング + KMS暗号化 + Intelligent-Tiering）        |
-| **自己回復設計**    | ECS Auto Recovery + Spot中断通知対応                    |
+| **自己回復設計**    | ECS Auto Recovery                    |
 | **ログ・監査**     | CloudTrail + CloudWatch Logs + S3                 |
 
 
