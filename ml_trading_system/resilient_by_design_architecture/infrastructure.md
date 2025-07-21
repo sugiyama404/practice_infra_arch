@@ -14,18 +14,18 @@
 
 
 ## AWSのシステム構成
+| レイヤー          | 使用サービス                                            |
+| ------------- | ------------------------------------------------- |
+| **操作画面**      | ECS Fargate + ALB + Auto Scaling + CloudFront     |
+| **推論エンドポイント** | ECS Fargate（+ Spot） + ALB + Auto Scaling          |
+| **学習基盤**      | SageMaker Training + Pipelines + Spot             |
+| **スケジューラー**   | EventBridge + Lambda                              |
+| **フェイルオーバー**  | Route 53 + ALB Health Check + ECS Circuit Breaker |
+| **モニタリング**    | CloudWatch + SNS（Slack通知）                         |
+| **ストレージ**     | S3（バージョニング + KMS暗号化 + Intelligent-Tiering）        |
+| **自己回復設計**    | ECS Auto Recovery + Spot中断通知対応                    |
+| **ログ・監査**     | CloudTrail + CloudWatch Logs + S3                 |
 
-| レイヤー          | サービス                                                                           |
-| ------------- | ------------------------------------------------------------------------------ |
-| **操作画面**     | ECS Fargate + ALB + Auto Scaling + CloudFront<br>マルチAZ配置 + Blue/Greenデプロイメント   |
-| **推論エンドポイント** | ECS Fargate（トレーディング実行環境）+ ALB + Service Auto Scaling<br>Fargate Spotも併用で高コスト効率         |
-| **学習基盤**      | SageMaker Training + Pipeline + Spot + Retryロジック（再学習中断対策）                      |
-| **スケジューラー**   | SageMaker Pipelines + EventBridge + StepFunctions<br>自動再学習とモデル更新のオーケストレーション    |
-| **フェイルオーバー**  | Route 53 + ALB Health Check + Global Accelerator<br>マルチリージョン構成とサーキットブレーカーパターン    |
-| **モニタリング**    | CloudWatch + Container Insights + X-Ray + SNS（Slack通知）<br>異常検知と自動スケーリングトリガー      |
-| **ストレージ**     | S3（バージョニング + KMS暗号化 + Intelligent-Tiering or Glacier Deep Archive）             |
-| **自己回復設計**    | ECS Service Auto Recovery + ヘルスチェックベースの置換<br>AZ分散 + Spot Interruption対応          |
-| **ログ・監査**     | CloudTrail + CloudWatch Logs + Firehose + S3 + AWS Config<br>システム全体の変更監査と証跡保存   |
 
 
 ## Azureのシステム構成
