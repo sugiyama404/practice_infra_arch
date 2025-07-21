@@ -1,11 +1,18 @@
 services:
   snowflake:
     build: ./snowflake
+    volumes:
+      - ./snowflake:/app
     ports:
       - "9001:8080"
   ticket-server:
     build: ./ticket_server
+    volumes:
+      - ./ticket_server:/app
     ports:
       - "9002:8080"
   client:
     build: ./client
+    volumes:
+      - ./client:/app
+    command: ["python", "app.py"]
