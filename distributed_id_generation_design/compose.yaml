@@ -1,0 +1,11 @@
+services:
+  snowflake:
+    build: ./snowflake
+    ports:
+      - "9001:8080"
+  ticket-server:
+    build: ./ticket_server
+    ports:
+      - "9002:8080"
+  client:
+    build: ./client
