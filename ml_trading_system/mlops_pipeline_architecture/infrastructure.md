@@ -22,7 +22,7 @@
 | **学習済みモデル保存**           | Amazon S3（モデルアーティファクトの永続化）                         |
 | **MLOpsパイプライン管理**       | Amazon EKS（Kubeflow上のPipeline）                     |
 | **CI/CD（アプリ・モデル）**      | AWS CodePipeline + CodeBuild + EKS デプロイ            |
-| **モニタリング・ログ管理**         | Amazon CloudWatch, AWS X-Ray, Prometheus + Grafana |
+| **モニタリング・ログ管理**         | Amazon CloudWatch, Prometheus + Grafana |
 | **認証・認可（UIやAPIアクセス制御）** | AWS IAM, AWS Cognito                               |
 | **ネットワーク制御・セキュリティ**     | Amazon VPC, AWS Security Groups, AWS WAF           |
 
