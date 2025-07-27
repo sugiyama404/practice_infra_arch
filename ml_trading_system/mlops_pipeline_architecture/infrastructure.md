@@ -18,7 +18,7 @@
 | **API / バックエンド**        | Amazon EKS（APIサーバー、オーケストレーション処理）                   |
 | **トレーディング実行環境**         | Amazon EKS（取引アルゴリズムのリアルタイム実行）                      |
 | **学習環境**                | Amazon EKS + Kubeflow Pipelines（学習・チューニング）         |
-| **学習用データ保存**            | Amazon RDS（PostgreSQLなど、構造化データ保存）                  |
+| **学習用データ保存**            | Amazon RDS（構造化データ保存）                  |
 | **学習済みモデル保存**           | Amazon S3（モデルアーティファクトの永続化）                         |
 | **MLOpsパイプライン管理**       | Amazon EKS（Kubeflow上のPipeline）                     |
 | **CI/CD（アプリ・モデル）**      | AWS CodePipeline + CodeBuild + EKS デプロイ            |
