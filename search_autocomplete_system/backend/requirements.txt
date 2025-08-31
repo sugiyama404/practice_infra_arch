@@ -4,3 +4,5 @@ SQLAlchemy==2.0.21
 PyMySQL==1.1.0
 python-dotenv==1.0.0
 cryptography==41.0.4
+redis==5.0.1
+pytrie==0.4.0
