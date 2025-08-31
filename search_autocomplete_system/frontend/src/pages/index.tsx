@@ -60,7 +60,6 @@ export default function Home() {
         <div className="container">
             <header className="header">
                 <h1>検索オートコンプリート</h1>
-                <p>Next.js + Flask + MySQL構成のデモ</p>
             </header>
 
             <main className="main">

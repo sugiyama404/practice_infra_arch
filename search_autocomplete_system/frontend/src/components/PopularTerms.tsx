@@ -34,7 +34,7 @@ const PopularTerms: React.FC<PopularTermsProps> = ({ terms, onTermClick }) => {
                 <p className="no-terms">人気ワードがありません</p>
             ) : (
                 <div className="terms-grid">
-                    {terms.map((term, index) => (
+                    {terms.map((term: PopularTerm, index: number) => (
                         <div
                             key={`${term.term}-${index}`}
                             className="term-card"
