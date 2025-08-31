@@ -66,17 +66,6 @@ APIは「シンプル・高速・拡張性」を重視して設計します。
 
 ---
 
-
-## スケーラビリティと運用性
-
-- Docker Composeで各サービスを独立デプロイできるため、「APIサーバだけ複数台に増やす」「DBだけリソース増強」など柔軟なスケールが可能です。
-- インデックス設計や全文検索インデックス追加でDB負荷を軽減
-- API側で接続プールやキャッシュを活用し、スパイク時も安定運用
-- フロントエンドはデバウンスや仮想リストで無駄なAPI呼び出し・再描画を抑制
-
----
-
-
 ## セキュリティ・監視・運用のポイント
 
 - SQLインジェクション対策は必須。パラメータ化クエリを徹底
@@ -85,6 +74,77 @@ APIは「シンプル・高速・拡張性」を重視して設計します。
 - アクセスログ・検索クエリログを構造化してBI分析にも活用
 
 ---
+
+## 発展系: コスト最適かつ低レイテンシを実現する実運用アーキテクチャ
+
+ここでは `infrastructure.md` の内容を実務で使いやすい形に整理し、設計者・実装者が具体的に判断・実装できるように要点をまとめます。
+
+### 全体像（一言）
+- 目的: P95 < 200ms / 月額コスト < $150 を目標に、マネージドサービスと多層キャッシュで最小構成から段階拡張する。
+
+### 推奨アーキテクチャ（簡易図）
+```
+User
+	│
+	├─→ CloudFront ──→ S3 (静的)
+	│
+	└─→ ALB ──→ ECS(Fargate) API
+								 ├─→ Redis (ElastiCache)
+								 ├─→ OpenSearch
+								 └─→ RDS (MySQL)
+```
+
+### コンポーネント要約（運用上の判断点）
+- CloudFront+S3: 静的配信とEdgeキャッシュでフロントの負荷を抑える。/api/popular のEdge TTLを設定。
+- ALB + ECS(Fargate): 最小は2タスク。CPUしきい値で水平スケール。タスクサイズは低コスト前提で小さく始める。
+- Redis: 第一応答レイヤ。小さなノードで始めてメトリクス（CacheHitRate, Evictions）を見て増強。
+- OpenSearch: 候補生成と重い検索のエンジン。キャッシュヒットで負荷を抑える。
+- RDS(MySQL): 正本データとログ保持に限定。インデックス設計で検索負荷を避ける。
+
+### 実用的キャッシュポリシー（即使える定義）
+- Browser: 検索結果 60s / 人気ワード 300s
+- CloudFront: `/api/popular` Edge TTL 300s、`/api/search` はパススルー
+- Redis keys: `search:{query}` TTL=600s、`popular:all` TTL=3600s、`user:history:{user_id}` TTL=300s
+- OpenSearch: クエリ結果のローカルキャッシュ（同一クエリ < 10分）を検討
+
+### SLO と計測（必須メトリクス）
+- /api/search: P95 < 200ms（目標）。期待する構成: Redisヒット率 ≈ 80%。
+- /api/popular: P95 < 100ms（高キャッシュヒット）。
+- 監視: API latency, error rate, Redis CacheHitRate, OpenSearch latency, RDS connections, ECS CPU/RPS。
+
+### スケール戦略（段階的）
+- 小規模: 単一AZ・小ノードで開始（コスト最優先）。監視でしきい値超過時に拡張。
+- 水平: ECSタスク数増加 → OpenSearchノード追加 → Redisノードクラス上げ（クラス変更）
+- 垂直: t3.small/medium へサイズアップ（まずは垂直、次に水平）
+
+### 可用性・DR（現実的な妥協案）
+- RPO: 24h、RTO: <4h を目安にする（検索候補は再構築可能なため許容）。
+- RDS: 自動バックアップ & PITR、OpenSearch: 日次スナップショットをS3へ保存。
+- Redis: 必要ならレプリケーションやAOF、有効な再生成スクリプトで復旧を短縮。
+
+### セキュリティと運用の具体策
+- VPC分離: Public(Alb) / Private(ECS, Redis, OpenSearch, RDS)
+- IAM最小権限・Secrets ManagerでDSN/鍵を管理
+- 暗号化: in-transit TLS と at-rest の設定を標準化
+- WAF, 基本ルールで外部の悪性リクエストをブロック
+
+### 実装“契約”（Inputs / Outputs / 成功基準）
+- Inputs: user query (q), user id (optional), feature flags for ranking
+- Outputs: JSON array of candidate strings + metadata (source: cache/OS/DB, latency)
+- 成功基準: 1) P95 レイテンシ要件を満たす 2) キャッシュヒット率が想定レンジ内 3) エラー率 < 0.1%
+
+### 代表的なエッジケース
+- 空クエリ/短すぎるクエリ（サーバ負荷低減のためローカルで早期返却）
+- 高頻度更新（人気語の再集計とキャッシュ失効の整合）
+- キャッシュスパイク（キャッシュミス連発時のバックプレッシャ対策）
+
+### 次のステップ（短期で価値が出る実作業）
+1. Redisキャッシュ設計を実装し、CacheHitRateをダッシュボード化
+2. `/api/popular` をCloudFront Edgeでキャッシュして静的化
+3. 負荷の小さい段階でOpenSearchの導入を検証（クエリプロファイル取得）
+
+---
+
 
 
 ## まとめ
