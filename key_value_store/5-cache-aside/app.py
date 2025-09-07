@@ -49,6 +49,12 @@ class CacheAsideKVS:
         # Cache Miss - DBから取得
         self.cache_stats['misses'] += 1
         db_data = self._db_read(entity_type, entity_id)
+        if db_data is None:
+            return {
+                'data': None,
+                'source': 'database',
+                'timestamp': datetime.now().isoformat()
+            }
         
         # キャッシュに保存 (TTL: 300秒)
         self.redis_client.setex(cache_key, 300, json.dumps(db_data))
@@ -113,12 +119,7 @@ class CacheAsideKVS:
                     'updated_at': updated_at.isoformat()
                 }
             else:
-                return {
-                    'id': entity_id,
-                    'type': entity_type,
-                    'data': f'Database data for {entity_type}:{entity_id}',
-                    'updated_at': (datetime.now() - timedelta(minutes=5)).isoformat()
-                }
+                return None  # Return None if not found in DB
     
     def _db_write(self, entity_type, entity_id, data):
         with self.db_conn.cursor() as cursor:

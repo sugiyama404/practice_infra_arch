@@ -11,12 +11,12 @@ app = Flask(__name__)
 DATA_DIR = './data'
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# Redis接続設定
+# Redis connection
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
-# Bloom Filter
+# Bloom Filter for fast lookups
 bloom = BloomFilter(capacity=10000, error_rate=0.001)
 
 # MemTable (in-memory sorted)
@@ -28,6 +28,7 @@ WAL_PATH = os.path.join(DATA_DIR, 'commit.log')
 
 # SSTable (disk sorted)
 def write_sstable(data, level=0):
+    """Write data to SSTable file."""
     fname = os.path.join(DATA_DIR, f'sstable_level{level}_{int(time.time())}.sst')
     with open(fname, 'w') as f:
         for k, v in data.items():
@@ -35,6 +36,7 @@ def write_sstable(data, level=0):
     return fname
 
 def read_sstable():
+    """Read all SSTable files and merge."""
     files = sorted([f for f in os.listdir(DATA_DIR) if f.startswith('sstable_')])
     sstable = SortedDict()
     for fname in files:
@@ -44,8 +46,9 @@ def read_sstable():
                 sstable[k] = v
     return sstable
 
-# LSM-Tree圧縮
+# LSM-Tree compaction
 def lsm_compact():
+    """Compact SSTable files."""
     files = sorted([f for f in os.listdir(DATA_DIR) if f.startswith('sstable_')])
     if len(files) > 2:
         merged = SortedDict()
@@ -58,17 +61,19 @@ def lsm_compact():
         for fname in files:
             os.remove(os.path.join(DATA_DIR, fname))
 
-# L1/L2キャッシュ
+# L1/L2 cache
 l1_cache = memtable
 l2_cache = diskcache.Cache(os.path.join(DATA_DIR, 'l2cache'))
 
-# WAL書き込み
+# WAL write
 def write_wal(key, value):
+    """Write to Write-Ahead Log."""
     with open(WAL_PATH, 'a') as f:
         f.write(f'{key}\t{value}\n')
 
 @app.route('/put', methods=['POST'])
 def put():
+    """Put key-value pair."""
     key = request.json.get('key')
     value = request.json.get('value')
     bloom.add(key)
@@ -82,6 +87,7 @@ def put():
 
 @app.route('/get', methods=['GET'])
 def get():
+    """Get value for key."""
     key = request.args.get('key')
     if key not in bloom:
         return jsonify({'found': False})
@@ -96,11 +102,13 @@ def get():
 
 @app.route('/compact', methods=['POST'])
 def compact():
+    """Trigger compaction."""
     lsm_compact()
     return jsonify({'status': 'compacted'})
 
 @app.route('/stats', methods=['GET'])
 def stats():
+    """Get statistics."""
     return jsonify({
         'memtable_size': len(memtable),
         'bloom_items': bloom.count,
@@ -109,9 +117,9 @@ def stats():
         'sstable_files': len([f for f in os.listdir(DATA_DIR) if f.startswith('sstable_')])
     })
 
-# バックグラウンド圧縮
-
+# Background compaction
 def compact_worker():
+    """Background compaction worker."""
     while True:
         lsm_compact()
         time.sleep(30)
@@ -119,4 +127,4 @@ def compact_worker():
 threading.Thread(target=compact_worker, daemon=True).start()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=8000, debug=True)

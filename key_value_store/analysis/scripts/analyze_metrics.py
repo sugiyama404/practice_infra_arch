@@ -9,7 +9,7 @@ with open(metrics_path) as f:
     metrics = json.load(f)
 
 names = list(metrics.keys())
-latencies = [metrics[n].get('latency', None) for n in names]
+latencies = [metrics[n].get('latency', 0) or 0 for n in names]
 
 plt.figure(figsize=(10, 5))
 plt.bar(names, latencies, color='skyblue')

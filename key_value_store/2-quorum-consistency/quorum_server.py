@@ -10,6 +10,7 @@ import json
 app = Flask(__name__)
 
 def get_node_configs():
+    # Get Redis node configurations from environment
     redis_nodes_str = os.environ.get("REDIS_NODES", "localhost:6379,localhost:6380,localhost:6381")
     node_configs = []
     for node_addr in redis_nodes_str.split(','):
@@ -19,11 +20,11 @@ def get_node_configs():
 
 NODE_CONFIGS = get_node_configs()
 NODES = [config['port'] for config in NODE_CONFIGS]
-W = 2
-R = 2
-
+W = 2  # Write quorum
+R = 2  # Read quorum
 
 class VectorClock:
+    """Vector clock for consistency."""
     def __init__(self, nodes):
         self.clock = {n: 0 for n in nodes}
     def increment(self, node):
@@ -37,6 +38,7 @@ class VectorClock:
         return str(self.clock)
 
 class KVSNode:
+    """Node in the quorum-based KVS."""
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -50,12 +52,12 @@ class KVSNode:
             return False
     def set(self, key, value, vc):
         self.redis.set(key, value)
-        self.redis.set(f"vc:{key}", str(vc))
+        self.redis.set(f"vc:{key}", json.dumps(vc))  # Use json.dumps to serialize vc
     def get(self, key):
         value = self.redis.get(key)
         vc_str = self.redis.get(f"vc:{key}")
         try:
-            vc = json.loads(vc_str.replace("'", "\"")) if vc_str else None
+            vc = json.loads(vc_str) if vc_str else None
         except (json.JSONDecodeError, AttributeError):
             vc = None
         return value, vc
@@ -70,6 +72,7 @@ nodes = [KVSNode(config['host'], config['port']) for config in NODE_CONFIGS]
 
 # Merkle Tree for integrity
 class KVSIntegrity:
+    """Merkle tree for data integrity verification."""
     def __init__(self):
         self.tree = MerkleTree()
     def update(self, key, value):
@@ -81,17 +84,18 @@ integrity = KVSIntegrity()
 
 @app.route('/write', methods=['POST'])
 def write():
+    # Write with quorum
     key = request.json.get('key')
     value = request.json.get('value')
     alive = [n for n in nodes if n.is_alive()]
     if len(alive) < W:
         return jsonify({'error': 'Quorum not met'}), 500
-    # ベクトルクロック更新
+    # Update vector clock
     for n in alive[:W]:
         n.vc.increment(n.port)
         n.set(key, value, n.vc.get())
         integrity.update(key, value)
-    # 障害ノードへのヒンテッドハンドオフ
+    # Hinted handoff for failed nodes
     for n in nodes:
         if not n.is_alive():
             n.store_hinted(key, value, n.vc.get())
@@ -99,20 +103,21 @@ def write():
 
 @app.route('/read', methods=['GET'])
 def read():
+    # Read with quorum
     key = request.args.get('key')
     alive = [n for n in nodes if n.is_alive()]
     if len(alive) < R:
         return jsonify({'error': 'Quorum not met'}), 500
-    # Rノードから取得
+    # Get from R nodes
     results = []
     vcs = []
     for n in alive[:R]:
         value, vc = n.get(key)
         results.append(value)
         vcs.append(vc)
-    # ベクトルクロック競合検出
+    # Detect conflicts
     if len(set(str(vc) for vc in vcs if vc)) > 1:
-        # リードリペア: 最新値で全ノード修復
+        # Read repair: repair all nodes with latest value
         latest = results[0]
         for n in alive:
             n.set(key, latest, vcs[0])
@@ -121,17 +126,20 @@ def read():
 
 @app.route('/flush_hinted', methods=['POST'])
 def flush_hinted():
+    # Flush hinted handoff data
     for n in nodes:
         n.flush_hinted()
     return jsonify({'status': 'flushed'}), 200
 
 @app.route('/integrity', methods=['GET'])
 def integrity_check():
+    # Check data integrity using Merkle tree
     return jsonify({'merkle_root': integrity.verify()}), 200
 
 @app.route('/status', methods=['GET'])
 def status():
+    # Get node status
     return jsonify({'nodes': [n.is_alive() for n in nodes]}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    app.run(host="0.0.0.0", port=8000, debug=True)

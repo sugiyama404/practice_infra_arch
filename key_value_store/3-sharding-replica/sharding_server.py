@@ -7,8 +7,9 @@ from typing import Dict, List
 
 app = Flask(__name__)
 
-# 仮想ノード付きコンシステントハッシュ
+# Consistent hashing with virtual nodes
 class ShardNode:
+    """Node with master-slave replication."""
     def __init__(self, name, master_port, slave_port):
         self.name = name
         self.master = redis.Redis(host='localhost', port=master_port, decode_responses=True)
@@ -27,11 +28,12 @@ NODES = [
 ]
 
 nodes = {n['name']: ShardNode(n['name'], n['master'], n['slave']) for n in NODES}
-ring = HashRing(list(nodes.keys()), replicas=100)  # 仮想ノード数でホットスポット緩和
+ring = HashRing(list(nodes.keys()), replicas=100)  # Virtual nodes to reduce hotspots
 
-# 動的ノード追加・削除
+# Dynamic node addition/removal
 @app.route('/add_node', methods=['POST'])
 def add_node():
+    # Add a new node to the ring
     name = request.json.get('name')
     master = request.json.get('master')
     slave = request.json.get('slave')
@@ -42,6 +44,7 @@ def add_node():
 
 @app.route('/remove_node', methods=['POST'])
 def remove_node():
+    # Remove a node from the ring
     name = request.json.get('name')
     if name in nodes:
         del nodes[name]
@@ -49,10 +52,10 @@ def remove_node():
         ring._sorted_keys = sorted([ring.gen_key(n) for n in ring.nodes])
     return jsonify({'status': 'removed', 'nodes': ring.nodes})
 
-# データ再分散（Rebalancing）
+# Rebalancing data
 @app.route('/rebalance', methods=['POST'])
 def rebalance():
-    # 簡易: 全キーを新ringで再配置
+    # Simple rebalance: redistribute all keys
     all_keys = []
     for n in nodes.values():
         all_keys += n.master.keys()
@@ -65,9 +68,10 @@ def rebalance():
         nodes[target].master.set(key, value)
     return jsonify({'status': 'rebalanced'})
 
-# 読み書き分離
+# Read-write separation
 @app.route('/write', methods=['POST'])
 def write():
+    # Write to master
     key = request.json.get('key')
     value = request.json.get('value')
     target = ring.get_node(key)
@@ -75,11 +79,12 @@ def write():
     if not node.is_alive():
         return jsonify({'error': 'Node unavailable'}), 500
     node.master.set(key, value)
-    node.slave.set(key, value)  # レプリケーション
+    node.slave.set(key, value)  # Replicate to slave
     return jsonify({'status': 'ok', 'node': target})
 
 @app.route('/read', methods=['GET'])
 def read():
+    # Read from slave
     key = request.args.get('key')
     target = ring.get_node(key)
     node = nodes[target]
@@ -88,11 +93,12 @@ def read():
     value = node.slave.get(key)
     return jsonify({'value': value, 'node': target})
 
-# 障害ノード自動検知と切り替え
+# Automatic failure detection and failover
 @app.route('/status', methods=['GET'])
 def status():
+    # Get health status of nodes
     health = {n: nodes[n].is_alive() for n in nodes}
     return jsonify({'nodes': health})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
