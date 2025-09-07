@@ -53,66 +53,49 @@ python app.py
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "Clients"
-        Client1[Client 1]
-        Client2[Client 2]
-        ClientN[Client N]
-    end
-
-    subgraph "Application"
-        LockServer[Python/Flask Lock Server]
-    end
-
-    subgraph "Data Store"
-        Redis[Redis for Lock Management]
-    end
-
-    Client1 --> LockServer
-    Client2 --> LockServer
-    ClientN --> LockServer
-    LockServer -- "Acquire/Release/Heartbeat" --> Redis
-```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Client 1   │    │  Client 2   │    │  Client N   │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │Python/Flask │
+                  │ Lock Server │
+                  └─────────────┘
+                           │
+                  Acquire/Release/Heartbeat
+                           │
+                  ┌─────────────┐
+                  │    Redis    │
+                  │Lock Mgmt    │
+                  └─────────────┘
 
 **解説:**
 複数のクライアントが、共有リソースへのアクセスを制御するために、Pythonで実装されたロックサーバーにロックの取得・解放をリクエストします。ロックサーバーは、RedlockアルゴリズムとTTL（Time To Live）ベースのリース管理を用いて、Redis上で分散ロックを実現します。これにより、複数のクライアント間での排他制御を保証し、デッドロックや障害発生時にも安全にロックを管理します。
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "Clients"
-        Client1[Client 1]
-        Client2[Client 2]
-        ClientN[Client N]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API Layer"
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            LockServerTask[fa:fa-cube Flask Lock Server Task]
-            ECS -- hosts --> LockServerTask
-        end
-
-        subgraph "Data Store Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "VPC"
-            APIGW --> ECS
-            ECS --> ElastiCache
-        end
-    end
-
-    Client1 --> APIGW
-    Client2 --> APIGW
-    ClientN --> APIGW
-```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Client 1   │    │  Client 2   │    │  Client N   │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │ API Gateway │
+                  └─────────────┘
+                           │
+                  ┌─────────────┐
+                  │ECS on Fargate│
+                  │Flask Lock   │
+                  │ Server Task │
+                  └─────────────┘
+                           │
+                  ┌─────────────┐
+                  │ElastiCache  │
+                  │  for Redis  │
+                  └─────────────┘
 
 **解説:**
 このAWS構成では、分散ロックシステムをAWSのマネージドサービスで構築します。

@@ -18,33 +18,40 @@ Redisを高速なセッションストアとして利用する実装。
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Browser[User's Browser]
-    end
-
-    subgraph "Application Layer"
-        LoadBalancer[Load Balancer]
-        WebApp1[Web App Server 1]
-        WebApp2[Web App Server 2]
-        WebAppN[Web App Server N]
-        LoadBalancer --> WebApp1
-        LoadBalancer --> WebApp2
-        LoadBalancer --> WebAppN
-    end
-
-    subgraph "Session Store"
-        Redis[Redis Session Store]
-    end
-
-    Browser -- "1. Request with Session ID (Cookie)" --> LoadBalancer
-    WebApp1 -- "2. Read/Write Session Data" --> Redis
-    WebApp2 -- "2. Read/Write Session Data" --> Redis
-    WebAppN -- "2. Read/Write Session Data" --> Redis
-    Redis -- "3. Return Session Data" --> WebApp1
-    WebApp1 -- "4. Response" --> Browser
-```
+┌─────────────┐
+│User's Browser│
+└─────────────┘
+       │
+   1. Request with Session ID (Cookie)
+       │
+┌─────────────┐
+│Load Balancer│
+└─────────────┘
+       │
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│Web App Svr 1│    │Web App Svr 2│    │Web App Svr N│
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+   2. Read/Write Session Data
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │    Redis    │
+                  │Session Store│
+                  └─────────────┘
+                           │
+                  3. Return Session Data
+                           │
+                  ┌─────────────┐
+                  │Web App Svr 1│
+                  └─────────────┘
+                           │
+                  4. Response
+                           │
+                  ┌─────────────┐
+                  │User's Browser│
+                  └─────────────┘
 
 **解説:**
 このシステムは、ステートレスなWebアプリケーションでセッション情報を管理するために、外部のセッションストアを利用する構成です。
@@ -57,43 +64,26 @@ graph TD
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Browser[User's Browser]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "Network & Scaling"
-            ALB[fa:fa-sitemap Application Load Balancer]
-            ASG[fa:fa-clone Auto Scaling Group]
-        end
-
-        subgraph "Application Layer"
-            EC2_1[fa:fa-desktop EC2 Instance 1]
-            EC2_2[fa:fa-desktop EC2 Instance 2]
-            EC2_N[fa:fa-desktop EC2 Instance N]
-            ASG -- manages --> EC2_1
-            ASG -- manages --> EC2_2
-            ASG -- manages --> EC2_N
-        end
-
-        subgraph "Session Store"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "VPC"
-            ALB --> EC2_1
-            ALB --> EC2_2
-            ALB --> EC2_N
-            EC2_1 --> ElastiCache
-            EC2_2 --> ElastiCache
-            EC2_N --> ElastiCache
-        end
-    end
-
-    Browser -- "Request" --> ALB
-```
+┌─────────────┐
+│User's Browser│
+└─────────────┘
+       │
+┌─────────────┐
+│Application  │
+│Load Balancer│
+└─────────────┘
+       │
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ EC2 Instance│    │ EC2 Instance│    │ EC2 Instance│
+│     1       │    │     2       │    │     N       │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │ElastiCache  │
+                  │  for Redis  │
+                  └─────────────┘
 
 **解説:**
 このAWS構成は、スケーラブルで高可用なWebアプリケーションのための一般的なアーキテクチャです。

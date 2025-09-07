@@ -53,97 +53,55 @@ python app.py
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "Application"
-        AppServer[Python/Flask API Server with Sharding Logic]
-    end
-
-    subgraph "Data Store (Sharded & Replicated)"
-        Shard1[Shard 1]
-        Master1[Redis Master 1]
-        Slave1[Redis Slave 1]
-        Shard1 --- Master1
-        Master1 --> Slave1
-
-        Shard2[Shard 2]
-        Master2[Redis Master 2]
-        Slave2[Redis Slave 2]
-        Shard2 --- Master2
-        Master2 --> Slave2
-
-        ShardN[Shard N]
-        MasterN[Redis Master N]
-        SlaveN[Redis Slave N]
-        ShardN --- MasterN
-        MasterN --> SlaveN
-    end
-
-    Client --> AppServer
-    AppServer -- "Writes to Master" --> Master1
-    AppServer -- "Writes to Master" --> Master2
-    AppServer -- "Writes to Master" --> MasterN
-    AppServer -- "Reads from Slave" --> Slave1
-    AppServer -- "Reads from Slave" --> Slave2
-    AppServer -- "Reads from Slave" --> SlaveN
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│Python/Flask │
+│API Server   │
+│(Sharding    │
+│ Logic)      │
+└─────────────┘
+       │
+   Writes to Masters
+       │
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Shard 1    │    │  Shard 2    │    │  Shard N    │
+│             │    │             │    │             │
+│Redis Master1│    │Redis Master2│    │Redis MasterN│
+│             │    │             │    │             │
+│Redis Slave1 │    │Redis Slave2 │    │Redis SlaveN │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+   Reads from Slaves
 
 **解説:**
 クライアントからのリクエストは、シャーディングロジックを持つPython/Flask APIサーバーに送られます。このサーバーはコンシステントハッシュ法を用いて、書き込みリクエストを適切なRedisマスターノードに振り分けます。読み込みリクエストは、負荷分散と高可用性のためにスレーブノードに送られます。この構成により、システムの水平スケーリングと読み書き性能の向上が実現されます。
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API Layer"
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            AppTask[fa:fa-cube Flask App Task with Sharding Logic]
-            ECS -- hosts --> AppTask
-        end
-
-        subgraph "Data Store Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-            subgraph "Shard Group 1"
-                Primary1[Primary Node]
-                Replica1[Read Replica]
-                Primary1 --> Replica1
-            end
-            subgraph "Shard Group 2"
-                Primary2[Primary Node]
-                Replica2[Read Replica]
-                Primary2 --> Replica2
-            end
-            subgraph "Shard Group N"
-                PrimaryN[Primary Node]
-                ReplicaN[Read Replica]
-                PrimaryN --> ReplicaN
-            end
-            ElastiCache -- contains --> Primary1
-            ElastiCache -- contains --> Primary2
-            ElastiCache -- contains --> PrimaryN
-        end
-
-        subgraph "VPC"
-            APIGW --> ECS
-            ECS --> ElastiCache
-        end
-    end
-
-    Client --> APIGW
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│ API Gateway │
+└─────────────┘
+       │
+┌─────────────┐
+│ECS on Fargate│
+│Flask App Task│
+│(Sharding    │
+│ Logic)      │
+└─────────────┘
+       │
+┌─────────────┐
+│ElastiCache  │
+│  for Redis  │
+│(Cluster Mode│
+│ Enabled)    │
+└─────────────┘
 
 **解説:**
 このAWS構成では、スケーラブルなKVSをAWSのマネージドサービスで構築します。

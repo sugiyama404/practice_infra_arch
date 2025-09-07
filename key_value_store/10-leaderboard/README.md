@@ -18,28 +18,25 @@ RedisのSorted Setを活用したリアルタイムランキングシステム�
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "Users/Clients"
-        User1[User 1]
-        User2[User 2]
-        UserN[User N]
-    end
-
-    subgraph "Application"
-        AppServer[Python/Flask API Server]
-    end
-
-    subgraph "Data Store"
-        Redis[Redis with Sorted Set]
-    end
-
-    User1 -- "Update Score" --> AppServer
-    User2 -- "View Leaderboard" --> AppServer
-    UserN -- "Check Rank" --> AppServer
-
-    AppServer -- "ZADD, ZREVRANGE, ZRANK" --> Redis
-```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  User 1     │    │  User 2     │    │  User N     │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+   Update Score    View Leaderboard    Check Rank
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │Python/Flask │
+                  │ API Server  │
+                  └─────────────┘
+                           │
+                  ZADD, ZREVRANGE, ZRANK
+                           │
+                  ┌─────────────┐
+                  │    Redis    │
+                  │Sorted Set   │
+                  └─────────────┘
 
 **解説:**
 このシステムは、RedisのSorted Setデータ構造を利用してリアルタイムのランキング（リーダーボード）を実装しています。
@@ -49,37 +46,24 @@ graph TD
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "Users/Clients"
-        User1[User 1]
-        User2[User 2]
-        UserN[User N]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API Layer"
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            Lambda[fa:fa-bolt AWS Lambda]
-        end
-
-        subgraph "Data Store Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "VPC"
-            APIGW --> Lambda
-            Lambda --> ElastiCache
-        end
-    end
-
-    User1 --> APIGW
-    User2 --> APIGW
-    UserN --> APIGW
-```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  User 1     │    │  User 2     │    │  User N     │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │ API Gateway │
+                  └─────────────┘
+                           │
+                  ┌─────────────┐
+                  │ AWS Lambda │
+                  └─────────────┘
+                           │
+                  ┌─────────────┐
+                  │ElastiCache  │
+                  │  for Redis  │
+                  └─────────────┘
 
 **解説:**
 このAWS構成では、リアルタイムランキングシステムをサーバーレスアーキテクチャで構築します。

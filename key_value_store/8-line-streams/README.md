@@ -55,35 +55,36 @@ python app.py
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "Producers"
-        Producer1[Producer 1]
-        Producer2[Producer 2]
-    end
-
-    subgraph "Messaging System"
-        RedisStream[Redis Stream]
-    end
-
-    subgraph "Consumers (Consumer Group)"
-        Consumer1[Consumer 1]
-        Consumer2[Consumer 2]
-        ConsumerN[Consumer N]
-    end
-
-    Producer1 -- "Produce Message" --> RedisStream
-    Producer2 -- "Produce Message" --> RedisStream
-
-    RedisStream -- "Distribute Messages" --> Consumer1
-    RedisStream -- "Distribute Messages" --> Consumer2
-    RedisStream -- "Distribute Messages" --> ConsumerN
-
-    subgraph "Pending Messages Logic"
-        Monitor[Monitor for Pending Messages]
-        Monitor -- "Check & Re-assign" --> RedisStream
-    end
-```
+┌─────────────┐    ┌─────────────┐
+│ Producer 1  │    │ Producer 2  │
+└─────────────┘    └─────────────┘
+       │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  Produce Message
+                           │
+                  ┌─────────────┐
+                  │ Redis Stream│
+                  └─────────────┘
+                           │
+                  Distribute Messages
+                           │
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Consumer 1  │    │ Consumer 2  │    │ Consumer N  │
+└─────────────┘    └─────────────┘    └─────────────┘
+       │                   │                   │
+       └───────────────────┼───────────────────┘
+                           │
+                  ┌─────────────┐
+                  │   Monitor   │
+                  │Pending Msgs │
+                  └─────────────┘
+                           │
+                  Check & Re-assign
+                           │
+                  ┌─────────────┐
+                  │ Redis Stream│
+                  └─────────────┘
 
 **解説:**
 このシステムは、Redis Streamsを利用したメッセージングシステムです。
@@ -94,25 +95,24 @@ graph TD
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "Producers"
-        ProducerApp[fa:fa-cube Producer Application (e.g., on ECS/Lambda)]
-    end
-
-    subgraph "Messaging/Streaming Service"
-        Kinesis[fa:fa-random Amazon Kinesis Data Streams]
-    end
-
-    subgraph "Consumers"
-        ConsumerApp[fa:fa-cube Consumer Application (e.g., on ECS/Lambda)]
-    end
-
-    subgraph "AWS Cloud"
-        ProducerApp -- "PutRecord" --> Kinesis
-        Kinesis -- "GetRecords" --> ConsumerApp
-    end
-```
+┌─────────────┐
+│ Producer App│
+│(ECS/Lambda) │
+└─────────────┘
+       │
+   PutRecord
+       │
+┌─────────────┐
+│Kinesis Data │
+│  Streams    │
+└─────────────┘
+       │
+   GetRecords
+       │
+┌─────────────┐
+│ Consumer App│
+│(ECS/Lambda) │
+└─────────────┘
 
 **解説:**
 Redis Streamsの機能をAWSのマネージドサービスで実現する場合、Amazon Kinesis Data Streamsが最も近い選択肢となります。

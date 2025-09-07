@@ -47,46 +47,26 @@ python app.py
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "Application (KVS Server)"
-        AppServer[Python/Flask API Server]
-
-        subgraph "Write Path"
-            WAL[Write Ahead Log]
-            MemTable[MemTable]
-            AppServer -- "1. Write" --> WAL
-            WAL -- "2. Ack" --> AppServer
-            AppServer -- "3. Write" --> MemTable
-        end
-
-        subgraph "Read Path"
-            BloomFilter[Bloom Filter]
-            L1Cache[L1 Cache]
-            L2Cache[L2 Cache]
-            AppServer -- "1. Check" --> BloomFilter
-            BloomFilter -- "2. May Exist" --> AppServer
-            AppServer -- "3. Read" --> L1Cache
-            L1Cache -- "4. Miss" --> AppServer
-            AppServer -- "5. Read" --> L2Cache
-            L2Cache -- "6. Miss" --> AppServer
-            AppServer -- "7. Read" --> SSTables
-        end
-
-        subgraph "Storage"
-            SSTables[SSTables on Disk]
-            Compaction[Background Compaction Process]
-            MemTable -- "Flush" --> SSTables
-            Compaction -- "Merge & Compact" --> SSTables
-        end
-    end
-
-    Client --> AppServer
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│Python/Flask │
+│ API Server  │
+│(KVS Server) │
+└─────────────┘
+       │
+   Write Path: 1. Write -> WAL -> 2. Ack -> 3. Write -> MemTable
+   Read Path: 1. Check -> Bloom Filter -> 2. May Exist -> 3. Read -> L1 Cache -> 4. Miss -> 5. Read -> L2 Cache -> 6. Miss -> 7. Read -> SSTables
+       │
+┌─────────────┐
+│ SSTables on │
+│    Disk     │
+│             │
+│Background   │
+│Compaction   │
+└─────────────┘
 
 **解説:**
 このシステムは、LSM-Tree（Log-Structured Merge-Tree）ベースのKVSアーキテクチャを実装しています。
@@ -102,36 +82,28 @@ graph TD
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API & Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            AppTask[fa:fa-cube Flask App Task]
-            ECS -- hosts --> AppTask
-        end
-
-        subgraph "Storage Layer"
-            EBS[fa:fa-hdd Amazon EBS]
-            S3[fa:fa-archive Amazon S3 for WAL & SSTable Backup]
-        end
-
-        subgraph "Cache Layer"
-            DAX[fa:fa-bolt Amazon DynamoDB Accelerator (DAX) for Caching]
-        end
-
-        subgraph "VPC"
-            Client --> ECS
-            AppTask -- "attaches" --> EBS
-            AppTask -- "backs up to" --> S3
-            AppTask -- "uses" --> DAX
-        end
-    end
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│ECS on Fargate│
+│Flask App Task│
+└─────────────┘
+       │
+   attaches
+       │
+┌─────────────┐
+│ Amazon EBS  │
+└─────────────┘
+       │
+   backs up to
+       │
+┌─────────────┐
+│ Amazon S3   │
+│(WAL & SSTable│
+│ Backup)     │
+└─────────────┘
 
 **解説:**
 このAWS構成では、LSM-TreeベースのKVSをAWSのサービスで構築します。

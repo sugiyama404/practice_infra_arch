@@ -19,33 +19,48 @@ Cache Miss時のDB読み込み、TTL管理、キャッシュ無効化戦略を�
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "Application"
-        AppServer[Python/Flask API Server]
-    end
-
-    subgraph "Cache"
-        Redis[Redis Cache]
-    end
-
-    subgraph "Database"
-        PostgreSQL[PostgreSQL DB]
-    end
-
-    Client --> AppServer
-    AppServer -- "1. Read Request" --> Redis
-    Redis -- "2. Cache Miss" --> AppServer
-    AppServer -- "3. Read from DB" --> PostgreSQL
-    PostgreSQL -- "4. Return Data" --> AppServer
-    AppServer -- "5. Write to Cache" --> Redis
-    AppServer -- "6. Return Data" --> Client
-
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+   6. Return Data
+       │
+┌─────────────┐
+│Python/Flask │
+│ API Server  │
+└─────────────┘
+       │
+   1. Read Request
+       │
+┌─────────────┐
+│ Redis Cache │
+└─────────────┘
+       │
+   2. Cache Miss
+       │
+┌─────────────┐
+│Python/Flask │
+│ API Server  │
+└─────────────┘
+       │
+   3. Read from DB
+       │
+┌─────────────┐
+│PostgreSQL DB│
+└─────────────┘
+       │
+   4. Return Data
+       │
+┌─────────────┐
+│Python/Flask │
+│ API Server  │
+└─────────────┘
+       │
+   5. Write to Cache
+       │
+┌─────────────┐
+│ Redis Cache │
+└─────────────┘
 
 **解説:**
 このシステムは、キャッシュアサイド（Cache-Aside）パターンを実装しています。
@@ -58,40 +73,32 @@ graph TD
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API Layer"
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            AppTask[fa:fa-cube Flask App Task]
-            ECS -- hosts --> AppTask
-        end
-
-        subgraph "Cache Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "Database Layer"
-            RDS[fa:fa-database Amazon RDS for PostgreSQL]
-        end
-
-        subgraph "VPC"
-            APIGW --> ECS
-            ECS -- "Cache Hit/Miss" --> ElastiCache
-            ECS -- "On Cache Miss" --> RDS
-        end
-    end
-
-    Client --> APIGW
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│ API Gateway │
+└─────────────┘
+       │
+┌─────────────┐
+│ECS on Fargate│
+│Flask App Task│
+└─────────────┘
+       │
+   Cache Hit/Miss
+       │
+┌─────────────┐
+│ElastiCache  │
+│  for Redis  │
+└─────────────┘
+       │
+   On Cache Miss
+       │
+┌─────────────┐
+│RDS for      │
+│PostgreSQL   │
+└─────────────┘
 
 **解説:**
 このAWS構成では、キャッシュアサイドパターンをマネージドサービスで効率的に実現します。

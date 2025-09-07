@@ -18,28 +18,42 @@ Redisを活用したAPIレート制限の実装。
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "Application"
-        RateLimiter[Rate Limiter Middleware]
-        AppServer[Python/Flask API Server]
-    end
-
-    subgraph "Cache"
-        Redis[Redis for Rate Limit Counters]
-    end
-
-    Client --> RateLimiter
-    RateLimiter -- "1. Check Limit" --> Redis
-    Redis -- "2. Allowed/Denied" --> RateLimiter
-    RateLimiter -- "3. Forward if Allowed" --> AppServer
-    RateLimiter -- "4. Reject if Denied (429)" --> Client
-    AppServer --> Client
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+   4. Reject if Denied (429)
+       │
+┌─────────────┐
+│Rate Limiter │
+│Middleware   │
+└─────────────┘
+       │
+   1. Check Limit
+       │
+┌─────────────┐
+│    Redis    │
+│Rate Limit   │
+│ Counters    │
+└─────────────┘
+       │
+   2. Allowed/Denied
+       │
+┌─────────────┐
+│Rate Limiter │
+│Middleware   │
+└─────────────┘
+       │
+   3. Forward if Allowed
+       │
+┌─────────────┐
+│Python/Flask │
+│ API Server  │
+└─────────────┘
+       │
+┌─────────────┐
+│   Client    │
+└─────────────┘
 
 **解説:**
 このシステムは、APIへのリクエストを制御するためのレートリミッターを実装しています。
@@ -51,37 +65,27 @@ graph TD
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "Edge & API Layer"
-            WAF[fa:fa-shield AWS WAF]
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            AppTask[fa:fa-cube Flask App Task]
-            ECS -- hosts --> AppTask
-        end
-
-        subgraph "Cache Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "VPC"
-            APIGW --> ECS
-            ECS --> ElastiCache
-        end
-    end
-
-    Client --> WAF
-    WAF --> APIGW
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│   AWS WAF   │
+└─────────────┘
+       │
+┌─────────────┐
+│ API Gateway │
+└─────────────┘
+       │
+┌─────────────┐
+│ECS on Fargate│
+│Flask App Task│
+└─────────────┘
+       │
+┌─────────────┐
+│ElastiCache  │
+│  for Redis  │
+└─────────────┘
 
 **解説:**
 AWSでは、レート制限を複数のレイヤーで実装することが可能です。

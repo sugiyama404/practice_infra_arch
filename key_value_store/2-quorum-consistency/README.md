@@ -53,64 +53,49 @@ python app.py
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "Application"
-        AppServer[Python/Flask API Server with Quorum Logic]
-    end
-
-    subgraph "Data Store"
-        RedisCluster[Redis Cluster]
-        Redis1[Redis Node 1]
-        Redis2[Redis Node 2]
-        Redis3[Redis Node 3]
-        RedisCluster --- Redis1
-        RedisCluster --- Redis2
-        RedisCluster --- Redis3
-    end
-
-    Client --> AppServer
-    AppServer -- "Writes (W=2), Reads (R=2)" --> RedisCluster
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│Python/Flask │
+│API Server   │
+│(Quorum Logic│
+└─────────────┘
+       │
+   Writes/Reads
+       │
+┌─────────────┐
+│Redis Cluster│
+│             │
+│Redis Node 1 │
+│Redis Node 2 │
+│Redis Node 3 │
+└─────────────┘
 
 **解説:**
 クライアントは、クォーラムロジックを実装したPython/Flask APIサーバーと通信します。このサーバーは、書き込み(W=2)と読み込み(R=2)のクォーラムを保証することで、データの強一貫性を実現します。障害発生時にはヒンテッドハンドオフ、読み込み時にはリードリペアを行い、データの整合性を維持します。データストアとしては3ノードのRedisクラスタが利用されます。
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API Layer"
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            AppTask[fa:fa-cube Flask App Task with Quorum Logic]
-            ECS -- hosts --> AppTask
-        end
-
-        subgraph "Data Store Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "VPC"
-            APIGW --> ECS
-            ECS --> ElastiCache
-        end
-    end
-
-    Client --> APIGW
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│ API Gateway │
+└─────────────┘
+       │
+┌─────────────┐
+│ECS on Fargate│
+│Flask App Task│
+│(Quorum Logic)│
+└─────────────┘
+       │
+┌─────────────┐
+│ElastiCache  │
+│  for Redis  │
+└─────────────┘
 
 **解説:**
 このAWS構成では、オンプレミスの各コンポーネントをAWSのマネージドサービスにマッピングしています。

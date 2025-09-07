@@ -55,64 +55,45 @@ python app.py
 
 ### システム構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "Application"
-        AppServer[Python/Flask API Server]
-    end
-
-    subgraph "Data Store"
-        RedisCluster[Redis Cluster]
-        Redis1[Redis Node 1]
-        Redis2[Redis Node 2]
-        Redis3[Redis Node 3]
-        RedisCluster --- Redis1
-        RedisCluster --- Redis2
-        RedisCluster --- Redis3
-    end
-
-    Client --> AppServer
-    AppServer --> RedisCluster
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│Python/Flask │
+│ API Server  │
+└─────────────┘
+       │
+┌─────────────┐
+│Redis Cluster│
+│             │
+│Redis Node 1 │
+│Redis Node 2 │
+│Redis Node 3 │
+└─────────────┘
 
 **解説:**
 ユーザーからのリクエストは、まずPythonで実装されたAPIサーバーに到達します。APIサーバーは、データの永続化と取得のためにRedisクラスタと通信します。このアーキテクチャは、Coordinator Ringパターンを実装しており、APIサーバーがノード管理、リーダー選出、障害検知などの役割を担い、Redisクラスタの各ノードと連携して強一貫性を保証します。
 
 ### AWS構成図
 
-```mermaid
-graph TD
-    subgraph "User"
-        Client[Client]
-    end
-
-    subgraph "AWS Cloud"
-        subgraph "API Layer"
-            APIGW[fa:fa-server API Gateway]
-        end
-
-        subgraph "Application Layer"
-            ECS[fa:fa-cubes Amazon ECS on Fargate]
-            AppTask[fa:fa-cube Flask App Task]
-            ECS -- hosts --> AppTask
-        end
-
-        subgraph "Data Store Layer"
-            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
-        end
-
-        subgraph "VPC"
-            APIGW --> ECS
-            ECS --> ElastiCache
-        end
-    end
-
-    Client --> APIGW
-```
+┌─────────────┐
+│   Client    │
+└─────────────┘
+       │
+┌─────────────┐
+│ API Gateway │
+└─────────────┘
+       │
+┌─────────────┐
+│ECS on Fargate│
+│Flask App Task│
+└─────────────┘
+       │
+┌─────────────┐
+│ElastiCache  │
+│  for Redis  │
+└─────────────┘
 
 **解説:**
 このAWS構成では、オンプレミスの各コンポーネントをAWSのマネージドサービスにマッピングしています。
