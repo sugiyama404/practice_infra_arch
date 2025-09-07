@@ -1,1 +1,3 @@
 redis
+flask
+hash_ring

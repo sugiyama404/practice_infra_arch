@@ -1,4 +1,4 @@
-# bloom-sstable pattern
+from bloom_sstable_server import app
 
 if __name__ == "__main__":
-    print("Bloom SSTable pattern sample.")
+    app.run(host="0.0.0.0", port=5000)

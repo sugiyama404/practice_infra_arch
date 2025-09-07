@@ -1,4 +1,4 @@
-# sharding-replica pattern
+from sharding_server import app
 
 if __name__ == "__main__":
-    print("Sharding Replica pattern sample.")
+    app.run(host="0.0.0.0", port=5000)
