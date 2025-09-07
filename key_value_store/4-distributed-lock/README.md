@@ -48,3 +48,80 @@ python app.py
 - TTLリースでデッドロック・障害ノード時の自動解放
 - 待機キューで公平な排他制御
 - ハートビートでリース延長・障害検知
+
+---
+
+### システム構成図
+
+```mermaid
+graph TD
+    subgraph "Clients"
+        Client1[Client 1]
+        Client2[Client 2]
+        ClientN[Client N]
+    end
+
+    subgraph "Application"
+        LockServer[Python/Flask Lock Server]
+    end
+
+    subgraph "Data Store"
+        Redis[Redis for Lock Management]
+    end
+
+    Client1 --> LockServer
+    Client2 --> LockServer
+    ClientN --> LockServer
+    LockServer -- "Acquire/Release/Heartbeat" --> Redis
+```
+
+**解説:**
+複数のクライアントが、共有リソースへのアクセスを制御するために、Pythonで実装されたロックサーバーにロックの取得・解放をリクエストします。ロックサーバーは、RedlockアルゴリズムとTTL（Time To Live）ベースのリース管理を用いて、Redis上で分散ロックを実現します。これにより、複数のクライアント間での排他制御を保証し、デッドロックや障害発生時にも安全にロックを管理します。
+
+### AWS構成図
+
+```mermaid
+graph TD
+    subgraph "Clients"
+        Client1[Client 1]
+        Client2[Client 2]
+        ClientN[Client N]
+    end
+
+    subgraph "AWS Cloud"
+        subgraph "API Layer"
+            APIGW[fa:fa-server API Gateway]
+        end
+
+        subgraph "Application Layer"
+            ECS[fa:fa-cubes Amazon ECS on Fargate]
+            LockServerTask[fa:fa-cube Flask Lock Server Task]
+            ECS -- hosts --> LockServerTask
+        end
+
+        subgraph "Data Store Layer"
+            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
+        end
+
+        subgraph "VPC"
+            APIGW --> ECS
+            ECS --> ElastiCache
+        end
+    end
+
+    Client1 --> APIGW
+    Client2 --> APIGW
+    ClientN --> APIGW
+```
+
+**解説:**
+このAWS構成では、分散ロックシステムをAWSのマネージドサービスで構築します。
+
+*   **Python/Flask Lock Server → Amazon ECS on Fargate:**
+    ロックサーバーアプリケーションは、コンテナ化してECS on Fargateで実行します。これにより、サーバーのプロビジョニングや管理が不要になり、リクエスト数に応じて自動的にスケールすることが可能です。
+*   **Redis → Amazon ElastiCache for Redis:**
+    ロック情報の管理に使用するRedisは、フルマネージドサービスのAmazon ElastiCache for Redisに置き換えます。ElastiCacheは高可用性構成を容易に組むことができ、Redlockアルゴリズムが必要とする複数の独立したRedisノードを提供できます。
+*   **Client Access → Amazon API Gateway:**
+    API Gatewayを介してロックサーバーにアクセスすることで、認証、リクエストの流量制御、ロギングなどの機能を利用でき、システムの信頼性とセキュリティを高めます。
+
+この構成により、スケーラブルで信頼性の高い分散ロックサービスをAWS上で効率的に運用することができます。

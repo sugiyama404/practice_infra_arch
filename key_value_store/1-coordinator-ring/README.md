@@ -1,11 +1,11 @@
 # 1-coordinator-ring
 
 ## 概要
-分散KVSのCoordinator Ringパターン実装例。各ノードは円環状に管理され、リーダー選出・障害検知・ベクトルクロックによるバージョン管理を行い、CAP定理のCP特性（強一貫性・可用性）を重視しています。
+分散KVSのリーダー選出モデルの実装例。各ノードはリーダーとフォロワーで構成され、リーダーが全ての読み書きを処理します。リーダー選出・障害検知・ベクトルクロックによるバージョン管理を行い、CAP定理のCP特性（強一貫性・可用性）を重視しています。
 
 ## 構成
-- Redis 3ノードクラスタ（docker-composeで起動）
-- Python/Flask APIサーバ（app.py）
+- Redis 3ノード（docker-composeで起動）
+- Python/Flask APIサーバ（app.py） - リーダー選出、障害検知、ベクトルクロック、強一貫性APIを管理するコーディネーターとして機能
 - ノード管理・リーダー選出・障害検知・ベクトルクロック・強一貫性API
 
 ## 機能
@@ -50,3 +50,78 @@ python app.py
 - リーダーは常に生存ノードから自動選出
 - ベクトルクロックでデータ競合・障害復旧時の整合性を担保
 - CP特性（強一貫性・可用性）を優先し、分断時は書き込み拒否
+
+---
+
+### システム構成図
+
+```mermaid
+graph TD
+    subgraph "User"
+        Client[Client]
+    end
+
+    subgraph "Application"
+        AppServer[Python/Flask API Server]
+    end
+
+    subgraph "Data Store"
+        RedisCluster[Redis Cluster]
+        Redis1[Redis Node 1]
+        Redis2[Redis Node 2]
+        Redis3[Redis Node 3]
+        RedisCluster --- Redis1
+        RedisCluster --- Redis2
+        RedisCluster --- Redis3
+    end
+
+    Client --> AppServer
+    AppServer --> RedisCluster
+```
+
+**解説:**
+ユーザーからのリクエストは、まずPythonで実装されたAPIサーバーに到達します。APIサーバーは、データの永続化と取得のためにRedisクラスタと通信します。このアーキテクチャは、Coordinator Ringパターンを実装しており、APIサーバーがノード管理、リーダー選出、障害検知などの役割を担い、Redisクラスタの各ノードと連携して強一貫性を保証します。
+
+### AWS構成図
+
+```mermaid
+graph TD
+    subgraph "User"
+        Client[Client]
+    end
+
+    subgraph "AWS Cloud"
+        subgraph "API Layer"
+            APIGW[fa:fa-server API Gateway]
+        end
+
+        subgraph "Application Layer"
+            ECS[fa:fa-cubes Amazon ECS on Fargate]
+            AppTask[fa:fa-cube Flask App Task]
+            ECS -- hosts --> AppTask
+        end
+
+        subgraph "Data Store Layer"
+            ElastiCache[fa:fa-database Amazon ElastiCache for Redis]
+        end
+
+        subgraph "VPC"
+            APIGW --> ECS
+            ECS --> ElastiCache
+        end
+    end
+
+    Client --> APIGW
+```
+
+**解説:**
+このAWS構成では、オンプレミスの各コンポーネントをAWSのマネージドサービスにマッピングしています。
+
+*   **Python/Flask API Server → Amazon ECS on Fargate:**
+    コンテナ化されたアプリケーションをサーバーレスで実行するためにECS on Fargateを選択します。これにより、インフラのプロビジョニングや管理の手間が削減され、スケーラビリティが向上します。
+*   **Redis Cluster → Amazon ElastiCache for Redis:**
+    フルマネージドなRedisサービスであるElastiCacheを利用することで、Redisクラスタのセットアップ、運用、スケーリングが容易になります。高可用性とパフォーマンスを提供します。
+*   **Client Access → Amazon API Gateway:**
+    API Gatewayをシステムのフロントに配置することで、APIの保護、スロットリング、モニタリングなどの機能を利用できます。
+
+この構成により、可用性、スケーラビリティ、運用効率に優れたシステムをAWS上に構築できます。

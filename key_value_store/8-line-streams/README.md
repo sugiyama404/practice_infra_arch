@@ -50,3 +50,78 @@ python app.py
 - Redis StreamsはIDベースで順序・永続性を保証
 - Consumer Groupで高スループット・障害復旧
 - 未処理・重複・容量制限もAPIで管理可能
+
+---
+
+### システム構成図
+
+```mermaid
+graph TD
+    subgraph "Producers"
+        Producer1[Producer 1]
+        Producer2[Producer 2]
+    end
+
+    subgraph "Messaging System"
+        RedisStream[Redis Stream]
+    end
+
+    subgraph "Consumers (Consumer Group)"
+        Consumer1[Consumer 1]
+        Consumer2[Consumer 2]
+        ConsumerN[Consumer N]
+    end
+
+    Producer1 -- "Produce Message" --> RedisStream
+    Producer2 -- "Produce Message" --> RedisStream
+
+    RedisStream -- "Distribute Messages" --> Consumer1
+    RedisStream -- "Distribute Messages" --> Consumer2
+    RedisStream -- "Distribute Messages" --> ConsumerN
+
+    subgraph "Pending Messages Logic"
+        Monitor[Monitor for Pending Messages]
+        Monitor -- "Check & Re-assign" --> RedisStream
+    end
+```
+
+**解説:**
+このシステムは、Redis Streamsを利用したメッセージングシステムです。
+*   **Producers:** メッセージを生成し、Redis Streamに送信します。
+*   **Redis Stream:** メッセージを永続的に保存し、順序を保証するログ構造のデータストアです。
+*   **Consumers:** コンシューマーグループを形成し、ストリームからメッセージを並行して受信・処理します。コンシューマーグループの機能により、各メッセージはグループ内の一つのコンシューマーにのみ配信されることが保証されます。
+*   **Pending Messages Logic:** あるコンシューマーがメッセージの処理に失敗したり、クラッシュした場合、そのメッセージは「ペンディング（未処理）」状態になります。監視プロセスがこれらのペンディングメッセージを検出し、他のアクティブなコンシューマーに再割り当てすることで、メッセージの処理を保証します。
+
+### AWS構成図
+
+```mermaid
+graph TD
+    subgraph "Producers"
+        ProducerApp[fa:fa-cube Producer Application (e.g., on ECS/Lambda)]
+    end
+
+    subgraph "Messaging/Streaming Service"
+        Kinesis[fa:fa-random Amazon Kinesis Data Streams]
+    end
+
+    subgraph "Consumers"
+        ConsumerApp[fa:fa-cube Consumer Application (e.g., on ECS/Lambda)]
+    end
+
+    subgraph "AWS Cloud"
+        ProducerApp -- "PutRecord" --> Kinesis
+        Kinesis -- "GetRecords" --> ConsumerApp
+    end
+```
+
+**解説:**
+Redis Streamsの機能をAWSのマネージドサービスで実現する場合、Amazon Kinesis Data Streamsが最も近い選択肢となります。
+
+*   **Redis Stream → Amazon Kinesis Data Streams:**
+    Kinesis Data Streamsは、リアルタイムで大量のデータを収集・処理・分析するためのスケーラブルで耐久性のあるストリーミングサービスです。シャード（Kinesis内の処理単位）を追加することでスループットをスケールでき、データの順序保証や複数コンシューマーによる並列処理をサポートします。これはRedis Streamsの機能と非常によく似ています。
+*   **Producers & Consumers → AWS Lambda / Amazon ECS:**
+    メッセージを生成するプロデューサーと、それを処理するコンシューマーは、サーバーレスのAWS LambdaやコンテナサービスのAmazon ECSなどで実装します。Kinesis Data StreamsとLambdaはネイティブに統合されており、ストリームにデータが到着すると自動的にLambda関数をトリガーすることができます。これにより、サーバーの管理なしでスケーラブルなストリーム処理アプリケーションを簡単に構築できます。
+*   **Consumer Group & Failover:**
+    Kinesisでは、複数のコンシューマーアプリケーションが同じストリームからデータを読み取ることができます。各コンシューマーは自身がどこまで読み取ったかを管理します（チェックポインティング）。障害が発生した場合、別のインスタンスが処理を引き継ぐことでフェイルオーバーを実現します。これはRedis Streamsのコンシューマーグループとペンディングメッセージの再配信機能に相当します。
+
+この構成により、高スループットで信頼性の高いリアルタイムメッセージングシステムを、運用負荷を抑えながらAWS上に構築できます。

@@ -4,11 +4,24 @@ import time
 from flask import Flask, request, jsonify
 from merklelib import MerkleTree
 from typing import Dict, List
+import os
+import json
 
 app = Flask(__name__)
-NODES = [6379, 6380, 6381]
+
+def get_node_configs():
+    redis_nodes_str = os.environ.get("REDIS_NODES", "localhost:6379,localhost:6380,localhost:6381")
+    node_configs = []
+    for node_addr in redis_nodes_str.split(','):
+        host, port = node_addr.split(':')
+        node_configs.append({"host": host, "port": int(port)})
+    return node_configs
+
+NODE_CONFIGS = get_node_configs()
+NODES = [config['port'] for config in NODE_CONFIGS]
 W = 2
 R = 2
+
 
 class VectorClock:
     def __init__(self, nodes):
@@ -24,9 +37,10 @@ class VectorClock:
         return str(self.clock)
 
 class KVSNode:
-    def __init__(self, port):
+    def __init__(self, host, port):
+        self.host = host
         self.port = port
-        self.redis = redis.Redis(host='localhost', port=port, decode_responses=True)
+        self.redis = redis.Redis(host=self.host, port=self.port, decode_responses=True)
         self.vc = VectorClock(NODES)
         self.hinted_handoff = {}
     def is_alive(self):
@@ -39,8 +53,12 @@ class KVSNode:
         self.redis.set(f"vc:{key}", str(vc))
     def get(self, key):
         value = self.redis.get(key)
-        vc = self.redis.get(f"vc:{key}")
-        return value, eval(vc) if vc else None
+        vc_str = self.redis.get(f"vc:{key}")
+        try:
+            vc = json.loads(vc_str.replace("'", "\"")) if vc_str else None
+        except (json.JSONDecodeError, AttributeError):
+            vc = None
+        return value, vc
     def store_hinted(self, key, value, vc):
         self.hinted_handoff[key] = (value, vc)
     def flush_hinted(self):
@@ -48,7 +66,7 @@ class KVSNode:
             self.set(key, value, vc)
         self.hinted_handoff.clear()
 
-nodes = [KVSNode(port) for port in NODES]
+nodes = [KVSNode(config['host'], config['port']) for config in NODE_CONFIGS]
 
 # Merkle Tree for integrity
 class KVSIntegrity:
@@ -116,4 +134,4 @@ def status():
     return jsonify({'nodes': [n.is_alive() for n in nodes]}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8000)

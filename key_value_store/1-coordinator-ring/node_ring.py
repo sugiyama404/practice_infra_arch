@@ -19,14 +19,15 @@ class VectorClock:
         return self.clock.copy()
 
 class Node:
-    def __init__(self, name: str, redis_port: int, nodes: List[str]):
+    def __init__(self, name: str, redis_host: str, redis_port: int, nodes: List[str]):
         self.name = name
+        self.redis_host = redis_host
         self.redis_port = redis_port
         self.nodes = nodes
         self.vector_clock = VectorClock(nodes)
         self.is_leader = False
         self.alive = True
-        self.redis_client = redis.Redis(host='localhost', port=redis_port, decode_responses=True)
+        self.redis_client = redis.Redis(host=self.redis_host, port=self.redis_port, decode_responses=True)
 
     def health_check(self):
         try:
@@ -38,8 +39,9 @@ class Node:
         self.alive = self.health_check()
 
 class CoordinatorRing:
-    def __init__(self, node_ports: Dict[str, int]):
-        self.nodes = {name: Node(name, port, list(node_ports.keys())) for name, port in node_ports.items()}
+    def __init__(self, node_configs: Dict[str, Dict[str, any]]):
+        node_names = list(node_configs.keys())
+        self.nodes = {name: Node(name, config['host'], config['port'], node_names) for name, config in node_configs.items()}
         self.ring = list(self.nodes.keys())
         self.leader = None
         self.lock = threading.Lock()
@@ -54,11 +56,6 @@ class CoordinatorRing:
                 self.nodes[n].is_leader = (n == self.leader)
         else:
             self.leader = None
-
-    def route_request(self, key: str):
-        # Hash-based ring routing
-        idx = hash(key) % len(self.ring)
-        return self.ring[idx]
 
     def vector_clock(self, node: str):
         return self.nodes[node].vector_clock.get()

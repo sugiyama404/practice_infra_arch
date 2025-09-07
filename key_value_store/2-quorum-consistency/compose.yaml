@@ -9,20 +9,20 @@ services:
       - redis-node2
       - redis-node3
     environment:
-      - REDIS_NODES=redis-node1:6388,redis-node2:6389,redis-node3:6390
+      - REDIS_NODES=redis-node1:6379,redis-node2:6379,redis-node3:6379
 
   redis-node1:
     image: redis:latest
     ports:
-      - "6388:6379"
+      - "6379:6379"
     command: redis-server --port 6379
   redis-node2:
     image: redis:latest
     ports:
-      - "6389:6379"
+      - "6380:6379"
     command: redis-server --port 6379
   redis-node3:
     image: redis:latest
     ports:
-      - "6390:6379"
+      - "6381:6379"
     command: redis-server --port 6379
