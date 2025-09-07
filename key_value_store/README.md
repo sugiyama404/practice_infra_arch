@@ -1,12 +1,81 @@
-# redis-kvs-patterns
+# Redis KVS Patterns
 
-このリポジトリは、Redisを活用したKVS設計パターンのサンプル集です。各ディレクトリは独立した設計例を含みます。
+このリポジトリは、Redisを活用した分散キーバリューストア（KVS）の設計パターンのサンプル集です。各ディレクトリは独立した設計例を含み、分散システムの様々な課題（一貫性、可用性、スケーラビリティ、障害耐性など）に対する実装パターンを示しています。
+
+## 概要
+
+分散KVSは、CAP定理（Consistency, Availability, Partition Tolerance）のトレードオフを考慮した設計が重要です。このリポジトリでは、Redisを基盤とした7つのパターンを提供し、それぞれが異なるCAP特性やユースケースに対応しています。
+
+- **Coordinator Ring**: CP特性（強一貫性・可用性）を重視したリーダー選出とベクトルクロックによるバージョン管理
+- **Gmail Pub/Sub**: AP特性（可用性・分断耐性）を重視したリアルタイム通知システム
+- **Line Streams**: CP特性をRedis Streamsで実現した永続化メッセージング
+- **Quorum Consistency**: W+R>Nクォーラムによる強一貫性とヒンテッドハンドオフ
+- **Sharding Replica**: コンシステントハッシュとレプリケーションによるスケーラビリティ
+- **Distributed Lock**: Redlockアルゴリズムによる分散排他制御
+- **Bloom SSTable**: LSM-Tree風の永続化とブルームフィルタによるパフォーマンス最適化
 
 ## パターン一覧
-1. coordinator-ring
-2. gmail-pubsub
-3. line-streams
-4. quorum-consistency
-5. sharding-replica
-6. distributed-lock
-7. bloom-sstable
+
+### 1. coordinator-ring
+分散KVSのCoordinator Ringパターン実装例。各ノードは円環状に管理され、リーダー選出・障害検知・ベクトルクロックによるバージョン管理を行い、CAP定理のCP特性（強一貫性・可用性）を重視しています。
+
+### 2. gmail-pubsub
+GmailライクなPub/Subリアルタイム通知システムの実装例。Redis Pub/SubとWebSocketを活用し、複数トピック・購読者管理・メッセージフィルタ・バックプレッシャー対応を備えています。
+
+### 3. line-streams
+LINE風のRedis Streams永続化メッセージングシステム実装例。Consumer Groupによる並列処理、順序保証、障害復旧・フェイルオーバー・重複検知・容量制限を備えています。
+
+### 4. quorum-consistency
+W+R>Nのクォーラム設定による強一貫性KVS実装例。ベクトルクロック競合検出・ヒンテッドハンドオフ・リードリペア・Merkle Tree整合性検証を備えています。
+
+### 5. sharding-replica
+コンシステントハッシュ＋マスター・スレーブレプリケーションによるスケーラブルKVS実装例。ホットスポット回避・オートスケーリング・読み書き分離・障害検知・再分散を備えています。
+
+### 6. distributed-lock
+Redlockアルゴリズム＋TTLリース管理による分散排他制御システム実装例。デッドロック回避・障害ノード対応・統計監視・待機キューを備えています。
+
+### 7. bloom-sstable
+ブルームフィルタ＋SSTableライクな永続化・LSM-Tree圧縮によるパフォーマンス最適化KVS実装例。コミットログ・メモリテーブル・キャッシュ階層・非同期圧縮を備えています。
+
+## 共通のセットアップ方法
+
+各パターンは独立して動作します。基本的なセットアップ手順は以下の通りです：
+
+1. **依存関係のインストール**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Redisの起動**（必要に応じて）
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **APIサーバの起動**
+   ```bash
+   python app.py
+   ```
+
+各ディレクトリの詳細なセットアップとAPI仕様は、それぞれの`README.md`を参照してください。
+
+## 技術スタック
+
+- **言語**: Python 3.x
+- **フレームワーク**: Flask, Flask-SocketIO
+- **データベース**: Redis
+- **コンテナ化**: Docker, Docker Compose
+- **その他**: ベクトルクロック, コンシステントハッシュ, Redlock, LSM-Tree, ブルームフィルタなど
+
+## 学習目的
+
+このリポジトリは、分散システムの設計パターンを学ぶためのものです。各パターンは以下の観点で実装されています：
+
+- CAP定理の理解とトレードオフ
+- Redisの高度な活用方法
+- 障害耐性と可用性の確保
+- スケーラビリティの設計
+- 実世界のユースケースへの適用
+
+## 貢献
+
+このリポジトリは学習目的で作成されています。改善点や新しいパターンの提案は歓迎します。
