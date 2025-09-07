@@ -1,81 +1,144 @@
-# Redis KVS Patterns
+# Redis Key-Value Store 設計パターンカタログ
 
-このリポジトリは、Redisを活用した分散キーバリューストア（KVS）の設計パターンのサンプル集です。各ディレクトリは独立した設計例を含み、分散システムの様々な課題（一貫性、可用性、スケーラビリティ、障害耐性など）に対する実装パターンを示しています。
+## 🏗️ 分散システム基盤パターン
 
-## 概要
+### 1. coordinator-ring - 分散協調制御
+```
+用途: リーダー選出、障害検知、ノード管理
+キー設計: ring:nodes, leader:current, heartbeat:{node_id}
+実装技術: ベクトルクロック、リーダー選出アルゴリズム
+応用例: 分散データベースのコーディネータノード
+```
 
-分散KVSは、CAP定理（Consistency, Availability, Partition Tolerance）のトレードオフを考慮した設計が重要です。このリポジトリでは、Redisを基盤とした7つのパターンを提供し、それぞれが異なるCAP特性やユースケースに対応しています。
+### 2. quorum-consistency - 強一貫性制御
+```
+用途: W+R>N クォーラムによるデータ一貫性保証
+キー設計: data:{key}:v{version}, replica:{node}:{key}
+実装技術: ベクトルクロック、ヒンテッドハンドオフ、リードリペア
+応用例: 金融システム、在庫管理システム
+```
 
-- **Coordinator Ring**: CP特性（強一貫性・可用性）を重視したリーダー選出とベクトルクロックによるバージョン管理
-- **Gmail Pub/Sub**: AP特性（可用性・分断耐性）を重視したリアルタイム通知システム
-- **Line Streams**: CP特性をRedis Streamsで実現した永続化メッセージング
-- **Quorum Consistency**: W+R>Nクォーラムによる強一貫性とヒンテッドハンドオフ
-- **Sharding Replica**: コンシステントハッシュとレプリケーションによるスケーラビリティ
-- **Distributed Lock**: Redlockアルゴリズムによる分散排他制御
-- **Bloom SSTable**: LSM-Tree風の永続化とブルームフィルタによるパフォーマンス最適化
+### 3. sharding-replica - 分散・レプリケーション
+```
+用途: コンシステントハッシュによるデータ分散とレプリケーション
+キー設計: shard:{hash_slot}:{key}, replica:{shard}:{node}
+実装技術: コンシステントハッシュ、仮想ノード、オートスケーリング
+応用例: Amazon DynamoDB、Apache Cassandra
+```
 
-## パターン一覧
+### 4. distributed-lock - 分散排他制御
+```
+用途: 複数ノード間での排他的リソースアクセス
+キー設計: lock:{resource_id}:{client_id}, lease:{resource_id}
+実装技術: Redlockアルゴリズム、TTL、デッドロック検知
+応用例: 分散バッチ処理、リソース予約システム
+```
 
-### 1. coordinator-ring
-分散KVSのCoordinator Ringパターン実装例。各ノードは円環状に管理され、リーダー選出・障害検知・ベクトルクロックによるバージョン管理を行い、CAP定理のCP特性（強一貫性・可用性）を重視しています。
+## ⚡ パフォーマンス最適化パターン
 
-### 2. gmail-pubsub
-GmailライクなPub/Subリアルタイム通知システムの実装例。Redis Pub/SubとWebSocketを活用し、複数トピック・購読者管理・メッセージフィルタ・バックプレッシャー対応を備えています。
+### 5. cache-aside - キャッシュサイドパターン
+```
+用途: 読み取り性能最適化、DB負荷軽減
+キー設計: cache:{entity_type}:{id}, ttl:{entity_type}
+実装技術: TTL管理、Cache Warming、Cache Stampede対策
+応用例: Webアプリケーションキャッシュ、APIレスポンス高速化
+```
 
-### 3. line-streams
-LINE風のRedis Streams永続化メッセージングシステム実装例。Consumer Groupによる並列処理、順序保証、障害復旧・フェイルオーバー・重複検知・容量制限を備えています。
+### 6. bloom-sstable - ストレージ最適化
+```
+用途: ディスクI/O削減、存在チェック高速化
+キー設計: bloom:{partition}, sstable:{level}:{partition}, memtable:{key}
+実装技術: ブルームフィルタ、LSM-Tree、コンパクション
+応用例: LevelDB、RocksDB、Apache Cassandra
+```
 
-### 4. quorum-consistency
-W+R>Nのクォーラム設定による強一貫性KVS実装例。ベクトルクロック競合検出・ヒンテッドハンドオフ・リードリペア・Merkle Tree整合性検証を備えています。
+### 7. rate-limiting - レート制限
+```
+用途: API過剰利用防止、システム保護
+キー設計: rate:{user_id}:{window}, tokens:{user_id}, counter:{api}:{window}
+実装技術: Token Bucket、Sliding Window Log、Fixed Window Counter
+応用例: API Gateway、マイクロサービス間通信制御
+```
 
-### 5. sharding-replica
-コンシステントハッシュ＋マスター・スレーブレプリケーションによるスケーラブルKVS実装例。ホットスポット回避・オートスケーリング・読み書き分離・障害検知・再分散を備えています。
+## 🔄 メッセージング・ストリーミングパターン
 
-### 6. distributed-lock
-Redlockアルゴリズム＋TTLリース管理による分散排他制御システム実装例。デッドロック回避・障害ノード対応・統計監視・待機キューを備えています。
+### 8. line-streams - Redis Streams応用
+```
+用途: 永続化メッセージング、順序保証されたデータストリーム
+キー設計: stream:{topic}, consumer:{group}:{consumer_id}
+実装技術: Consumer Groups、XADD/XREAD、障害復旧機構
+応用例: イベントログ、メッセージキュー、リアルタイム分析
+```
 
-### 7. bloom-sstable
-ブルームフィルタ＋SSTableライクな永続化・LSM-Tree圧縮によるパフォーマンス最適化KVS実装例。コミットログ・メモリテーブル・キャッシュ階層・非同期圧縮を備えています。
+## 🎮 アプリケーション応用パターン
 
-## 共通のセットアップ方法
+### 9. session-store - セッションストア
+```
+用途: Webアプリケーションのセッション管理
+キー設計: session:{session_id}, user_sessions:{user_id}
+実装技術: JSON直列化、TTL自動延長、セッション共有
+応用例: ログイン状態管理、ショッピングカート、マルチデバイス対応
+```
 
-各パターンは独立して動作します。基本的なセットアップ手順は以下の通りです：
+### 10. leaderboard - ランキングシステム
+```
+用途: リアルタイムランキング、スコア管理
+キー設計: rank:{game_id}:{period}, user_score:{user_id}, top_players
+実装技術: Sorted Set (ZADD/ZREVRANK)、時間窓スコア集計
+応用例: ゲームランキング、SNSいいね数、売上ランキング
+```
 
-1. **依存関係のインストール**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 📋 パターン選択ガイド
 
-2. **Redisの起動**（必要に応じて）
-   ```bash
-   docker-compose up -d
-   ```
+### データ一貫性重視
+- **coordinator-ring** + **quorum-consistency** + **distributed-lock**
+- 用途: 金融、在庫管理、予約システム
 
-3. **APIサーバの起動**
-   ```bash
-   python app.py
-   ```
+### 高可用性・性能重視  
+- **sharding-replica** + **cache-aside** + **bloom-sstable**
+- 用途: SNS、ECサイト、コンテンツ配信
 
-各ディレクトリの詳細なセットアップとAPI仕様は、それぞれの`README.md`を参照してください。
+### リアルタイム処理重視
+- **line-streams** + **rate-limiting** + **leaderboard**
+- 用途: チャット、ゲーム、ライブ配信
 
-## 技術スタック
+### セッション管理重視
+- **session-store** + **distributed-lock** + **cache-aside**
+- 用途: Webアプリ、API認証、マルチテナント
 
-- **言語**: Python 3.x
-- **フレームワーク**: Flask, Flask-SocketIO
-- **データベース**: Redis
-- **コンテナ化**: Docker, Docker Compose
-- **その他**: ベクトルクロック, コンシステントハッシュ, Redlock, LSM-Tree, ブルームフィルタなど
+## 🔧 技術スタック対応表
 
-## 学習目的
+| パターン | Redis機能 | 代替技術 | 学習難易度 |
+|---------|----------|---------|----------|
+| coordinator-ring | Hash, Pub/Sub | etcd, ZooKeeper | ★★★★★ |
+| quorum-consistency | Hash, Script | Cassandra, DynamoDB | ★★★★★ |
+| sharding-replica | Cluster, Sentinel | MongoDB, Elasticsearch | ★★★★☆ |
+| distributed-lock | String, TTL | etcd, Consul | ★★★☆☆ |
+| cache-aside | String, Hash | Memcached, Hazelcast | ★★☆☆☆ |
+| bloom-sstable | BitField, Hash | LevelDB, RocksDB | ★★★★☆ |
+| rate-limiting | String, Script | Nginx, API Gateway | ★★★☆☆ |
+| line-streams | Streams | Apache Kafka, Pulsar | ★★★☆☆ |
+| session-store | Hash, TTL | MongoDB, PostgreSQL | ★★☆☆☆ |
+| leaderboard | Sorted Set | Elasticsearch, InfluxDB | ★★☆☆☆ |
 
-このリポジトリは、分散システムの設計パターンを学ぶためのものです。各パターンは以下の観点で実装されています：
+## 🎯 実装優先度マトリックス
 
-- CAP定理の理解とトレードオフ
-- Redisの高度な活用方法
-- 障害耐性と可用性の確保
-- スケーラビリティの設計
-- 実世界のユースケースへの適用
+### 高頻出 × 基本理解必須
+1. **cache-aside** - 最も一般的なパターン
+2. **session-store** - Webアプリの基本
+3. **distributed-lock** - 分散システムの基本
 
-## 貢献
+### 高頻出 × 専門知識必要
+4. **sharding-replica** - スケーラビリティの核心
+5. **rate-limiting** - システム保護の要
+6. **leaderboard** - 高性能ランキング
 
-このリポジトリは学習目的で作成されています。改善点や新しいパターンの提案は歓迎します。
+### 中頻出 × 深い理解必要
+7. **line-streams** - 現代的メッセージング
+8. **bloom-sstable** - パフォーマンス最適化
+
+### 低頻出 × 専門性高い
+9. **coordinator-ring** - 分散システム設計の核心
+10. **quorum-consistency** - 一貫性理論の実践
+
+このカタログを参考に、必要なパターンから学習を始めてください。
