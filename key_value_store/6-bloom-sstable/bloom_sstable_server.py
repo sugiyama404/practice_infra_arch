@@ -5,10 +5,16 @@ from flask import Flask, request, jsonify
 from pybloom_live import BloomFilter
 from sortedcontainers import SortedDict
 import diskcache
+import redis
 
 app = Flask(__name__)
 DATA_DIR = './data'
 os.makedirs(DATA_DIR, exist_ok=True)
+
+# Redis接続設定
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 # Bloom Filter
 bloom = BloomFilter(capacity=10000, error_rate=0.001)
@@ -113,4 +119,4 @@ def compact_worker():
 threading.Thread(target=compact_worker, daemon=True).start()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8000)

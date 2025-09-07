@@ -1,9 +1,14 @@
 from flask import Flask, request, jsonify
 import redis
 import time
+import os
 
 app = Flask(__name__)
-redis_client = redis.Redis(host='redis', port=6379, decode_responses=True)
+
+# Redis接続設定
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 # 固定ウィンドウカウンタアルゴリズム
 def is_rate_limited_fixed_window(user_id, limit=10, window=60):

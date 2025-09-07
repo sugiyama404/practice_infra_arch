@@ -1,4 +1,4 @@
-# 3-line-streams
+# 8-line-streams
 
 ## 概要
 LINE風のRedis Streams永続化メッセージングシステム実装例。Consumer Groupによる並列処理、順序保証、障害復旧・フェイルオーバー・重複検知・容量制限を備えています。

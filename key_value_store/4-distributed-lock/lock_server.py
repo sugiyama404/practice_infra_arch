@@ -4,15 +4,20 @@ from flask import Flask, request, jsonify
 from redlock import Redlock
 import redis
 from collections import deque, defaultdict
+import os
 
 app = Flask(__name__)
 
 # Redisノード構成
-NODES = [
-    {'host': 'localhost', 'port': 6379},
-    {'host': 'localhost', 'port': 6380},
-    {'host': 'localhost', 'port': 6381}
-]
+def get_redis_nodes():
+    nodes_str = os.environ.get("REDIS_NODES", "localhost:6379,localhost:6380,localhost:6381")
+    nodes = []
+    for node_addr in nodes_str.split(','):
+        host, port = node_addr.split(':')
+        nodes.append({'host': host, 'port': int(port)})
+    return nodes
+
+NODES = get_redis_nodes()
 redlock = Redlock([{'host': n['host'], 'port': n['port']} for n in NODES])
 
 # ロック待機キュー・統計
@@ -87,4 +92,4 @@ def lock_monitor():
 threading.Thread(target=lock_monitor, daemon=True).start()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8000)

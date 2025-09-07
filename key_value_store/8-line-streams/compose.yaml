@@ -5,24 +5,11 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - redis-node1
-      - redis-node2
-      - redis-node3
+      - redis
     environment:
-      - REDIS_NODES=redis-node1:6385,redis-node2:6386,redis-node3:6387
-
-  redis-node1:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+  redis:
     image: redis:latest
     ports:
-      - "6385:6379"
-    command: redis-server --port 6379
-  redis-node2:
-    image: redis:latest
-    ports:
-      - "6386:6379"
-    command: redis-server --port 6379
-  redis-node3:
-    image: redis:latest
-    ports:
-      - "6387:6379"
-    command: redis-server --port 6379
+      - "6379:6379"

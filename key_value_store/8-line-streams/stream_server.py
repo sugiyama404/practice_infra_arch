@@ -2,9 +2,14 @@ import redis
 import threading
 import time
 from flask import Flask, request, jsonify
+import os
 
 app = Flask(__name__)
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+
+# Redis接続設定
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
 STREAM_KEY = "line_stream"
 GROUP_NAME = "line_consumers"
@@ -100,4 +105,4 @@ def failover_monitor():
 threading.Thread(target=failover_monitor, daemon=True).start()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8000)

@@ -3,9 +3,15 @@ import redis
 import json
 import uuid
 from datetime import timedelta
+import os
 
 app = Flask(__name__)
-redis_client = redis.Redis(host='redis', port=6379, decode_responses=True)
+
+# Redis接続設定
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+
 SESSION_TIME = timedelta(minutes=30)
 
 def get_session_id():

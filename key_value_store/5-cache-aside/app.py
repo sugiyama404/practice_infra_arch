@@ -4,11 +4,34 @@ import json
 import time
 import hashlib
 from datetime import datetime, timedelta
+import os
+import psycopg2
 
 class CacheAsideKVS:
-    def __init__(self, redis_host='redis', redis_port=6379):
+    def __init__(self, redis_host='redis', redis_port=6379, db_host='db', db_port=5432):
         self.redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+        self.db_conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            database=os.environ.get('POSTGRES_DB', 'cache_aside_db'),
+            user=os.environ.get('POSTGRES_USER', 'postgres'),
+            password=os.environ.get('POSTGRES_PASSWORD', 'password')
+        )
         self.cache_stats = {'hits': 0, 'misses': 0}
+        self._init_db()
+        
+    def _init_db(self):
+        with self.db_conn.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS cache_data (
+                    entity_type VARCHAR(50),
+                    entity_id VARCHAR(100),
+                    data JSONB,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (entity_type, entity_id)
+                )
+            """)
+            self.db_conn.commit()
         
     def get(self, entity_type, entity_id):
         cache_key = f"cache:{entity_type}:{entity_id}"
@@ -23,9 +46,9 @@ class CacheAsideKVS:
                 'timestamp': datetime.now().isoformat()
             }
         
-        # Cache Miss - DBから取得（シミュレーション）
+        # Cache Miss - DBから取得
         self.cache_stats['misses'] += 1
-        db_data = self._simulate_db_read(entity_type, entity_id)
+        db_data = self._db_read(entity_type, entity_id)
         
         # キャッシュに保存 (TTL: 300秒)
         self.redis_client.setex(cache_key, 300, json.dumps(db_data))
@@ -40,8 +63,8 @@ class CacheAsideKVS:
         # Write-Through: DBとキャッシュ両方に書き込み
         cache_key = f"cache:{entity_type}:{entity_id}"
         
-        # DB書き込み（シミュレーション）
-        self._simulate_db_write(entity_type, entity_id, data)
+        # DB書き込み
+        self._db_write(entity_type, entity_id, data)
         
         # キャッシュ更新
         self.redis_client.setex(cache_key, 300, json.dumps(data))
@@ -73,20 +96,39 @@ class CacheAsideKVS:
             'cache_size': self.redis_client.dbsize()
         }
     
-    def _simulate_db_read(self, entity_type, entity_id):
-        # DB読み取りレイテンシをシミュレート
-        time.sleep(0.1)  # 100ms delay
-        
-        return {
-            'id': entity_id,
-            'type': entity_type,
-            'data': f'Database data for {entity_type}:{entity_id}',
-            'updated_at': (datetime.now() - timedelta(minutes=5)).isoformat()
-        }
+    def _db_read(self, entity_type, entity_id):
+        with self.db_conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT data, updated_at FROM cache_data 
+                WHERE entity_type = %s AND entity_id = %s
+            """, (entity_type, entity_id))
+            result = cursor.fetchone()
+            
+            if result:
+                data, updated_at = result
+                return {
+                    'id': entity_id,
+                    'type': entity_type,
+                    'data': data,
+                    'updated_at': updated_at.isoformat()
+                }
+            else:
+                return {
+                    'id': entity_id,
+                    'type': entity_type,
+                    'data': f'Database data for {entity_type}:{entity_id}',
+                    'updated_at': (datetime.now() - timedelta(minutes=5)).isoformat()
+                }
     
-    def _simulate_db_write(self, entity_type, entity_id, data):
-        # DB書き込みレイテンシをシミュレート
-        time.sleep(0.05)  # 50ms delay
+    def _db_write(self, entity_type, entity_id, data):
+        with self.db_conn.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO cache_data (entity_type, entity_id, data, updated_at) 
+                VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+                ON CONFLICT (entity_type, entity_id) 
+                DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP
+            """, (entity_type, entity_id, json.dumps(data)))
+            self.db_conn.commit()
         return True
 
 app = Flask(__name__)

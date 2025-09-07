@@ -1,4 +1,4 @@
-# 6-distributed-lock
+# 4-distributed-lock
 
 ## 概要
 Redlockアルゴリズム＋TTLリース管理による分散排他制御システム実装例。デッドロック回避・障害ノード対応・統計監視・待機キューを備えています。
