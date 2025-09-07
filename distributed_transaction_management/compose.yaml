@@ -1,0 +1,77 @@
+services:
+  # MySQL databases
+  user_db:
+    image: mysql:8.0
+    container_name: user_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: user_service
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user123
+    ports:
+      - "3306:3306"
+    volumes:
+      - user_db_data:/var/lib/mysql
+      - ./init_scripts/user_db.sql:/docker-entrypoint-initdb.d/init.sql
+  payment_db:
+    image: mysql:8.0
+    container_name: payment_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: payment_service
+      MYSQL_USER: payment
+      MYSQL_PASSWORD: payment123
+    ports:
+      - "3307:3306"
+    volumes:
+      - payment_db_data:/var/lib/mysql
+      - ./init_scripts/payment_db.sql:/docker-entrypoint-initdb.d/init.sql
+  order_db:
+    image: mysql:8.0
+    container_name: order_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: order_service
+      MYSQL_USER: order
+      MYSQL_PASSWORD: order123
+    ports:
+      - "3308:3306"
+    volumes:
+      - order_db_data:/var/lib/mysql
+      - ./init_scripts/order_db.sql:/docker-entrypoint-initdb.d/init.sql
+  saga_db:
+    image: mysql:8.0
+    container_name: saga_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: saga_orchestrator
+      MYSQL_USER: saga
+      MYSQL_PASSWORD: saga123
+    ports:
+      - "3309:3306"
+    volumes:
+      - saga_db_data:/var/lib/mysql
+      - ./init_scripts/saga_db.sql:/docker-entrypoint-initdb.d/init.sql
+  # Redis for distributed state management
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+  # Main application container
+  distributed_transaction_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: distributed_transaction_app
+    environment:
+      - USER_DB_URL=mysql://user:user123@user_db:3306/user_service
+      - PAYMENT_DB_URL=mysql://payment:payment123@payment_db:3306/payment_service
+      - ORDER_DB_URL=mysql://order:order123@order_db:3306/order_service
+      - SAGA_DB_URL=mysql://saga:saga123@saga_db:3306/saga_orchestrator
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./src:/app/src
+    stdin_open: true
+    tty: true
+    command: python -m src.main
