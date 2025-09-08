@@ -1,9 +1,6 @@
 import redis
-import threading
-import time
 from flask import Flask, request, jsonify
 from merklelib import MerkleTree
-from typing import Dict, List
 import os
 import json
 
