@@ -72,5 +72,13 @@ def logout():
     
     return response
 
+@app.route('/health', methods=['GET'])
+def health():
+    try:
+        redis_client.ping()
+        return jsonify({'status': 'ok'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 503
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

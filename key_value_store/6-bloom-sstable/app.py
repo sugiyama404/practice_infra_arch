@@ -117,6 +117,15 @@ def stats():
         'sstable_files': len([f for f in os.listdir(DATA_DIR) if f.startswith('sstable_')])
     })
 
+@app.route('/health', methods=['GET'])
+def health():
+    """Health check."""
+    try:
+        redis_client.ping()
+        return jsonify({'status': 'ok'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 503
+
 # Background compaction
 def compact_worker():
     """Background compaction worker."""

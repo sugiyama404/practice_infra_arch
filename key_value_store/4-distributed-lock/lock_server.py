@@ -68,6 +68,11 @@ def heartbeat():
     heartbeats[owner] = time.time()
     return jsonify({'status': 'heartbeat', 'owner': owner})
 
+@app.route('/health', methods=['GET'])
+def health():
+    # Simple health check
+    return jsonify({'status': 'ok'}), 200
+
 @app.route('/stats', methods=['GET'])
 def stats():
     # Get lock statistics

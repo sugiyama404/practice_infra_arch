@@ -89,7 +89,7 @@ def group_info():
     info = redis_client.xinfo_groups(STREAM_KEY)
     return jsonify({'groups': info})
 
-@app.route('/stream_info', methods=['GET'])
+@app.route('/health', methods=['GET'])
 def stream_info():
     """Get stream info."""
     info = redis_client.xinfo_stream(STREAM_KEY)

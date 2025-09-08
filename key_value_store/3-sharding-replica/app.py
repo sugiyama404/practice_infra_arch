@@ -94,10 +94,16 @@ def read():
     return jsonify({'value': value, 'node': target})
 
 # Automatic failure detection and failover
-@app.route('/status', methods=['GET'])
-def status():
+@app.route('/health', methods=['GET'])
+def health():
     # Get health status of nodes
-    health = {n: nodes[n].is_alive() for n in nodes}
+    health_status = {n: nodes[n].is_alive() for n in nodes}
+    all_alive = all(health_status.values())
+    
+    if all_alive:
+        return jsonify({'status': 'ok', 'nodes': health_status}), 200
+    else:
+        return jsonify({'status': 'error', 'nodes': health_status}), 503
     return jsonify({'nodes': health})
 
 if __name__ == "__main__":

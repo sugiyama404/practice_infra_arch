@@ -141,5 +141,14 @@ def status():
     # Get node status
     return jsonify({'nodes': [n.is_alive() for n in nodes]}), 200
 
+@app.route('/health', methods=['GET'])
+def health():
+    # Check the health of the nodes
+    alive_nodes = [n.port for n in nodes if n.is_alive()]
+    if len(alive_nodes) >= 1:
+        return jsonify({'status': 'ok', 'alive_nodes': alive_nodes}), 200
+    else:
+        return jsonify({'status': 'error', 'message': 'No nodes are alive'}), 503
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

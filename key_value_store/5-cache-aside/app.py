@@ -156,5 +156,16 @@ def invalidate_cache(entity_type, entity_id=None):
 def get_cache_stats():
     return jsonify(cache_kvs.get_stats())
 
+@app.route('/health', methods=['GET'])
+def health():
+    try:
+        # Check Redis connection
+        cache_kvs.redis_client.ping()
+        # Check DB connection
+        cache_kvs.db_conn.cursor().execute("SELECT 1")
+        return jsonify({'status': 'ok'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 503
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
