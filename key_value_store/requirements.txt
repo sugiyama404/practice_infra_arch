@@ -1,0 +1,6 @@
+requests
+pandas
+numpy
+docker
+ipykernel
+notebook
