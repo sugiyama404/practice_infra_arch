@@ -1,9 +1,10 @@
 import time
 import threading
 from flask import Flask, request, jsonify
-from redlock import Redlock
+from redlock import RedLock
 import redis
 from collections import deque, defaultdict
+import os
 import os
 
 app = Flask(__name__)
@@ -11,7 +12,7 @@ app = Flask(__name__)
 # Redis nodes configuration
 def get_redis_nodes():
     # Get Redis nodes from environment
-    nodes_str = os.environ.get("REDIS_NODES", "localhost:6379,localhost:6380,localhost:6381")
+    nodes_str = os.environ.get("REDIS_NODES", f"{os.environ.get('REDIS_HOST', 'redis')}:{os.environ.get('REDIS_PORT', 6379)}")
     nodes = []
     for node_addr in nodes_str.split(','):
         host, port = node_addr.split(':')
@@ -19,12 +20,11 @@ def get_redis_nodes():
     return nodes
 
 NODES = get_redis_nodes()
-redlock = Redlock([{'host': n['host'], 'port': n['port']} for n in NODES])
 
 # Lock waiting queue and statistics
 lock_queues = defaultdict(deque)  # key -> queue of requestors
 lock_stats = defaultdict(lambda: {'acquired': 0, 'released': 0, 'deadlocks': 0})
-active_locks = {}  # key -> {'lock': lock, 'owner': owner, 'expires': ts}
+active_locks = {}  # key -> {'redlock': redlock, 'owner': owner, 'expires': ts}
 heartbeats = {}  # owner -> last heartbeat
 LEASE_TTL = 5000  # ms
 HEARTBEAT_INTERVAL = 2  # sec
@@ -34,13 +34,15 @@ def acquire():
     # Acquire a distributed lock
     key = request.json.get('key')
     owner = request.json.get('owner')
+    if not key or not owner:
+        return jsonify({'status': 'error', 'message': 'key and owner are required'}), 400
     # Manage waiting queue
     lock_queues[key].append(owner)
     if lock_queues[key][0] != owner:
         return jsonify({'status': 'waiting', 'queue': list(lock_queues[key])})
-    lock = redlock.lock(key, LEASE_TTL)
-    if lock:
-        active_locks[key] = {'lock': lock, 'owner': owner, 'expires': time.time() + LEASE_TTL/1000}
+    redlock = RedLock(key, [{'host': n['host'], 'port': n['port']} for n in NODES], ttl=LEASE_TTL)
+    if redlock.acquire():
+        active_locks[key] = {'redlock': redlock, 'owner': owner, 'expires': time.time() + LEASE_TTL/1000}
         lock_stats[key]['acquired'] += 1
         return jsonify({'status': 'acquired', 'key': key, 'owner': owner})
     else:
@@ -52,9 +54,11 @@ def release():
     # Release the lock
     key = request.json.get('key')
     owner = request.json.get('owner')
+    if not key or not owner:
+        return jsonify({'status': 'error', 'message': 'key and owner are required'}), 400
     info = active_locks.get(key)
     if info and info['owner'] == owner:
-        redlock.unlock(info['lock'])
+        info['redlock'].release()
         lock_stats[key]['released'] += 1
         lock_queues[key].popleft()
         active_locks.pop(key)
@@ -87,14 +91,14 @@ def lock_monitor():
         for key, info in list(active_locks.items()):
             # Expire locks
             if now > info['expires']:
-                redlock.unlock(info['lock'])
+                info['redlock'].release()
                 lock_stats[key]['released'] += 1
                 lock_queues[key].popleft()
                 active_locks.pop(key)
             # Expire heartbeats
             owner = info['owner']
             if owner in heartbeats and now - heartbeats[owner] > HEARTBEAT_INTERVAL * 3:
-                redlock.unlock(info['lock'])
+                info['redlock'].release()
                 lock_stats[key]['released'] += 1
                 lock_queues[key].popleft()
                 active_locks.pop(key)
