@@ -4,7 +4,12 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - REDIS_NODES=redis-node1:6397,redis-node2:6398,redis-node3:6399
+      - REDIS_NODES=redis-node1:6397,redis-node2:6379,redis-node3:6379
+      - REDIS_HOST=redis-node1
+      - REDIS_PORT=6379
+    volumes:
+      - .:/app
+    command: python app.py
 
   redis-node1:
     image: redis:latest

@@ -3,9 +3,6 @@ services:
     build: .
     ports:
       - "8000:8000"
-    depends_on:
-      - redis
-      - db
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -14,6 +11,9 @@ services:
       - POSTGRES_DB=cache_aside_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+    volumes:
+      - .:/app
+    command: python app.py
   redis:
     image: redis:latest
     ports:

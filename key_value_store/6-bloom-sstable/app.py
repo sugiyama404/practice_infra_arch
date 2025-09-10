@@ -12,10 +12,49 @@ DATA_DIR = './data'
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # Redis connection
-REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_HOST = os.environ.get("REDIS_HOST", "redis-node1")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
+@app.route('/write', methods=['POST'])
+def write():
+    data = request.get_json()
+    if not data or 'key' not in data or 'value' not in data:
+        return jsonify({'status': 'error', 'message': 'Missing key or value'}), 400
+    key = data['key']
+    value = data['value']
+    memtable[key] = value
+    bloom.add(key)
+    try:
+        redis_client.set(key, value)
+    except Exception as e:
+        pass
+    if len(memtable) >= MEMTABLE_LIMIT:
+        write_sstable(memtable)
+        memtable.clear()
+    return jsonify({'status': 'ok', 'key': key, 'value': value})
+
+@app.route('/read', methods=['GET'])
+def read():
+    key = request.args.get('key')
+    if not key:
+        return jsonify({'status': 'error', 'message': 'Missing key'}), 400
+    if key in memtable:
+        return jsonify({'status': 'ok', 'key': key, 'value': memtable[key]})
+    try:
+        value = redis_client.get(key)
+        if value is not None:
+            return jsonify({'status': 'ok', 'key': key, 'value': value})
+    except Exception as e:
+        pass
+    # SSTable fallback
+    for fname in sorted([f for f in os.listdir(DATA_DIR) if f.startswith('sstable_')]):
+        with open(os.path.join(DATA_DIR, fname)) as f:
+            for line in f:
+                k, v = line.strip().split('\t')
+                if k == key:
+                    return jsonify({'status': 'ok', 'key': key, 'value': v})
+    return jsonify({'status': 'not_found', 'key': key}), 404
 # Bloom Filter for fast lookups
 bloom = BloomFilter(capacity=10000, error_rate=0.001)
 
