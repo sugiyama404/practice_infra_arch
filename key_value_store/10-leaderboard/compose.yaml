@@ -3,6 +3,9 @@ services:
     build: .
     ports:
       - "8000:8000"
+    volumes:
+      - .:/app
+    command: python app.py
   redis:
     image: redis:latest
     ports:
