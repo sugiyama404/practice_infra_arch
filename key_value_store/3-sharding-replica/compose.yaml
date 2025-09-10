@@ -3,13 +3,11 @@ services:
     build: .
     ports:
       - "8000:8000"
-    depends_on:
-      - redis-node1
-      - redis-node2
-      - redis-node3
     environment:
-      - REDIS_NODES=redis-node1:6391,redis-node2:6392,redis-node3:6393
-
+      - REDIS_NODES=redis-node1:6379,redis-node2:6379,redis-node3:6379
+    volumes:
+      - .:/app
+    command: python app.py
   redis-node1:
     image: redis:latest
     ports:

@@ -71,7 +71,7 @@ nodes = [KVSNode(config['host'], config['port']) for config in NODE_CONFIGS]
 class KVSIntegrity:
     """Merkle tree for data integrity verification."""
     def __init__(self):
-        self.tree = MerkleTree()
+        self.tree = MerkleTree([])
     def update(self, key, value):
         self.tree.append(f"{key}:{value}")
     def verify(self):
@@ -87,12 +87,10 @@ def write():
     alive = [n for n in nodes if n.is_alive()]
     if len(alive) < W:
         return jsonify({'error': 'Quorum not met'}), 500
-    # Update vector clock
     for n in alive[:W]:
         n.vc.increment(n.port)
         n.set(key, value, n.vc.get())
         integrity.update(key, value)
-    # Hinted handoff for failed nodes
     for n in nodes:
         if not n.is_alive():
             n.store_hinted(key, value, n.vc.get())
@@ -100,21 +98,17 @@ def write():
 
 @app.route('/read', methods=['GET'])
 def read():
-    # Read with quorum
     key = request.args.get('key')
     alive = [n for n in nodes if n.is_alive()]
     if len(alive) < R:
         return jsonify({'error': 'Quorum not met'}), 500
-    # Get from R nodes
     results = []
     vcs = []
     for n in alive[:R]:
         value, vc = n.get(key)
         results.append(value)
         vcs.append(vc)
-    # Detect conflicts
     if len(set(str(vc) for vc in vcs if vc)) > 1:
-        # Read repair: repair all nodes with latest value
         latest = results[0]
         for n in alive:
             n.set(key, latest, vcs[0])
@@ -130,7 +124,6 @@ def flush_hinted():
 
 @app.route('/integrity', methods=['GET'])
 def integrity_check():
-    # Check data integrity using Merkle tree
     return jsonify({'merkle_root': integrity.verify()}), 200
 
 @app.route('/status', methods=['GET'])
@@ -140,7 +133,6 @@ def status():
 
 @app.route('/health', methods=['GET'])
 def health():
-    # Check the health of the nodes
     alive_nodes = [n.port for n in nodes if n.is_alive()]
     if len(alive_nodes) >= 1:
         return jsonify({'status': 'ok', 'alive_nodes': alive_nodes}), 200
