@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 50000,
+    "successful_requests": 202,
+    "error_rate": 99.59599999999999,
+    "qps": 1.0236360291683637,
+    "avg_response_time": 3.4578129796698542,
+    "median_response_time": 3.3130645751953125,
+    "p95_response_time": 4.897058010101318,
+    "p99_response_time": 7.555501461029059,
+    "min_response_time": 2.0270347595214844,
+    "max_response_time": 10.708808898925781,
+    "initial_stats": {
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.023868394815553338,
+        "memory_usage": 64229376,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.04330009970089731,
+        "memory_usage": 5541888,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.041743027888446214,
+        "memory_usage": 7532544,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.03130478087649402,
+        "memory_usage": 8310784,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.024632206759443342,
+        "memory_usage": 3889401856,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.04291252485089463,
+        "memory_usage": 5541888,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.035988083416087384,
+        "memory_usage": 5595136,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.037572139303482584,
+        "memory_usage": 6709248,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "6-bloom-sstable",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T08:17:25.124340",
+    "clients": 100,
+    "duration": 197.33576607704163
+  }
+]

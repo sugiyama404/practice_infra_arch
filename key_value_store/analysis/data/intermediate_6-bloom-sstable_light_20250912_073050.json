@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 269.8649544116344,
+    "avg_response_time": 3.6674251556396484,
+    "median_response_time": 3.727078437805176,
+    "p95_response_time": 5.043995380401611,
+    "p99_response_time": 6.110453605651855,
+    "min_response_time": 1.9178390502929688,
+    "max_response_time": 7.228851318359375,
+    "initial_stats": {
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.034399205561072496,
+        "memory_usage": 65388544,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.050169660678642716,
+        "memory_usage": 5541888,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.035833333333333335,
+        "memory_usage": 17457152,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.04822244289970209,
+        "memory_usage": 8888320,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.030439121756487025,
+        "memory_usage": 66445312,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.03840319361277445,
+        "memory_usage": 5541888,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.036317365269461076,
+        "memory_usage": 17457152,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.04825396825396825,
+        "memory_usage": 9003008,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "6-bloom-sstable",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T08:12:54.985234",
+    "clients": 10,
+    "duration": 3.705557107925415
+  }
+]

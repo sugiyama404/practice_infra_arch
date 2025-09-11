@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 182.76110196817478,
+    "avg_response_time": 5.415943741798401,
+    "median_response_time": 5.098819732666016,
+    "p95_response_time": 8.372223377227781,
+    "p99_response_time": 9.996931552886963,
+    "min_response_time": 2.2079944610595703,
+    "max_response_time": 230.77893257141113,
+    "initial_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.052445328031809145,
+        "memory_usage": 42037248,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.02345273631840796,
+        "memory_usage": 74117120,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.0412375249500998,
+        "memory_usage": 5697536,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.06161838161838162,
+        "memory_usage": 5894144,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.04543369890329013,
+        "memory_usage": 20832256,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.025129482071713147,
+        "memory_usage": 90451968,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.04594217347956132,
+        "memory_usage": 5697536,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.06209790209790209,
+        "memory_usage": 13021184,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "2-quorum-consistency",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T07:41:27.543910",
+    "clients": 50,
+    "duration": 54.716238260269165
+  }
+]

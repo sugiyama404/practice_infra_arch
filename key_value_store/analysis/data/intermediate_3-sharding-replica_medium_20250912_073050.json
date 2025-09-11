@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 179.85367909682398,
+    "avg_response_time": 5.50814905166626,
+    "median_response_time": 5.503058433532715,
+    "p95_response_time": 7.084858417510986,
+    "p99_response_time": 7.931072711944582,
+    "min_response_time": 2.184152603149414,
+    "max_response_time": 14.10984992980957,
+    "initial_stats": {
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.029800796812749004,
+        "memory_usage": 71659520,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.05834990059642147,
+        "memory_usage": 5783552,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.0585771144278607,
+        "memory_usage": 47411200,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.05835329341317365,
+        "memory_usage": 5767168,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.05936883629191321,
+        "memory_usage": 58421248,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.051089108910891086,
+        "memory_usage": 5963776,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.04555666003976143,
+        "memory_usage": 13631488,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.052934131736526946,
+        "memory_usage": 5980160,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "3-sharding-replica",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T07:49:52.998776",
+    "clients": 50,
+    "duration": 55.60075306892395
+  }
+]

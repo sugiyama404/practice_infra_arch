@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 162.98670095382667,
+    "avg_response_time": 6.077149868011475,
+    "median_response_time": 5.813121795654297,
+    "p95_response_time": 8.410632610321045,
+    "p99_response_time": 9.443330764770506,
+    "min_response_time": 2.8510093688964844,
+    "max_response_time": 23.357868194580078,
+    "initial_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.054281466798810706,
+        "memory_usage": 42450944,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.034097706879361915,
+        "memory_usage": 81805312,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.05319085487077535,
+        "memory_usage": 5697536,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.050825870646766164,
+        "memory_usage": 5730304,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.0522794846382557,
+        "memory_usage": 42037248,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.032821535393818546,
+        "memory_usage": 74117120,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.05295409181636727,
+        "memory_usage": 5697536,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.06520398009950248,
+        "memory_usage": 5894144,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "2-quorum-consistency",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T07:40:13.698071",
+    "clients": 10,
+    "duration": 6.135469913482666
+  }
+]

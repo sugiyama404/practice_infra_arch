@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 204.06589089299115,
+    "avg_response_time": 4.838632822036743,
+    "median_response_time": 4.90260124206543,
+    "p95_response_time": 6.8343162536621085,
+    "p99_response_time": 7.517764568328857,
+    "min_response_time": 1.9650459289550781,
+    "max_response_time": 8.60905647277832,
+    "initial_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.037176938369781316,
+        "memory_usage": 81453056,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.03964143426294821,
+        "memory_usage": 27811840,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.053968095712861416,
+        "memory_usage": 15376384,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.04624875621890547,
+        "memory_usage": 15712256,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.037422885572139304,
+        "memory_usage": 81969152,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.054297108673978065,
+        "memory_usage": 27811840,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.04948103792415169,
+        "memory_usage": 15376384,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.05549351944167497,
+        "memory_usage": 15908864,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "1-coordinator-ring",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T07:32:11.998746",
+    "clients": 10,
+    "duration": 4.900377988815308
+  }
+]

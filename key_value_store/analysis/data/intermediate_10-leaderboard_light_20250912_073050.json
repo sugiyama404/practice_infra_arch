@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 216.91013072723547,
+    "avg_response_time": 4.5568459033966064,
+    "median_response_time": 4.357576370239258,
+    "p95_response_time": 6.095898151397705,
+    "p99_response_time": 6.911048889160156,
+    "min_response_time": 2.701997756958008,
+    "max_response_time": 7.952690124511719,
+    "initial_stats": {
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.041132075471698115,
+        "memory_usage": 46743552,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.016822709163346612,
+        "memory_usage": 90062848,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.0381330685203575,
+        "memory_usage": 46903296,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.031830845771144284,
+        "memory_usage": 79876096,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "10-leaderboard",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T08:37:03.929451",
+    "clients": 10,
+    "duration": 4.610204219818115
+  }
+]

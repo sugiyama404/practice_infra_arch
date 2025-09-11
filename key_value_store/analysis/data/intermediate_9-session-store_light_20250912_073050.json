@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 290.1095447284124,
+    "avg_response_time": 3.3951187133789062,
+    "median_response_time": 3.406405448913574,
+    "p95_response_time": 4.660606384277343,
+    "p99_response_time": 5.244078636169432,
+    "min_response_time": 1.8520355224609375,
+    "max_response_time": 11.258840560913086,
+    "initial_stats": {
+      "9-session-store-app-1": {
+        "cpu_percent": 0.020936254980079682,
+        "memory_usage": 66809856,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.03638446215139442,
+        "memory_usage": 38699008,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "9-session-store-app-1": {
+        "cpu_percent": 0.02910625620655412,
+        "memory_usage": 68841472,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.04920239282153539,
+        "memory_usage": 38748160,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "9-session-store",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T08:31:23.323234",
+    "clients": 10,
+    "duration": 3.4469738006591797
+  }
+]
