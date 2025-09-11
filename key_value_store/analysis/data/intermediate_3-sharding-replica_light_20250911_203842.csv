@@ -1,0 +1,2 @@
+total_requests,successful_requests,error_rate,qps,avg_response_time,median_response_time,p95_response_time,p99_response_time,min_response_time,max_response_time,service_name,pattern_name,pattern_description,timestamp,clients,duration
+1000,1000,0.0,155.09404104140208,6.374009132385254,6.393909454345703,8.49686861038208,9.287776947021484,2.471923828125,30.76481819152832,3-sharding-replica,light,軽負荷,2025-09-11T20:40:19.545422,10,6.4477009773254395

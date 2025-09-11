@@ -1,0 +1,2 @@
+total_requests,successful_requests,error_rate,qps,avg_response_time,median_response_time,p95_response_time,p99_response_time,min_response_time,max_response_time,service_name,pattern_name,pattern_description,timestamp,clients,duration
+1000,1000,0.0,410.6258428037701,2.4127771854400635,1.7805099487304688,5.479323863983154,6.927461624145508,1.2488365173339844,12.588024139404297,5-cache-aside,light,軽負荷,2025-09-11T20:54:44.986978,10,2.435307025909424

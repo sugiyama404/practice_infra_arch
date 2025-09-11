@@ -1,0 +1,22 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 302.1061263531756,
+    "avg_response_time": 3.2771332263946533,
+    "median_response_time": 3.1409263610839844,
+    "p95_response_time": 4.7441720962524405,
+    "p99_response_time": 5.8058762550353995,
+    "min_response_time": 1.6918182373046875,
+    "max_response_time": 8.913993835449219,
+    "initial_stats": {},
+    "final_stats": {},
+    "service_name": "1-coordinator-ring",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-11T20:38:49.568975",
+    "clients": 10,
+    "duration": 3.3100950717926025
+  }
+]

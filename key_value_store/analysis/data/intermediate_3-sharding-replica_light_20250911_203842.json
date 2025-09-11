@@ -1,0 +1,22 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 155.09404104140208,
+    "avg_response_time": 6.374009132385254,
+    "median_response_time": 6.393909454345703,
+    "p95_response_time": 8.49686861038208,
+    "p99_response_time": 9.287776947021484,
+    "min_response_time": 2.471923828125,
+    "max_response_time": 30.76481819152832,
+    "initial_stats": {},
+    "final_stats": {},
+    "service_name": "3-sharding-replica",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-11T20:40:19.545422",
+    "clients": 10,
+    "duration": 6.4477009773254395
+  }
+]
