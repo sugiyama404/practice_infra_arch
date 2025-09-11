@@ -1,2 +1,0 @@
-total_requests,successful_requests,error_rate,qps,avg_response_time,median_response_time,p95_response_time,p99_response_time,min_response_time,max_response_time,service_name,pattern_name,pattern_description,timestamp,clients,duration
-10000,10000,0.0,292.41949730568626,3.3838462114334105,3.377079963684082,4.69313859939575,5.443212985992434,1.5802383422851562,30.842065811157227,6-bloom-sstable,medium,中負荷,2025-09-11T21:20:13.798217,50,34.19744610786438
