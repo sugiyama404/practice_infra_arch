@@ -4,3 +4,5 @@ numpy
 docker
 ipykernel
 notebook
+plotly
+matplotlib

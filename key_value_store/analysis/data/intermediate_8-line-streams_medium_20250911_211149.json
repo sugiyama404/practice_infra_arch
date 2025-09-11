@@ -1,0 +1,22 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 290.5868356162307,
+    "avg_response_time": 3.405954146385193,
+    "median_response_time": 3.3828020095825195,
+    "p95_response_time": 4.6730637550353995,
+    "p99_response_time": 5.435011386871339,
+    "min_response_time": 1.5797615051269531,
+    "max_response_time": 28.866052627563477,
+    "initial_stats": {},
+    "final_stats": {},
+    "service_name": "8-line-streams",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-11T21:22:38.435505",
+    "clients": 50,
+    "duration": 34.41312122344971
+  }
+]

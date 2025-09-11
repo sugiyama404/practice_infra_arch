@@ -1,0 +1,22 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 225.30461430908923,
+    "avg_response_time": 4.386242985725403,
+    "median_response_time": 4.264950752258301,
+    "p95_response_time": 6.1488866806030265,
+    "p99_response_time": 6.963036060333253,
+    "min_response_time": 1.336812973022461,
+    "max_response_time": 24.93119239807129,
+    "initial_stats": {},
+    "final_stats": {},
+    "service_name": "1-coordinator-ring",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-11T21:12:38.473398",
+    "clients": 50,
+    "duration": 44.38435506820679
+  }
+]

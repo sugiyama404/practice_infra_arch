@@ -1,0 +1,22 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 292.41949730568626,
+    "avg_response_time": 3.3838462114334105,
+    "median_response_time": 3.377079963684082,
+    "p95_response_time": 4.69313859939575,
+    "p99_response_time": 5.443212985992434,
+    "min_response_time": 1.5802383422851562,
+    "max_response_time": 30.842065811157227,
+    "initial_stats": {},
+    "final_stats": {},
+    "service_name": "6-bloom-sstable",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-11T21:20:13.798217",
+    "clients": 50,
+    "duration": 34.19744610786438
+  }
+]

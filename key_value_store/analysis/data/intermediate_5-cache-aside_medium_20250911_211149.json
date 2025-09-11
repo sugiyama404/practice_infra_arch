@@ -1,0 +1,22 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 165.3378100760478,
+    "avg_response_time": 5.992382478713989,
+    "median_response_time": 6.44993782043457,
+    "p95_response_time": 8.415937423706055,
+    "p99_response_time": 10.023910999298097,
+    "min_response_time": 2.1047592163085938,
+    "max_response_time": 32.05513954162598,
+    "initial_stats": {},
+    "final_stats": {},
+    "service_name": "5-cache-aside",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-11T21:18:56.127200",
+    "clients": 50,
+    "duration": 60.48223328590393
+  }
+]
