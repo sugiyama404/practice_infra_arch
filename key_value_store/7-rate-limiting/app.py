@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # Redis接続設定
-REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
@@ -69,7 +69,16 @@ def health():
         redis_client.ping()
         return jsonify({'status': 'ok'}), 200
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 503
+        return jsonify({'status': 'error', 'detail': str(e)}), 500
+
+@app.route('/check_rate', methods=['GET'])
+def check_rate():
+    user_id = request.args.get('user_id', 'default_user')
+    limited = is_rate_limited_fixed_window(user_id)
+    if limited:
+        return jsonify({'allowed': False, 'error': 'Rate limit exceeded'}), 429
+    else:
+        return jsonify({'allowed': True, 'message': 'Request allowed'}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
