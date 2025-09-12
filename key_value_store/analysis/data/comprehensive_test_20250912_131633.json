@@ -1,0 +1,1532 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 300.15419536704,
+    "avg_response_time": 3.301426887512207,
+    "median_response_time": 3.12960147857666,
+    "p95_response_time": 4.889321327209472,
+    "p99_response_time": 5.920977592468262,
+    "min_response_time": 1.3878345489501953,
+    "max_response_time": 9.603738784790039,
+    "initial_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.03682270916334661,
+        "memory_usage": 91193344,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.0552390438247012,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.06768774703557312,
+        "memory_usage": 12902400,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.05615690168818273,
+        "memory_usage": 40497152,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.018804780876494023,
+        "memory_usage": 80916480,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.049492031872509966,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.05169154228855721,
+        "memory_usage": 13099008,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.056875,
+        "memory_usage": 40497152,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "1-coordinator-ring",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:17:53.815554",
+    "clients": 10,
+    "duration": 3.331620931625366
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 248.46817499099916,
+    "avg_response_time": 3.9859688520431518,
+    "median_response_time": 3.9168596267700195,
+    "p95_response_time": 5.329012870788572,
+    "p99_response_time": 6.588938236236572,
+    "min_response_time": 1.7049312591552734,
+    "max_response_time": 33.29586982727051,
+    "initial_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.017495049504950493,
+        "memory_usage": 80723968,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.05187872763419483,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.050586481113320085,
+        "memory_usage": 13099008,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.0477589641434263,
+        "memory_usage": 40497152,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.0418344965104686,
+        "memory_usage": 72646656,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.06388059701492538,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.04012884043607532,
+        "memory_usage": 9760768,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.05887785501489573,
+        "memory_usage": 22151168,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "1-coordinator-ring",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:18:53.226589",
+    "clients": 50,
+    "duration": 40.24660301208496
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 247.04658018156258,
+    "avg_response_time": 4.00964991569519,
+    "median_response_time": 3.9489269256591797,
+    "p95_response_time": 5.198264122009276,
+    "p99_response_time": 8.428134918212898,
+    "min_response_time": 0.9050369262695312,
+    "max_response_time": 43.07818412780762,
+    "initial_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.0386839481555334,
+        "memory_usage": 72646656,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.06403193612774451,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.05771598808341609,
+        "memory_usage": 9760768,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.050149700598802395,
+        "memory_usage": 22151168,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "1-coordinator-ring-app-1": {
+        "cpu_percent": 0.020944333996023856,
+        "memory_usage": 68976640,
+        "memory_limit": 16810717184
+      },
+      "redis-node3": {
+        "cpu_percent": 0.04550348953140578,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "redis-node1": {
+        "cpu_percent": 0.05936254980079682,
+        "memory_usage": 37810176,
+        "memory_limit": 16810717184
+      },
+      "redis-node2": {
+        "cpu_percent": 0.050039880358923226,
+        "memory_usage": 6619136,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "1-coordinator-ring",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T13:22:34.818648",
+    "clients": 100,
+    "duration": 202.3909821510315
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 168.26368514650255,
+    "avg_response_time": 5.893177509307861,
+    "median_response_time": 5.930066108703613,
+    "p95_response_time": 7.2963476181030265,
+    "p99_response_time": 8.281056880950928,
+    "min_response_time": 2.8579235076904297,
+    "max_response_time": 22.50981330871582,
+    "initial_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.05709163346613546,
+        "memory_usage": 5668864,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05814741035856574,
+        "memory_usage": 30461952,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.047066402378592664,
+        "memory_usage": 23187456,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.030249003984063744,
+        "memory_usage": 80797696,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.055714285714285716,
+        "memory_usage": 5849088,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05664342629482071,
+        "memory_usage": 30101504,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.05582504970178926,
+        "memory_usage": 23171072,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.029132602193419743,
+        "memory_usage": 74014720,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "2-quorum-consistency",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:24:32.638767",
+    "clients": 10,
+    "duration": 5.9430530071258545
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 192.17371317833772,
+    "avg_response_time": 5.156218028068542,
+    "median_response_time": 4.945993423461914,
+    "p95_response_time": 7.469308376312254,
+    "p99_response_time": 9.469637870788583,
+    "min_response_time": 2.373933792114258,
+    "max_response_time": 38.09094429016113,
+    "initial_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.06040796019900497,
+        "memory_usage": 5849088,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05167497507477568,
+        "memory_usage": 30101504,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.05018924302788844,
+        "memory_usage": 23171072,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.03699203187250996,
+        "memory_usage": 74014720,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.054850894632206756,
+        "memory_usage": 7491584,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.054925373134328354,
+        "memory_usage": 21049344,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.04932270916334662,
+        "memory_usage": 10723328,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.03682951146560319,
+        "memory_usage": 91512832,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "2-quorum-consistency",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:25:43.827739",
+    "clients": 50,
+    "duration": 52.036253213882446
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 174.03169193794764,
+    "avg_response_time": 5.694511833190918,
+    "median_response_time": 5.652308464050293,
+    "p95_response_time": 6.883871555328368,
+    "p99_response_time": 7.560017108917237,
+    "min_response_time": 2.613067626953125,
+    "max_response_time": 297.8181838989258,
+    "initial_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.06481150793650794,
+        "memory_usage": 7360512,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05037810945273632,
+        "memory_usage": 20918272,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.06219123505976096,
+        "memory_usage": 10723328,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.030296442687747036,
+        "memory_usage": 87420928,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.04815109343936382,
+        "memory_usage": 12775424,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05590863952333664,
+        "memory_usage": 19238912,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.051870646766169155,
+        "memory_usage": 5697536,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.03608955223880597,
+        "memory_usage": 464732160,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "2-quorum-consistency",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T13:30:50.322858",
+    "clients": 100,
+    "duration": 287.3039929866791
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 230.1736939097239,
+    "avg_response_time": 4.307513952255249,
+    "median_response_time": 4.3784379959106445,
+    "p95_response_time": 5.691015720367432,
+    "p99_response_time": 6.461212635040283,
+    "min_response_time": 2.254009246826172,
+    "max_response_time": 24.873971939086914,
+    "initial_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.048346613545816736,
+        "memory_usage": 5681152,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.03464746772591857,
+        "memory_usage": 78299136,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.050547808764940236,
+        "memory_usage": 5664768,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.055896414342629486,
+        "memory_usage": 47943680,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.05046673286991062,
+        "memory_usage": 5763072,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.03449203187250996,
+        "memory_usage": 71241728,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.050199600798403195,
+        "memory_usage": 5746688,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.04825523429710867,
+        "memory_usage": 47742976,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "3-sharding-replica",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:32:46.576274",
+    "clients": 10,
+    "duration": 4.344545125961304
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 212.48070005543147,
+    "avg_response_time": 4.665131545066833,
+    "median_response_time": 4.759073257446289,
+    "p95_response_time": 6.0558319091796875,
+    "p99_response_time": 6.866018772125245,
+    "min_response_time": 1.5900135040283203,
+    "max_response_time": 14.483928680419922,
+    "initial_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.05361194029850746,
+        "memory_usage": 5763072,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.03130738522954092,
+        "memory_usage": 71012352,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.05485629335976214,
+        "memory_usage": 5746688,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.05728174603174604,
+        "memory_usage": 47742976,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.05865403788634098,
+        "memory_usage": 5976064,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.034199004975124375,
+        "memory_usage": 62574592,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.057804391217564866,
+        "memory_usage": 5926912,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.05660019940179462,
+        "memory_usage": 24690688,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "3-sharding-replica",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:33:52.801110",
+    "clients": 50,
+    "duration": 47.06309795379639
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 206.86497466104498,
+    "avg_response_time": 4.792378587722778,
+    "median_response_time": 4.808902740478516,
+    "p95_response_time": 6.093025207519531,
+    "p99_response_time": 7.097005844116211,
+    "min_response_time": 1.3508796691894531,
+    "max_response_time": 32.912254333496094,
+    "initial_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.05143141153081511,
+        "memory_usage": 5976064,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.03528414755732801,
+        "memory_usage": 62062592,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.047480158730158734,
+        "memory_usage": 5926912,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.05702487562189055,
+        "memory_usage": 24690688,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.04678926441351888,
+        "memory_usage": 8212480,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.026743027888446215,
+        "memory_usage": 64180224,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.05144278606965175,
+        "memory_usage": 7000064,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.06131736526946108,
+        "memory_usage": 7798784,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "3-sharding-replica",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T13:38:13.713892",
+    "clients": 100,
+    "duration": 241.70355606079102
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 194.98609650926267,
+    "avg_response_time": 5.085132122039795,
+    "median_response_time": 4.976391792297363,
+    "p95_response_time": 6.803536415100097,
+    "p99_response_time": 7.899532318115233,
+    "min_response_time": 2.8209686279296875,
+    "max_response_time": 13.755083084106445,
+    "initial_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.05271641791044777,
+        "memory_usage": 21786624,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.032517412935323384,
+        "memory_usage": 60022784,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.08507952286282305,
+        "memory_usage": 29822976,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.22057425742574255,
+        "memory_usage": 89235456,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "4-distributed-lock",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:40:06.805331",
+    "clients": 10,
+    "duration": 5.128570795059204
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 235.58424145299804,
+    "avg_response_time": 4.204673337936401,
+    "median_response_time": 4.1065216064453125,
+    "p95_response_time": 6.607151031494139,
+    "p99_response_time": 8.452894687652588,
+    "min_response_time": 1.3670921325683594,
+    "max_response_time": 323.5158920288086,
+    "initial_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.05403386454183266,
+        "memory_usage": 20889600,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.026838453914767094,
+        "memory_usage": 88027136,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.19412698412698415,
+        "memory_usage": 35065856,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.2476961271102284,
+        "memory_usage": 182489088,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "4-distributed-lock",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:41:00.368706",
+    "clients": 50,
+    "duration": 42.44766092300415
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 222.09612976192423,
+    "avg_response_time": 4.460275735855102,
+    "median_response_time": 4.409074783325195,
+    "p95_response_time": 6.536960601806641,
+    "p99_response_time": 10.12021064758302,
+    "min_response_time": 1.3670921325683594,
+    "max_response_time": 149.02901649475098,
+    "initial_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.07859266600594648,
+        "memory_usage": 30085120,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.033970149253731347,
+        "memory_usage": 182476800,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.12422310756972112,
+        "memory_usage": 24727552,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.22058764940239045,
+        "memory_usage": 238030848,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "4-distributed-lock",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T13:44:56.653401",
+    "clients": 100,
+    "duration": 225.12774109840393
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 125.64087855370691,
+    "avg_response_time": 7.886355400085449,
+    "median_response_time": 8.4761381149292,
+    "p95_response_time": 10.090267658233643,
+    "p99_response_time": 11.158289909362793,
+    "min_response_time": 2.6221275329589844,
+    "max_response_time": 17.444849014282227,
+    "initial_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.415439121756487,
+        "memory_usage": 90546176,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.061015936254980085,
+        "memory_usage": 29483008,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.0066135458167330685,
+        "memory_usage": 88715264,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.026200396825396825,
+        "memory_usage": 81010688,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.04992023928215354,
+        "memory_usage": 20258816,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.005324027916251246,
+        "memory_usage": 52383744,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "5-cache-aside",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:47:03.077026",
+    "clients": 10,
+    "duration": 7.959192991256714
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 124.20610577420733,
+    "avg_response_time": 7.9767505645751955,
+    "median_response_time": 8.641958236694336,
+    "p95_response_time": 10.263979434967041,
+    "p99_response_time": 11.81082010269165,
+    "min_response_time": 1.233816146850586,
+    "max_response_time": 37.47200965881348,
+    "initial_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.029850746268656716,
+        "memory_usage": 82006016,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.05901394422310757,
+        "memory_usage": 20934656,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.008743768693918245,
+        "memory_usage": 55836672,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.029155908639523335,
+        "memory_usage": 70115328,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.06399201596806386,
+        "memory_usage": 31301632,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.0,
+        "memory_usage": 73830400,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "5-cache-aside",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:48:38.719442",
+    "clients": 50,
+    "duration": 80.51133990287781
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 131.545441333757,
+    "avg_response_time": 7.534616045951843,
+    "median_response_time": 8.135080337524414,
+    "p95_response_time": 10.055792331695555,
+    "p99_response_time": 11.657028198242193,
+    "min_response_time": 1.2769699096679688,
+    "max_response_time": 26.268959045410156,
+    "initial_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.014322709163346615,
+        "memory_usage": 70529024,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.06409770687936192,
+        "memory_usage": 31137792,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.005139442231075697,
+        "memory_usage": 73719808,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.026382556987115956,
+        "memory_usage": 68374528,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.08236399604352126,
+        "memory_usage": 16932864,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.004737883283877349,
+        "memory_usage": 47501312,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "5-cache-aside",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T13:55:14.006546",
+    "clients": 100,
+    "duration": 380.0967900753021
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 249.47144318107874,
+    "avg_response_time": 3.9710545539855957,
+    "median_response_time": 3.9243698120117188,
+    "p95_response_time": 5.060255527496337,
+    "p99_response_time": 6.182994842529296,
+    "min_response_time": 2.393007278442383,
+    "max_response_time": 10.048866271972656,
+    "initial_stats": {
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.058774900398406375,
+        "memory_usage": 5701632,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.056716417910447764,
+        "memory_usage": 24211456,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.026796019900497514,
+        "memory_usage": 64303104,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.04826865671641791,
+        "memory_usage": 5562368,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.055586481113320076,
+        "memory_usage": 5816320,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.0431610337972167,
+        "memory_usage": 24211456,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.03956175298804781,
+        "memory_usage": 64872448,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.052270916334661355,
+        "memory_usage": 5562368,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "6-bloom-sstable",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:57:14.857877",
+    "clients": 10,
+    "duration": 4.008474826812744
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 252.65448239484004,
+    "avg_response_time": 3.9202590227127074,
+    "median_response_time": 3.981471061706543,
+    "p95_response_time": 5.079030990600586,
+    "p99_response_time": 6.347000598907472,
+    "min_response_time": 1.161813735961914,
+    "max_response_time": 33.926963806152344,
+    "initial_stats": {
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.05094433399602386,
+        "memory_usage": 5816320,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.05832335329341318,
+        "memory_usage": 24211456,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.0314356929212363,
+        "memory_usage": 64872448,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.06364179104477612,
+        "memory_usage": 5562368,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.05333333333333334,
+        "memory_usage": 7753728,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.060557213930348255,
+        "memory_usage": 14950400,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.03217131474103586,
+        "memory_usage": 64057344,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.05254980079681275,
+        "memory_usage": 5562368,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "6-bloom-sstable",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:58:13.576217",
+    "clients": 50,
+    "duration": 39.579745054244995
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 202,
+    "error_rate": 99.59599999999999,
+    "qps": 0.8915746291262676,
+    "avg_response_time": 3.987017244395643,
+    "median_response_time": 3.8524866104125977,
+    "p95_response_time": 5.377399921417236,
+    "p99_response_time": 8.091051578521746,
+    "min_response_time": 2.579212188720703,
+    "max_response_time": 9.684324264526367,
+    "initial_stats": {
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.059352589641434264,
+        "memory_usage": 7655424,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.057502497502497495,
+        "memory_usage": 10842112,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.038135593220338986,
+        "memory_usage": 64057344,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.05996011964107677,
+        "memory_usage": 5562368,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "6-bloom-sstable-redis-node1-1": {
+        "cpu_percent": 0.045455445544554454,
+        "memory_usage": 6627328,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node2-1": {
+        "cpu_percent": 0.05858706467661691,
+        "memory_usage": 5832704,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-app-1": {
+        "cpu_percent": 0.03569292123629112,
+        "memory_usage": 3736764416,
+        "memory_limit": 16810717184
+      },
+      "6-bloom-sstable-redis-node3-1": {
+        "cpu_percent": 0.05042871385842472,
+        "memory_usage": 5562368,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "6-bloom-sstable",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:02:19.309846",
+    "clients": 100,
+    "duration": 226.5654420852661
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 265.5942351104821,
+    "avg_response_time": 3.731405735015869,
+    "median_response_time": 3.6649703979492188,
+    "p95_response_time": 4.66477870941162,
+    "p99_response_time": 5.555322170257568,
+    "min_response_time": 2.4340152740478516,
+    "max_response_time": 8.649349212646484,
+    "initial_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.025878848063555115,
+        "memory_usage": 90120192,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06185258964143426,
+        "memory_usage": 47968256,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.027452736318407958,
+        "memory_usage": 90505216,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.05780876494023904,
+        "memory_usage": 47968256,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "7-rate-limiting",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T14:04:06.869634",
+    "clients": 10,
+    "duration": 3.7651419639587402
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 268.429821121195,
+    "avg_response_time": 3.691007113456726,
+    "median_response_time": 3.679990768432617,
+    "p95_response_time": 4.649198055267333,
+    "p99_response_time": 5.618114471435547,
+    "min_response_time": -49.81517791748047,
+    "max_response_time": 30.614137649536133,
+    "initial_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.0418344965104686,
+        "memory_usage": 79929344,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06596421471172963,
+        "memory_usage": 47374336,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.027749003984063745,
+        "memory_usage": 80011264,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.054665334665334665,
+        "memory_usage": 47374336,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "7-rate-limiting",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T14:04:55.217496",
+    "clients": 50,
+    "duration": 37.253684997558594
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 261.16019940886906,
+    "avg_response_time": 3.7942335987091065,
+    "median_response_time": 3.6814212799072266,
+    "p95_response_time": 4.897844791412353,
+    "p99_response_time": 8.894920349121094,
+    "min_response_time": 1.1382102966308594,
+    "max_response_time": 59.893131256103516,
+    "initial_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.02945219123505976,
+        "memory_usage": 70303744,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06111553784860558,
+        "memory_usage": 20488192,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.02850346878097126,
+        "memory_usage": 67866624,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06310756972111554,
+        "memory_usage": 8372224,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "7-rate-limiting",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:08:17.807619",
+    "clients": 100,
+    "duration": 191.45336890220642
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 262.378270998718,
+    "avg_response_time": 3.7773406505584717,
+    "median_response_time": 3.940463066101074,
+    "p95_response_time": 5.227088928222656,
+    "p99_response_time": 6.372959613800049,
+    "min_response_time": 1.146078109741211,
+    "max_response_time": 10.0860595703125,
+    "initial_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.04199602780536246,
+        "memory_usage": 61927424,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.060129740518962076,
+        "memory_usage": 23556096,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.025347222222222222,
+        "memory_usage": 62693376,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.0687363184079602,
+        "memory_usage": 23400448,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "8-line-streams",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T14:10:26.089511",
+    "clients": 10,
+    "duration": 3.811291217803955
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 257.42426447636797,
+    "avg_response_time": 3.8489227056503297,
+    "median_response_time": 3.8487911224365234,
+    "p95_response_time": 4.96537685394287,
+    "p99_response_time": 6.0537195205688485,
+    "min_response_time": 1.2998580932617188,
+    "max_response_time": 30.40909767150879,
+    "initial_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.03619662363455809,
+        "memory_usage": 62693376,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.06209533267130089,
+        "memory_usage": 11628544,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.027890547263681596,
+        "memory_usage": 60641280,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.0618444666001994,
+        "memory_usage": 12353536,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "8-line-streams",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T14:11:16.034602",
+    "clients": 50,
+    "duration": 38.84637689590454
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 249.06316254186623,
+    "avg_response_time": 3.9783297061920164,
+    "median_response_time": 3.8900375366210938,
+    "p95_response_time": 5.085957050323485,
+    "p99_response_time": 8.797883987426758,
+    "min_response_time": 1.1219978332519531,
+    "max_response_time": 34.13724899291992,
+    "initial_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.04967131474103585,
+        "memory_usage": 60153856,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.06024900398406374,
+        "memory_usage": 9023488,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.031101190476190477,
+        "memory_usage": 65400832,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.058013902681231376,
+        "memory_usage": 27705344,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "8-line-streams",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:14:47.948002",
+    "clients": 100,
+    "duration": 200.75228905677795
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 242.6371134408268,
+    "avg_response_time": 4.055874586105347,
+    "median_response_time": 4.015922546386719,
+    "p95_response_time": 4.996144771575928,
+    "p99_response_time": 6.049144268035888,
+    "min_response_time": 2.5510787963867188,
+    "max_response_time": 9.580135345458984,
+    "initial_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.06611553784860558,
+        "memory_usage": 47529984,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.02904382470119522,
+        "memory_usage": 90378240,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.06186626746506985,
+        "memory_usage": 46882816,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.02465603190428714,
+        "memory_usage": 79990784,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "9-session-store",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T14:16:35.763236",
+    "clients": 10,
+    "duration": 4.121381044387817
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 253.78053095376814,
+    "avg_response_time": 3.9039878368377687,
+    "median_response_time": 3.9014816284179688,
+    "p95_response_time": 4.920887947082517,
+    "p99_response_time": 5.899918079376221,
+    "min_response_time": 1.529693603515625,
+    "max_response_time": 29.64496612548828,
+    "initial_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.06154382470119522,
+        "memory_usage": 46882816,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.02945219123505976,
+        "memory_usage": 79974400,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.060178926441351886,
+        "memory_usage": 25268224,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.030727091633466135,
+        "memory_usage": 71176192,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "9-session-store",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T14:17:26.274807",
+    "clients": 50,
+    "duration": 39.404125928878784
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 249.6368832247948,
+    "avg_response_time": 3.982215600013733,
+    "median_response_time": 3.9010047912597656,
+    "p95_response_time": 5.051171779632565,
+    "p99_response_time": 8.435995578765876,
+    "min_response_time": 1.363992691040039,
+    "max_response_time": 32.768964767456055,
+    "initial_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.04808531746031746,
+        "memory_usage": 25268224,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.02484577114427861,
+        "memory_usage": 71176192,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.0608234126984127,
+        "memory_usage": 29630464,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.030169322709163348,
+        "memory_usage": 68841472,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "9-session-store",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:20:57.719509",
+    "clients": 100,
+    "duration": 200.29091596603394
+  },
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 255.6224794229372,
+    "avg_response_time": 3.87536358833313,
+    "median_response_time": 3.8405656814575195,
+    "p95_response_time": 4.899823665618896,
+    "p99_response_time": 5.983233451843259,
+    "min_response_time": 2.3720264434814453,
+    "max_response_time": 7.4310302734375,
+    "initial_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.03256944444444444,
+        "memory_usage": 65970176,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.06410358565737052,
+        "memory_usage": 36921344,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.026766169154228855,
+        "memory_usage": 66134016,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.050828343313373256,
+        "memory_usage": 37085184,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "10-leaderboard",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T14:22:45.479632",
+    "clients": 10,
+    "duration": 3.9120190143585205
+  },
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 256.0914404623931,
+    "avg_response_time": 3.8669725894927978,
+    "median_response_time": 3.8748979568481445,
+    "p95_response_time": 4.920291900634765,
+    "p99_response_time": 6.083121299743655,
+    "min_response_time": 1.6169548034667969,
+    "max_response_time": 31.468868255615234,
+    "initial_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.03119641076769691,
+        "memory_usage": 66134016,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.05336318407960199,
+        "memory_usage": 37085184,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.027182539682539683,
+        "memory_usage": 62033920,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.05743512974051896,
+        "memory_usage": 28504064,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "10-leaderboard",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T14:23:35.621588",
+    "clients": 50,
+    "duration": 39.04855227470398
+  },
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 245.26130272037335,
+    "avg_response_time": 4.038517255783081,
+    "median_response_time": 3.988981246948242,
+    "p95_response_time": 5.195140838623047,
+    "p99_response_time": 8.478479385375993,
+    "min_response_time": 0.8990764617919922,
+    "max_response_time": 20.6758975982666,
+    "initial_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.029056603773584908,
+        "memory_usage": 62033920,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.06250746268656716,
+        "memory_usage": 28504064,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.03204771371769384,
+        "memory_usage": 66326528,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.06462612163509471,
+        "memory_usage": 27394048,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "10-leaderboard",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:27:10.656022",
+    "clients": 100,
+    "duration": 203.8642029762268
+  }
+]

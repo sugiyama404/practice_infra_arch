@@ -74,16 +74,16 @@ def write_sstable(data, level=0):
             f.write(f'{k}\t{v}\n')
     return fname
 
-def read_sstable():
-    """Read all SSTable files and merge."""
+def read_sstable(key):
+    """Search a key across SSTable files without full load into memory."""
     files = sorted([f for f in os.listdir(DATA_DIR) if f.startswith('sstable_')])
-    sstable = SortedDict()
     for fname in files:
         with open(os.path.join(DATA_DIR, fname)) as f:
             for line in f:
-                k, v = line.strip().split('\t')
-                sstable[k] = v
-    return sstable
+                k, v = line.strip().split('\t', 1)
+                if k == key:
+                    return v
+    return None
 
 # LSM-Tree compaction
 def lsm_compact():
@@ -134,9 +134,12 @@ def get():
         return jsonify({'value': l1_cache[key], 'cache': 'L1'})
     if key in l2_cache:
         return jsonify({'value': l2_cache[key], 'cache': 'L2'})
-    sstable = read_sstable()
-    if key in sstable:
-        return jsonify({'value': sstable[key], 'cache': 'SSTable'})
+    
+    # 変更点: 全読み込みではなく直接検索
+    value = read_sstable(key)
+    if value is not None:
+        return jsonify({'value': value, 'cache': 'SSTable'})
+    
     return jsonify({'found': False})
 
 @app.route('/compact', methods=['POST'])
