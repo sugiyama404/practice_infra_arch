@@ -7,6 +7,7 @@ from sqlalchemy import (
     DateTime,
     MetaData,
     Table,
+    select,
 )
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -19,7 +20,9 @@ class UserService:
     """ユーザー残高管理サービス（シンプルなTCCサンプル実装）"""
 
     def __init__(self, db_url: str):
-        self.engine = create_engine(db_url)
+        # Use pool_pre_ping to ensure connections are validated before use
+        # which helps with transient DB restarts when running in docker compose.
+        self.engine = create_engine(db_url, pool_pre_ping=True)
         self.SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=self.engine
         )
@@ -30,9 +33,9 @@ class UserService:
             "users",
             self.metadata,
             Column("id", Integer, primary_key=True, autoincrement=True),
-            Column("name", String(100), nullable=False),
+            Column("username", String(100), nullable=False),
             Column("balance", Numeric(12, 2), nullable=False, default=0),
-            Column("reserved", Numeric(12, 2), nullable=False, default=0),
+            Column("reserved_balance", Numeric(12, 2), nullable=False, default=0),
             Column("created_at", DateTime, default=datetime.utcnow),
         )
 
@@ -52,12 +55,14 @@ class UserService:
 
     def _init_sample_data(self):
         with self.SessionLocal() as session:
-            existing = session.execute(self.users_table.select()).fetchall()
-            if len(existing) == 0:
+            # Select only the id to check for existence, avoiding issues with schema mismatches
+            # during initialization.
+            existing = session.execute(select(self.users_table.c.id)).first()
+            if not existing:
                 users = [
-                    {"name": "alice", "balance": 1000.0, "reserved": 0},
-                    {"name": "bob", "balance": 500.0, "reserved": 0},
-                    {"name": "charlie", "balance": 2000.0, "reserved": 0},
+                    {"username": "alice", "balance": 1000.0, "reserved_balance": 0},
+                    {"username": "bob", "balance": 500.0, "reserved_balance": 0},
+                    {"username": "charlie", "balance": 2000.0, "reserved_balance": 0},
                 ]
                 for u in users:
                     session.execute(self.users_table.insert().values(**u))
@@ -88,7 +93,7 @@ class UserService:
                 if not user:
                     raise Exception("User not found")
 
-                available = user.balance - user.reserved
+                available = user.balance - user.reserved_balance
                 if available < amount:
                     raise Exception("Insufficient funds")
 
@@ -96,7 +101,7 @@ class UserService:
                 session.execute(
                     self.users_table.update()
                     .where(self.users_table.c.id == user_id)
-                    .values(reserved=user.reserved + amount)
+                    .values(reserved_balance=user.reserved_balance + amount)
                 )
 
                 session.execute(
@@ -142,7 +147,7 @@ class UserService:
                     .where(self.users_table.c.id == user_id)
                     .values(
                         balance=user.balance - tx.amount,
-                        reserved=user.reserved - tx.amount,
+                        reserved_balance=user.reserved_balance - tx.amount,
                     )
                 )
 
@@ -187,7 +192,7 @@ class UserService:
                 session.execute(
                     self.users_table.update()
                     .where(self.users_table.c.id == user_id)
-                    .values(reserved=user.reserved - tx.amount)
+                    .values(reserved_balance=user.reserved_balance - tx.amount)
                 )
 
                 session.execute(

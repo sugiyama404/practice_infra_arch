@@ -82,7 +82,9 @@ class SagaWorkflowManager:
     """
 
     def __init__(self, db_url: str, redis_url: str):
-        self.engine = create_engine(db_url)
+        # Use pool_pre_ping to avoid stale connections if the database is
+        # restarted while the application is running (common during docker-compose startup)
+        self.engine = create_engine(db_url, pool_pre_ping=True)
         self.SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=self.engine
         )

@@ -19,7 +19,7 @@ class OrderService:
     """注文処理サービス"""
 
     def __init__(self, db_url: str):
-        self.engine = create_engine(db_url)
+        self.engine = create_engine(db_url, pool_pre_ping=True)
         self.SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=self.engine
         )

@@ -50,7 +50,7 @@ services:
       - "3309:3306"
     volumes:
       - ./dbconf/conf/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./dbconf/init_scripts/saga_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dbconf/init_scripts/saga_db.sql/00_create.sql:/docker-entrypoint-initdb.d/init.sql
   redis:
     image: redis:7-alpine
     container_name: redis

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS balance_reservations (
+CREATE TABLE IF NOT EXISTS balance_transactions (
     id VARCHAR(36) PRIMARY KEY,
     user_id INT NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,

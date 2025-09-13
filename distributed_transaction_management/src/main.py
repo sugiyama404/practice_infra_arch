@@ -6,6 +6,7 @@ from workflow.manager import SagaWorkflowManager, Activity
 from services.user_service import UserService
 from services.payment_service import PaymentService
 from services.order_service import OrderService
+from utils import wait_for_database, wait_for_redis
 
 # ログ設定
 logging.basicConfig(
@@ -41,6 +42,14 @@ class PurchaseWorkflowService:
             "mysql+pymysql://saga:saga123@localhost:3309/saga_orchestrator",
         )
         self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        # Wait for dependent services (DBs / Redis) to be reachable before
+        # creating SQLAlchemy engines. This avoids immediate connection refused
+        # errors when containers start at the same time.
+        wait_for_database(self.user_db_url, timeout=60)
+        wait_for_database(self.payment_db_url, timeout=60)
+        wait_for_database(self.order_db_url, timeout=60)
+        wait_for_database(self.saga_db_url, timeout=60)
+        wait_for_redis(self.redis_url, timeout=30)
 
         # サービス初期化
         self.user_service = UserService(self.user_db_url)
@@ -297,12 +306,12 @@ def interactive_demo():
         # 詳細な状態表示
         status = service.get_workflow_status(workflow_id)
         if status:
-            print(f"\nワークフロー詳細:")
+            print("\nワークフロー詳細:")
             print(f"  ステータス: {status['status']}")
             print(
                 f"  進行状況: {status['current_activity_index']}/{status['total_activities']}"
             )
-            print(f"  アクティビティ:")
+            print("  アクティビティ:")
             for i, activity in enumerate(status["activities"]):
                 print(f"    {i + 1}. {activity['name']}: {activity['status']}")
                 if activity["error"]:
