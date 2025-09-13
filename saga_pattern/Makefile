@@ -11,6 +11,9 @@ install: venv
 list:
 	.venv/bin/python -m pip list
 
+format:
+	ruff format .
+
 uninstall:
 	.venv/bin/python -m pip uninstall $(pkg)
 
