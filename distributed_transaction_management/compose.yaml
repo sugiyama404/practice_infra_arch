@@ -1,5 +1,4 @@
 services:
-  # MySQL databases
   user_db:
     image: mysql:8.0
     container_name: user_db
@@ -11,8 +10,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - user_db_data:/var/lib/mysql
-      - ./init_scripts/user_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dbconf/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./dbconf/init_scripts/user_db.sql:/docker-entrypoint-initdb.d/init.sql
   payment_db:
     image: mysql:8.0
     container_name: payment_db
@@ -24,8 +23,8 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - payment_db_data:/var/lib/mysql
-      - ./init_scripts/payment_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dbconf/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./dbconf/init_scripts/payment_db.sql:/docker-entrypoint-initdb.d/init.sql
   order_db:
     image: mysql:8.0
     container_name: order_db
@@ -37,8 +36,8 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - order_db_data:/var/lib/mysql
-      - ./init_scripts/order_db.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./dbconf/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./dbconf/init_scripts/order_db.sql:/docker-entrypoint-initdb.d/init.sql
   saga_db:
     image: mysql:8.0
     container_name: saga_db
@@ -50,15 +49,13 @@ services:
     ports:
       - "3309:3306"
     volumes:
-      - saga_db_data:/var/lib/mysql
-      - ./init_scripts/saga_db.sql:/docker-entrypoint-initdb.d/init.sql
-  # Redis for distributed state management
+      - ./dbconf/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./dbconf/init_scripts/saga_db.sql:/docker-entrypoint-initdb.d/init.sql
   redis:
     image: redis:7-alpine
     container_name: redis
     ports:
       - "6379:6379"
-  # Main application container
   distributed_transaction_app:
     build:
       context: .
@@ -74,4 +71,6 @@ services:
       - ./src:/app/src
     stdin_open: true
     tty: true
-    command: python -m src.main
+    ports:
+      - "8000:8000"
+    command: [ "python", "-m", "src.main" ]
