@@ -2,10 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import logging
-from workflow.manager import SagaWorkflowManager
-from services.user_service import UserService
-from services.payment_service import PaymentService
-from services.order_service import OrderService
+from main import PurchaseWorkflowService
 from utils import wait_for_database, wait_for_redis
 import os
 
@@ -66,17 +63,17 @@ wait_for_database(order_db_url, timeout=60)
 wait_for_database(saga_db_url, timeout=60)
 wait_for_redis(redis_url, timeout=60)
 
-user_service = UserService(user_db_url)
-payment_service = PaymentService(payment_db_url)
-order_service = OrderService(order_db_url)
-saga_manager = SagaWorkflowManager(saga_db_url, redis_url)
+# Use the higher-level PurchaseWorkflowService which composes the
+# SagaWorkflowManager and the individual services. That class exposes
+# create_purchase_workflow and execute_purchase used by the API.
+purchase_service = PurchaseWorkflowService()
 
 
 @app.post("/purchase", response_model=PurchaseResponse)
 async def purchase(request: PurchaseRequest):
     try:
-        # Create workflow
-        workflow_id = saga_manager.create_purchase_workflow(
+        # Create workflow via PurchaseWorkflowService
+        workflow_id = purchase_service.create_purchase_workflow(
             {
                 "user_id": request.user_id,
                 "product_id": request.product_id,
@@ -87,7 +84,7 @@ async def purchase(request: PurchaseRequest):
         )
 
         # Execute workflow
-        result = saga_manager.execute_purchase(workflow_id)
+        result = purchase_service.execute_purchase(workflow_id)
 
         return PurchaseResponse(
             success=result.get("success", False),
