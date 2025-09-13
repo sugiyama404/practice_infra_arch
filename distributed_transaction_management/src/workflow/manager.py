@@ -17,6 +17,7 @@ from sqlalchemy import (
     MetaData,
     Table,
 )
+from sqlalchemy.dialects.mysql import insert as mysql_insert
 from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
@@ -308,21 +309,28 @@ class SagaWorkflowManager:
                 }
                 activities_data.append(activity_data)
 
-            # データベースに保存
-            stmt = (
-                self.workflows_table.insert()
-                .values(
-                    workflow_id=execution.workflow_id,
-                    status=execution.status.value,
-                    activities=json.dumps(activities_data),
-                    current_activity_index=execution.current_activity_index,
-                    created_at=execution.created_at,
-                    updated_at=datetime.utcnow(),
-                    error=execution.error,
-                    result=json.dumps(execution.result) if execution.result else None,
-                )
-                .prefix_with("REPLACE")
+            # データベースに保存（MySQL 用に ON DUPLICATE KEY UPDATE を使用）
+            insert_stmt = mysql_insert(self.workflows_table).values(
+                workflow_id=execution.workflow_id,
+                status=execution.status.value,
+                activities=json.dumps(activities_data),
+                current_activity_index=execution.current_activity_index,
+                created_at=execution.created_at,
+                updated_at=datetime.utcnow(),
+                error=execution.error,
+                result=json.dumps(execution.result) if execution.result else None,
             )
+
+            update_dict = {
+                "status": insert_stmt.inserted.status,
+                "activities": insert_stmt.inserted.activities,
+                "current_activity_index": insert_stmt.inserted.current_activity_index,
+                "updated_at": insert_stmt.inserted.updated_at,
+                "error": insert_stmt.inserted.error,
+                "result": insert_stmt.inserted.result,
+            }
+
+            stmt = insert_stmt.on_duplicate_key_update(**update_dict)
 
             session.execute(stmt)
             session.commit()
@@ -345,7 +353,8 @@ class SagaWorkflowManager:
                 # ハンドラー関数はレジストリから取得する必要がある
                 activity = Activity(
                     name=activity_data["name"],
-                    handler=lambda: None,  # プレースホルダー
+                    handler=lambda **kwargs: None,  # プレースホルダー（任意引数を許可）
+                    compensation_handler=(lambda **kwargs: None),
                     params=activity_data["params"],
                     max_retries=activity_data["max_retries"],
                     retry_count=activity_data["retry_count"],
