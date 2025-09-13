@@ -79,4 +79,54 @@ INSERT INTO saga_step_logs (saga_id, step_number, step_name, service_name, comma
 ('saga-success-001', 2, 'ReserveStock', 'inventory-service', 'RESERVE_STOCK', 'COMPLETED',
  JSON_OBJECT('order_id', 'order-success-001', 'book_id', 'book-123', 'quantity', 1),
  JSON_OBJECT('success', true, 'reserved', true, 'available_stock', 4),
- DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 200 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 380 MICROSECOND), 180);
+ DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 200 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 380 MICROSECOND), 180),
+('saga-success-001', 3, 'ProcessPayment', 'payment-service', 'PROCESS_PAYMENT', 'COMPLETED',
+ JSON_OBJECT('order_id', 'order-success-001', 'amount', 3850.00, 'payment_method', 'CREDIT_CARD'),
+ JSON_OBJECT('success', true, 'payment_id', 'pay-success-001', 'transaction_id', 'txn-12345678'),
+ DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 400 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 650 MICROSECOND), 250),
+('saga-success-001', 4, 'CreateShipment', 'shipping-service', 'CREATE_SHIPMENT', 'COMPLETED',
+ JSON_OBJECT('order_id', 'order-success-001', 'carrier', 'ヤマト運輸', 'shipping_address', JSON_OBJECT('name', '田中太郎', 'address', '東京都渋谷区神南1-1-1')),
+ JSON_OBJECT('success', true, 'shipment_id', 'ship-success-001', 'tracking_number', 'YMT123456789'),
+ DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 700 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 DAY), INTERVAL 850 MICROSECOND), 150);
+
+-- 決済失敗ケースのイベントデータ
+INSERT INTO events (event_type, aggregate_id, aggregate_type, version, payload, processed_at) VALUES
+('ORDER_CREATED', 'order-fail-payment', 'order', 1,
+ JSON_OBJECT('order_id', 'order-fail-payment', 'customer_id', 'customer-004', 'book_id', 'book-101', 'quantity', 1),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+('STOCK_RESERVED', 'order-fail-payment', 'inventory', 1,
+ JSON_OBJECT('order_id', 'order-fail-payment', 'book_id', 'book-101', 'quantity', 1, 'available_stock', 2),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+('PAYMENT_FAILED', 'order-fail-payment', 'payment', 1,
+ JSON_OBJECT('order_id', 'order-fail-payment', 'amount', 4620.00, 'reason', 'Insufficient funds'),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+('STOCK_RELEASED', 'order-fail-payment', 'inventory', 2,
+ JSON_OBJECT('order_id', 'order-fail-payment', 'book_id', 'book-101', 'quantity', 1, 'available_stock', 3),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+('ORDER_CANCELLED', 'order-fail-payment', 'order', 2,
+ JSON_OBJECT('order_id', 'order-fail-payment', 'reason', 'payment_failed'),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR));
+
+-- 決済失敗ケースのSagaデータ
+INSERT INTO saga_instances (saga_id, order_id, status, current_step, payload, failed_at, failure_reason) VALUES
+('saga-fail-payment', 'order-fail-payment', 'FAILED', 3,
+ JSON_OBJECT('order_id', 'order-fail-payment', 'customer_id', 'customer-004', 'total_amount', 4620.00),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR), 'PAYMENT_FAILED');
+
+INSERT INTO saga_step_logs (saga_id, step_number, step_name, service_name, command_type, status, request_payload, response_payload, started_at, completed_at, duration_ms) VALUES
+('saga-fail-payment', 1, 'CreateOrder', 'order-service', 'CREATE_ORDER', 'COMPLETED',
+ JSON_OBJECT('order_id', 'order-fail-payment', 'customer_id', 'customer-004'),
+ JSON_OBJECT('success', true, 'order_id', 'order-fail-payment', 'status', 'CREATED'),
+ DATE_SUB(NOW(), INTERVAL 1 HOUR), DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 120 MICROSECOND), 120),
+('saga-fail-payment', 2, 'ReserveStock', 'inventory-service', 'RESERVE_STOCK', 'COMPLETED',
+ JSON_OBJECT('order_id', 'order-fail-payment', 'book_id', 'book-101', 'quantity', 1),
+ JSON_OBJECT('success', true, 'reserved', true, 'available_stock', 2),
+ DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 150 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 300 MICROSECOND), 150),
+('saga-fail-payment', 3, 'ProcessPayment', 'payment-service', 'PROCESS_PAYMENT', 'FAILED',
+ JSON_OBJECT('order_id', 'order-fail-payment', 'amount', 4620.00, 'payment_method', 'CREDIT_CARD'),
+ JSON_OBJECT('success', false, 'error', 'Insufficient funds'),
+ DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 350 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 600 MICROSECOND), 250),
+('saga-fail-payment', 4, 'ReleaseStock', 'inventory-service', 'RELEASE_STOCK', 'COMPLETED',
+ JSON_OBJECT('order_id', 'order-fail-payment', 'book_id', 'book-101', 'quantity', 1),
+ JSON_OBJECT('success', true, 'released', true, 'available_stock', 3),
+ DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 650 MICROSECOND), DATE_ADD(DATE_SUB(NOW(), INTERVAL 1 HOUR), INTERVAL 750 MICROSECOND), 100);
