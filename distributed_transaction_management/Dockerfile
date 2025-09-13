@@ -1,9 +1,10 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONPATH=/app/src:$PYTHONPATH
 
 RUN apt-get update && apt-get install -y \
     pkg-config \

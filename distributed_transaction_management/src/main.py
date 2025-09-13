@@ -22,18 +22,23 @@ class PurchaseWorkflowService:
 
     def __init__(self):
         # データベース接続URL
+        # Use the PyMySQL driver via the mysql+pymysql scheme (PyMySQL is
+        # installed in requirements). Using plain `mysql://` can trigger
+        # `No module named 'MySQLdb'` if the MySQL-Python driver is missing.
         self.user_db_url = os.getenv(
-            "USER_DB_URL", "mysql://user:user123@localhost:3306/user_service"
+            "USER_DB_URL", "mysql+pymysql://user:user123@localhost:3306/user_service"
         )
         self.payment_db_url = os.getenv(
             "PAYMENT_DB_URL",
-            "mysql://payment:payment123@localhost:3307/payment_service",
+            "mysql+pymysql://payment:payment123@localhost:3307/payment_service",
         )
         self.order_db_url = os.getenv(
-            "ORDER_DB_URL", "mysql://order:order123@localhost:3308/order_service"
+            "ORDER_DB_URL",
+            "mysql+pymysql://order:order123@localhost:3308/order_service",
         )
         self.saga_db_url = os.getenv(
-            "SAGA_DB_URL", "mysql://saga:saga123@localhost:3309/saga_orchestrator"
+            "SAGA_DB_URL",
+            "mysql+pymysql://saga:saga123@localhost:3309/saga_orchestrator",
         )
         self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
 

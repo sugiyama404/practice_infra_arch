@@ -62,10 +62,10 @@ services:
       dockerfile: Dockerfile
     container_name: distributed_transaction_app
     environment:
-      - USER_DB_URL=mysql://user:user123@user_db:3306/user_service
-      - PAYMENT_DB_URL=mysql://payment:payment123@payment_db:3306/payment_service
-      - ORDER_DB_URL=mysql://order:order123@order_db:3306/order_service
-      - SAGA_DB_URL=mysql://saga:saga123@saga_db:3306/saga_orchestrator
+      - USER_DB_URL=mysql+pymysql://user:user123@user_db:3306/user_service
+      - PAYMENT_DB_URL=mysql+pymysql://payment:payment123@payment_db:3306/payment_service
+      - ORDER_DB_URL=mysql+pymysql://order:order123@order_db:3306/order_service
+      - SAGA_DB_URL=mysql+pymysql://saga:saga123@saga_db:3306/saga_orchestrator
       - REDIS_URL=redis://redis:6379
     volumes:
       - ./src:/app/src

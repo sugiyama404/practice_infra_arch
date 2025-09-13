@@ -3,6 +3,5 @@ PyMySQL==1.1.0
 redis==5.0.1
 python-dotenv==1.0.0
 cryptography==41.0.7
-asyncio==3.4.3
-workflow
-pkg_resources
+setuptools>=60.0
+
