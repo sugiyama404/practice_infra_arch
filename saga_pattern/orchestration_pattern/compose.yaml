@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cloudmart-mysql-orchestration
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cloudmart_saga
+      MYSQL_USER: cloudmart_user
+      MYSQL_PASSWORD: cloudmart_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./dbconf/init_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "cloudmart_user", "-pcloudmart_pass" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: cloudmart-redis-orchestration
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: cloudmart-rabbitmq-orchestration
+    environment:
+      RABBITMQ_DEFAULT_USER: cloudmart_user
+      RABBITMQ_DEFAULT_PASS: cloudmart_pass
+      RABBITMQ_DEFAULT_VHOST: cloudmart_vhost
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    restart: unless-stopped
+
+  saga-orchestrator:
+    build: ./saga_orchestrator
+    container_name: orchestration-saga-orchestrator
+    ports:
+      - "8005:8005"
+    environment:
+      - MYSQL_HOST=mysql
+      - REDIS_HOST=redis
+      - RABBITMQ_HOST=rabbitmq
+      - ORDER_SERVICE_URL=http://order-service:8001
+      - INVENTORY_SERVICE_URL=http://inventory-service:8002
+      - PAYMENT_SERVICE_URL=http://payment-service:8003
+      - SHIPPING_SERVICE_URL=http://shipping-service:8004
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  order-service:
+    build: ./order_service
+    container_name: orchestration-order-service
+    ports:
+      - "8011:8001"
+    environment:
+      - MYSQL_HOST=mysql
+      - REDIS_HOST=redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  inventory-service:
+    build: ./inventory_service
+    container_name: orchestration-inventory-service
+    ports:
+      - "8012:8002"
+    environment:
+      - MYSQL_HOST=mysql
+      - REDIS_HOST=redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  payment-service:
+    build: ./payment_service
+    container_name: orchestration-payment-service
+    ports:
+      - "8013:8003"
+    environment:
+      - MYSQL_HOST=mysql
+      - REDIS_HOST=redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  shipping-service:
+    build: ./shipping_service
+    container_name: orchestration-shipping-service
+    ports:
+      - "8014:8004"
+    environment:
+      - MYSQL_HOST=mysql
+      - REDIS_HOST=redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  rabbitmq_data:
