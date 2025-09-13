@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 265.5942351104821,
+    "avg_response_time": 3.731405735015869,
+    "median_response_time": 3.6649703979492188,
+    "p95_response_time": 4.66477870941162,
+    "p99_response_time": 5.555322170257568,
+    "min_response_time": 2.4340152740478516,
+    "max_response_time": 8.649349212646484,
+    "initial_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.025878848063555115,
+        "memory_usage": 90120192,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06185258964143426,
+        "memory_usage": 47968256,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.027452736318407958,
+        "memory_usage": 90505216,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.05780876494023904,
+        "memory_usage": 47968256,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "7-rate-limiting",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T14:04:06.869634",
+    "clients": 10,
+    "duration": 3.7651419639587402
+  }
+]

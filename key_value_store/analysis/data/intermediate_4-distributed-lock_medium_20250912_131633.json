@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 235.58424145299804,
+    "avg_response_time": 4.204673337936401,
+    "median_response_time": 4.1065216064453125,
+    "p95_response_time": 6.607151031494139,
+    "p99_response_time": 8.452894687652588,
+    "min_response_time": 1.3670921325683594,
+    "max_response_time": 323.5158920288086,
+    "initial_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.05403386454183266,
+        "memory_usage": 20889600,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.026838453914767094,
+        "memory_usage": 88027136,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "4-distributed-lock-redis-1": {
+        "cpu_percent": 0.19412698412698415,
+        "memory_usage": 35065856,
+        "memory_limit": 16810717184
+      },
+      "4-distributed-lock-app-1": {
+        "cpu_percent": 0.2476961271102284,
+        "memory_usage": 182489088,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "4-distributed-lock",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:41:00.368706",
+    "clients": 50,
+    "duration": 42.44766092300415
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 249.6368832247948,
+    "avg_response_time": 3.982215600013733,
+    "median_response_time": 3.9010047912597656,
+    "p95_response_time": 5.051171779632565,
+    "p99_response_time": 8.435995578765876,
+    "min_response_time": 1.363992691040039,
+    "max_response_time": 32.768964767456055,
+    "initial_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.04808531746031746,
+        "memory_usage": 25268224,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.02484577114427861,
+        "memory_usage": 71176192,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "9-session-store-redis-1": {
+        "cpu_percent": 0.0608234126984127,
+        "memory_usage": 29630464,
+        "memory_limit": 16810717184
+      },
+      "9-session-store-app-1": {
+        "cpu_percent": 0.030169322709163348,
+        "memory_usage": 68841472,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "9-session-store",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:20:57.719509",
+    "clients": 100,
+    "duration": 200.29091596603394
+  }
+]

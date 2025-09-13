@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 256.0914404623931,
+    "avg_response_time": 3.8669725894927978,
+    "median_response_time": 3.8748979568481445,
+    "p95_response_time": 4.920291900634765,
+    "p99_response_time": 6.083121299743655,
+    "min_response_time": 1.6169548034667969,
+    "max_response_time": 31.468868255615234,
+    "initial_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.03119641076769691,
+        "memory_usage": 66134016,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.05336318407960199,
+        "memory_usage": 37085184,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "10-leaderboard-app-1": {
+        "cpu_percent": 0.027182539682539683,
+        "memory_usage": 62033920,
+        "memory_limit": 16810717184
+      },
+      "10-leaderboard-redis-1": {
+        "cpu_percent": 0.05743512974051896,
+        "memory_usage": 28504064,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "10-leaderboard",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T14:23:35.621588",
+    "clients": 50,
+    "duration": 39.04855227470398
+  }
+]

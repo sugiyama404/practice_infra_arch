@@ -1,0 +1,8 @@
+requests
+pandas
+numpy
+docker
+ipykernel
+notebook
+plotly
+matplotlib

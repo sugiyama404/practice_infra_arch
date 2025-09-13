@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 257.42426447636797,
+    "avg_response_time": 3.8489227056503297,
+    "median_response_time": 3.8487911224365234,
+    "p95_response_time": 4.96537685394287,
+    "p99_response_time": 6.0537195205688485,
+    "min_response_time": 1.2998580932617188,
+    "max_response_time": 30.40909767150879,
+    "initial_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.03619662363455809,
+        "memory_usage": 62693376,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.06209533267130089,
+        "memory_usage": 11628544,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.027890547263681596,
+        "memory_usage": 60641280,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.0618444666001994,
+        "memory_usage": 12353536,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "8-line-streams",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T14:11:16.034602",
+    "clients": 50,
+    "duration": 38.84637689590454
+  }
+]

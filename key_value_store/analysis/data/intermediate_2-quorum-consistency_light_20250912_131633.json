@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 168.26368514650255,
+    "avg_response_time": 5.893177509307861,
+    "median_response_time": 5.930066108703613,
+    "p95_response_time": 7.2963476181030265,
+    "p99_response_time": 8.281056880950928,
+    "min_response_time": 2.8579235076904297,
+    "max_response_time": 22.50981330871582,
+    "initial_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.05709163346613546,
+        "memory_usage": 5668864,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05814741035856574,
+        "memory_usage": 30461952,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.047066402378592664,
+        "memory_usage": 23187456,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.030249003984063744,
+        "memory_usage": 80797696,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "2-quorum-consistency-redis-node1-1": {
+        "cpu_percent": 0.055714285714285716,
+        "memory_usage": 5849088,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node2-1": {
+        "cpu_percent": 0.05664342629482071,
+        "memory_usage": 30101504,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-redis-node3-1": {
+        "cpu_percent": 0.05582504970178926,
+        "memory_usage": 23171072,
+        "memory_limit": 16810717184
+      },
+      "2-quorum-consistency-app-1": {
+        "cpu_percent": 0.029132602193419743,
+        "memory_usage": 74014720,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "2-quorum-consistency",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T13:24:32.638767",
+    "clients": 10,
+    "duration": 5.9430530071258545
+  }
+]

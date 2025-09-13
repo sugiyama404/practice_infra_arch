@@ -1,0 +1,64 @@
+[
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 206.86497466104498,
+    "avg_response_time": 4.792378587722778,
+    "median_response_time": 4.808902740478516,
+    "p95_response_time": 6.093025207519531,
+    "p99_response_time": 7.097005844116211,
+    "min_response_time": 1.3508796691894531,
+    "max_response_time": 32.912254333496094,
+    "initial_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.05143141153081511,
+        "memory_usage": 5976064,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.03528414755732801,
+        "memory_usage": 62062592,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.047480158730158734,
+        "memory_usage": 5926912,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.05702487562189055,
+        "memory_usage": 24690688,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "3-sharding-replica-redis-node2-1": {
+        "cpu_percent": 0.04678926441351888,
+        "memory_usage": 8212480,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-app-1": {
+        "cpu_percent": 0.026743027888446215,
+        "memory_usage": 64180224,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node1-1": {
+        "cpu_percent": 0.05144278606965175,
+        "memory_usage": 7000064,
+        "memory_limit": 16810717184
+      },
+      "3-sharding-replica-redis-node3-1": {
+        "cpu_percent": 0.06131736526946108,
+        "memory_usage": 7798784,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "3-sharding-replica",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T13:38:13.713892",
+    "clients": 100,
+    "duration": 241.70355606079102
+  }
+]

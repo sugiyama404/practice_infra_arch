@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 50000,
+    "successful_requests": 50000,
+    "error_rate": 0.0,
+    "qps": 261.16019940886906,
+    "avg_response_time": 3.7942335987091065,
+    "median_response_time": 3.6814212799072266,
+    "p95_response_time": 4.897844791412353,
+    "p99_response_time": 8.894920349121094,
+    "min_response_time": 1.1382102966308594,
+    "max_response_time": 59.893131256103516,
+    "initial_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.02945219123505976,
+        "memory_usage": 70303744,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06111553784860558,
+        "memory_usage": 20488192,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "7-rate-limiting-app-1": {
+        "cpu_percent": 0.02850346878097126,
+        "memory_usage": 67866624,
+        "memory_limit": 16810717184
+      },
+      "7-rate-limiting-redis-1": {
+        "cpu_percent": 0.06310756972111554,
+        "memory_usage": 8372224,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "7-rate-limiting",
+    "pattern_name": "heavy",
+    "pattern_description": "高負荷",
+    "timestamp": "2025-09-12T14:08:17.807619",
+    "clients": 100,
+    "duration": 191.45336890220642
+  }
+]
