@@ -137,39 +137,39 @@ def handle_order_cancelled(event_data: Dict[str, Any], db: Session):
 
 
 # Event listener (simplified - in production, use proper message queue consumer)
-@app.on_event("startup")
-async def startup_event():
-    """Subscribe to events on startup"""
-    import threading
+# @app.on_event("startup")
+# async def startup_event():
+#     """Subscribe to events on startup"""
+#     import threading
 
-    def event_listener():
-        pubsub = redis_client.pubsub()
-        pubsub.subscribe(f"{settings.event_channel_prefix}.order")
+#     def event_listener():
+#         pubsub = redis_client.pubsub()
+#         pubsub.subscribe(f"{settings.event_channel_prefix}.order")
 
-        logger.info("Inventory service listening for events...")
+#         logger.info("Inventory service listening for events...")
 
-        for message in pubsub.listen():
-            if message["type"] == "message":
-                try:
-                    event_data = json.loads(message["data"])
-                    event_type = event_data["event_type"]
+#         for message in pubsub.listen():
+#             if message["type"] == "message":
+#                 try:
+#                     event_data = json.loads(message["data"])
+#                     event_type = event_data["event_type"]
 
-                    # Get database session
-                    db = Session(engine)
+#                     # Get database session
+#                     db = Session(engine)
 
-                    if event_type == "OrderCreated":
-                        handle_order_created(event_data, db)
-                    elif event_type == "OrderCancelled":
-                        handle_order_cancelled(event_data, db)
+#                     if event_type == "OrderCreated":
+#                         handle_order_created(event_data, db)
+#                     elif event_type == "OrderCancelled":
+#                         handle_order_cancelled(event_data, db)
 
-                    db.close()
+#                     db.close()
 
-                except Exception as e:
-                    logger.error(f"Error processing event: {str(e)}")
+#                 except Exception as e:
+#                     logger.error(f"Error processing event: {str(e)}")
 
-    # Start event listener in background thread
-    thread = threading.Thread(target=event_listener, daemon=True)
-    thread.start()
+#     # Start event listener in background thread
+#     thread = threading.Thread(target=event_listener, daemon=True)
+#     thread.start()
 
 
 @app.post("/inventory/reserve")
@@ -182,11 +182,13 @@ async def reserve_stock(
         if "payload" in reservation_data:
             # Command structure from saga orchestrator
             payload = reservation_data["payload"]
-            book_id = payload["product_id"]  # Note: using product_id from order data
+            book_id = payload.get("product_id") or payload.get("book_id")
             quantity = payload["quantity"]
         else:
-            # Direct payload
-            book_id = reservation_data["book_id"]
+            # Direct payload - check if it's already flattened
+            book_id = reservation_data.get("product_id") or reservation_data.get(
+                "book_id"
+            )
             quantity = reservation_data["quantity"]
 
         inventory = db.query(Inventory).filter(Inventory.book_id == book_id).first()

@@ -14,7 +14,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
 
 from shared.models import SagaInstance, SagaStatus, SagaStepLog, StepStatus
 from shared.config import settings, get_database_url, get_rabbitmq_url
-from shared.utils import setup_logging, create_command, create_response, generate_saga_id
+from shared.utils import (
+    setup_logging,
+    create_command,
+    create_response,
+    generate_saga_id,
+)
 
 # Setup logging
 logger = setup_logging("saga-orchestrator")
@@ -84,7 +89,9 @@ async def send_command(service: str, command: Dict[str, Any]) -> Dict[str, Any]:
                     return result
                 else:
                     error_text = await response.text()
-                    logger.error(f"Command failed with status {response.status}: {error_text}")
+                    logger.error(
+                        f"Command failed with status {response.status}: {error_text}"
+                    )
                     raise Exception(f"Service error: {response.status} - {error_text}")
         except Exception as e:
             logger.error(f"Error sending command to {service}: {str(e)}")
@@ -285,18 +292,33 @@ async def start_saga(
         order_data["saga_id"] = saga_id
 
         # First, create the order to get the actual order_id
-
-        order_payload = {
-            "customer_id": order_data["customer_id"],
-            "items": [
-                {
-                    "book_id": order_data["product_id"],
-                    "quantity": order_data["quantity"],
-                    "unit_price": order_data["price"]
-                }
-            ],
-            "saga_id": saga_id
-        }
+        # Extract first item for order creation
+        if "items" in order_data and len(order_data["items"]) > 0:
+            first_item = order_data["items"][0]
+            order_payload = {
+                "customer_id": order_data["customer_id"],
+                "items": [
+                    {
+                        "book_id": first_item["product_id"],
+                        "quantity": first_item["quantity"],
+                        "unit_price": first_item["price"],
+                    }
+                ],
+                "saga_id": saga_id,
+            }
+        else:
+            # Fallback for old format
+            order_payload = {
+                "customer_id": order_data["customer_id"],
+                "items": [
+                    {
+                        "book_id": order_data["product_id"],
+                        "quantity": order_data["quantity"],
+                        "unit_price": order_data["price"],
+                    }
+                ],
+                "saga_id": saga_id,
+            }
 
         async with aiohttp.ClientSession() as session:
             try:
@@ -306,13 +328,19 @@ async def start_saga(
                         order_response = await response.json()
                         actual_order_id = order_response.get("order_id")
                         order_data["order_id"] = actual_order_id
-                        logger.info(f"Created order {actual_order_id} for saga {saga_id}")
+                        logger.info(
+                            f"Created order {actual_order_id} for saga {saga_id}"
+                        )
                     else:
                         error_text = await response.text()
-                        raise Exception(f"Failed to create order: {response.status} - {error_text}")
+                        raise Exception(
+                            f"Failed to create order: {response.status} - {error_text}"
+                        )
             except Exception as e:
                 logger.error(f"Error creating order for saga {saga_id}: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
+                raise HTTPException(
+                    status_code=500, detail=f"Failed to create order: {str(e)}"
+                )
 
         # Now run the saga with the actual order_id
         background_tasks.add_task(run_saga, saga_id, order_data)

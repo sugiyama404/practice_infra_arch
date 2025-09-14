@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 import redis
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any
 import sys
 import os
@@ -197,6 +197,62 @@ async def startup_event():
 
     thread = threading.Thread(target=event_listener, daemon=True)
     thread.start()
+
+
+@app.post("/shipping/arrange")
+async def arrange_shipping(
+    shipping_data: Dict[str, Any], db: Session = Depends(get_db)
+):
+    """Arrange shipping for order"""
+    try:
+        # Handle both direct payload and command structure
+        if "payload" in shipping_data:
+            payload = shipping_data["payload"]
+            order_id = payload["order_id"]
+        else:
+            order_id = shipping_data["order_id"]
+
+        logger.info(f"Arranging shipping for order: {order_id}")
+
+        # Simulate shipping arrangement
+        shipping_success = simulate_shipping_arrangement()
+
+        if shipping_success:
+            # Create shipment record
+            shipment_id = generate_shipment_id()
+            shipment = Shipment(
+                shipment_id=shipment_id,
+                order_id=order_id,
+                carrier="Demo Carrier",
+                tracking_number=f"TRK{shipment_id[-8:]}",
+                status=ShipmentStatus.ARRANGED,
+                shipping_address={
+                    "name": "Demo Customer",
+                    "address": "123 Demo Street, Demo City, 12345",
+                    "phone": "555-0123",
+                },
+                estimated_delivery=datetime.utcnow().replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
+                + timedelta(days=3),
+                shipping_cost=500.00,  # Fixed shipping cost for demo
+            )
+            db.add(shipment)
+            db.commit()
+
+            return {
+                "message": "Shipping arranged successfully",
+                "shipment_id": shipment_id,
+            }
+        else:
+            # Shipping arrangement failed
+            raise HTTPException(status_code=400, detail="Shipping arrangement failed")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error arranging shipping: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/shipping/{order_id}")

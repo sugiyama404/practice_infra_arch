@@ -193,6 +193,67 @@ async def startup_event():
     thread.start()
 
 
+@app.post("/payments/process")
+async def process_payment(payment_data: Dict[str, Any], db: Session = Depends(get_db)):
+    """Process payment for order"""
+    try:
+        # Handle both direct payload and command structure
+        if "payload" in payment_data:
+            payload = payment_data["payload"]
+            order_id = payload["order_id"]
+            amount = payload.get("amount") or payload.get(
+                "price"
+            )  # Handle both amount and price
+        else:
+            order_id = payment_data["order_id"]
+            amount = payment_data.get("amount") or payment_data.get("price")
+
+        logger.info(f"Processing payment for order: {order_id}, amount: {amount}")
+
+        # Simulate payment processing
+        payment_success = simulate_payment_processing(amount)
+
+        if payment_success:
+            # Create payment record
+            payment_id = generate_payment_id()
+            payment = Payment(
+                payment_id=payment_id,
+                order_id=order_id,
+                amount=amount,
+                payment_method="CREDIT_CARD",  # Default for demo
+                status=PaymentStatus.COMPLETED,
+                transaction_id=f"txn_{payment_id}",
+                processed_at=datetime.utcnow(),
+            )
+            db.add(payment)
+            db.commit()
+
+            return {
+                "message": "Payment processed successfully",
+                "payment_id": payment_id,
+            }
+        else:
+            # Payment failed
+            payment = Payment(
+                payment_id=generate_payment_id(),
+                order_id=order_id,
+                amount=amount,
+                payment_method="CREDIT_CARD",
+                status=PaymentStatus.FAILED,
+                failed_reason="Payment processing failed",
+            )
+            db.add(payment)
+            db.commit()
+
+            raise HTTPException(status_code=400, detail="Payment failed")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing payment: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/payments/{order_id}")
 async def get_payment(order_id: str, db: Session = Depends(get_db)):
     """Get payment details"""
