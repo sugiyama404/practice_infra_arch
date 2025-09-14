@@ -125,8 +125,42 @@ async def execute_step(
     db.commit()
 
     try:
+        # Prepare payload based on service
+        if service == "inventory":
+            # Extract first item for inventory service
+            if "items" in payload and len(payload["items"]) > 0:
+                first_item = payload["items"][0]
+                command_payload = {
+                    "product_id": first_item["product_id"],
+                    "quantity": first_item["quantity"],
+                    "order_id": payload.get("order_id"),
+                    "saga_id": saga_id,
+                }
+            else:
+                command_payload = payload
+        elif service == "payment":
+            # Extract payment info for payment service
+            if "items" in payload and len(payload["items"]) > 0:
+                first_item = payload["items"][0]
+                command_payload = {
+                    "customer_id": payload.get("customer_id"),
+                    "amount": first_item["price"] * first_item["quantity"],
+                    "order_id": payload.get("order_id"),
+                    "saga_id": saga_id,
+                }
+            else:
+                command_payload = payload
+        elif service == "shipping":
+            # Shipping service needs order_id
+            command_payload = {
+                "order_id": payload.get("order_id"),
+                "saga_id": saga_id,
+            }
+        else:
+            command_payload = payload
+
         # Send command to service
-        command = create_command(command_type, saga_id, payload)
+        command = create_command(command_type, saga_id, command_payload)
         command["endpoint"] = endpoint
 
         response = await send_command(service, command)
