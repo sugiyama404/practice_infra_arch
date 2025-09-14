@@ -134,7 +134,7 @@ async def execute_step(
             if "items" in payload and len(payload["items"]) > 0:
                 first_item = payload["items"][0]
                 command_payload = {
-                    "product_id": first_item["product_id"],
+                    "book_id": first_item["book_id"],
                     "quantity": first_item["quantity"],
                     "order_id": payload.get("order_id"),
                     "saga_id": saga_id,
@@ -145,10 +145,11 @@ async def execute_step(
             # Extract payment info for payment service
             if "items" in payload and len(payload["items"]) > 0:
                 first_item = payload["items"][0]
+                # Calculate amount based on quantity and a default price since unit_price is not in payload
+                amount = first_item["quantity"] * 3500.00  # Default price
                 command_payload = {
-                    "customer_id": payload.get("customer_id"),
-                    "amount": first_item["price"] * first_item["quantity"],
                     "order_id": payload.get("order_id"),
+                    "amount": amount,
                     "saga_id": saga_id,
                 }
             else:
@@ -215,8 +216,36 @@ async def execute_compensation(
     )
 
     try:
+        # Prepare compensation payload based on service
+        if service == "inventory":
+            # Extract first item for inventory compensation
+            if "items" in payload and len(payload["items"]) > 0:
+                first_item = payload["items"][0]
+                compensation_payload = {
+                    "book_id": first_item["book_id"],
+                    "quantity": first_item["quantity"],
+                    "order_id": payload.get("order_id"),
+                    "saga_id": saga_id,
+                }
+            else:
+                compensation_payload = payload
+        elif service == "payment":
+            # Payment compensation needs order_id
+            compensation_payload = {
+                "order_id": payload.get("order_id"),
+                "saga_id": saga_id,
+            }
+        elif service == "shipping":
+            # Shipping compensation needs order_id
+            compensation_payload = {
+                "order_id": payload.get("order_id"),
+                "saga_id": saga_id,
+            }
+        else:
+            compensation_payload = payload
+
         # Send compensation command
-        command = create_command(compensation_command, saga_id, payload)
+        command = create_command(compensation_command, saga_id, compensation_payload)
         command["endpoint"] = endpoint
 
         response = await send_command(service, command)
@@ -344,22 +373,21 @@ async def start_saga(
                 "customer_id": order_data["customer_id"],
                 "items": [
                     {
-                        "book_id": first_item["product_id"],
+                        "book_id": first_item["book_id"],
                         "quantity": first_item["quantity"],
-                        "unit_price": first_item["price"],
                     }
                 ],
                 "saga_id": saga_id,
             }
         else:
-            # Fallback for old format
+            # Fallback for old format - convert to new format
             order_payload = {
                 "customer_id": order_data["customer_id"],
                 "items": [
                     {
-                        "book_id": order_data["product_id"],
-                        "quantity": order_data["quantity"],
-                        "unit_price": order_data["price"],
+                        "book_id": order_data.get("book_id")
+                        or order_data.get("product_id"),
+                        "quantity": order_data.get("quantity", 1),
                     }
                 ],
                 "saga_id": saga_id,

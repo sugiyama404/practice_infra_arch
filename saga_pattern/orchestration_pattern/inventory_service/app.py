@@ -233,6 +233,40 @@ async def health_check():
     return {"status": "healthy", "service": "inventory-service"}
 
 
+# Event listener
+@app.on_event("startup")
+async def startup_event():
+    """Subscribe to events on startup"""
+    import threading
+
+    def event_listener():
+        pubsub = redis_client.pubsub()
+        pubsub.subscribe(f"{settings.event_channel_prefix}.order")
+
+        logger.info("Inventory service listening for events...")
+
+        for message in pubsub.listen():
+            if message["type"] == "message":
+                try:
+                    event_data = json.loads(message["data"])
+                    event_type = event_data["event_type"]
+
+                    db = Session(engine)
+
+                    if event_type == "OrderCreated":
+                        handle_order_created(event_data, db)
+                    elif event_type == "OrderCancelled":
+                        handle_order_cancelled(event_data, db)
+
+                    db.close()
+
+                except Exception as e:
+                    logger.error(f"Error processing event: {str(e)}")
+
+    thread = threading.Thread(target=event_listener, daemon=True)
+    thread.start()
+
+
 if __name__ == "__main__":
     import uvicorn
 

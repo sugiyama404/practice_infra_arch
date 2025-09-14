@@ -1,5 +1,11 @@
 CREATE TABLE events (
     event_id VARCHAR(36) PRIMARY KEY,
+    aggregate_id VARCHAR(50) NOT NULL,
+    aggregate_type VARCHAR(50) NOT NULL,
+    event_type VARCHAR(50) NOT NULL,
+    event_data JSON,
+    version INT NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_aggregate_version (aggregate_id, version),
     INDEX idx_events_aggregate_id (aggregate_id),
     INDEX idx_events_event_type (event_type),
