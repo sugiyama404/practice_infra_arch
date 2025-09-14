@@ -1,3 +1,11 @@
+CREATE TABLE events (
+    event_id VARCHAR(36) PRIMARY KEY,
+    UNIQUE KEY uk_aggregate_version (aggregate_id, version),
+    INDEX idx_events_aggregate_id (aggregate_id),
+    INDEX idx_events_event_type (event_type),
+    INDEX idx_events_created_at (created_at),
+    INDEX idx_events_aggregate_type (aggregate_type)
+);
 CREATE TABLE customers (
     customer_id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -61,7 +69,7 @@ CREATE TABLE orders (
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
     INDEX idx_orders_customer_id (customer_id),
     INDEX idx_orders_status (status),
-    INDEX idx_orders_created_at (created_at DESC)
+    INDEX idx_orders_created_at (created_at)
 );
 
 CREATE TABLE order_items (
@@ -98,7 +106,7 @@ CREATE TABLE payments (
     INDEX idx_payments_order_id (order_id),
     INDEX idx_payments_status (status),
     INDEX idx_payments_transaction_id (transaction_id),
-    INDEX idx_payments_created_at (created_at DESC)
+    INDEX idx_payments_created_at (created_at)
 );
 
 CREATE TABLE shipments (
@@ -143,11 +151,11 @@ CREATE TABLE saga_instances (
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     INDEX idx_saga_instances_order_id (order_id),
     INDEX idx_saga_instances_status (status),
-    INDEX idx_saga_instances_created_at (created_at DESC)
+    INDEX idx_saga_instances_created_at (created_at)
 );
 
 CREATE TABLE saga_step_logs (
-    step_log_id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    step_log_id VARCHAR(36) PRIMARY KEY,
     saga_id VARCHAR(50) NOT NULL,
     step_number INT NOT NULL,
     step_name VARCHAR(100) NOT NULL,

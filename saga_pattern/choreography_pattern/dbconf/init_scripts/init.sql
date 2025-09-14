@@ -61,7 +61,7 @@ CREATE TABLE orders (
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
     INDEX idx_orders_customer_id (customer_id),
     INDEX idx_orders_status (status),
-    INDEX idx_orders_created_at (created_at DESC)
+    INDEX idx_orders_created_at (created_at)
 );
 
 CREATE TABLE order_items (
@@ -98,7 +98,7 @@ CREATE TABLE payments (
     INDEX idx_payments_order_id (order_id),
     INDEX idx_payments_status (status),
     INDEX idx_payments_transaction_id (transaction_id),
-    INDEX idx_payments_created_at (created_at DESC)
+    INDEX idx_payments_created_at (created_at)
 );
 
 CREATE TABLE shipments (
@@ -125,7 +125,7 @@ CREATE TABLE shipments (
 );
 
 CREATE TABLE events (
-    event_id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    event_id VARCHAR(36) PRIMARY KEY,
     event_type ENUM(
         'ORDER_CREATED', 'ORDER_CONFIRMED', 'ORDER_CANCELLED', 'ORDER_FAILED',
         'STOCK_RESERVED', 'STOCK_RELEASED', 'STOCK_UNAVAILABLE',
@@ -143,7 +143,7 @@ CREATE TABLE events (
     UNIQUE KEY uk_aggregate_version (aggregate_id, version),
     INDEX idx_events_aggregate_id (aggregate_id),
     INDEX idx_events_event_type (event_type),
-    INDEX idx_events_created_at (created_at DESC),
+    INDEX idx_events_created_at (created_at),
     INDEX idx_events_aggregate_type (aggregate_type)
 );
 

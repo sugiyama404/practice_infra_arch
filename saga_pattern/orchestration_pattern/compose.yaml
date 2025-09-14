@@ -1,5 +1,5 @@
 services:
-  mysql:
+  mysql_orch:
     image: mysql:8.0
     container_name: cloudmart-mysql-orchestration
     environment:
@@ -8,7 +8,7 @@ services:
       MYSQL_USER: cloudmart_user
       MYSQL_PASSWORD: cloudmart_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./dbconf/conf/my.cnf:/etc/mysql/my.cnf
       - ./dbconf/init_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -19,11 +19,11 @@ services:
       retries: 5
     restart: unless-stopped
 
-  redis:
+  redis_orch:
     image: redis:7-alpine
     container_name: cloudmart-redis-orchestration
     ports:
-      - "6379:6379"
+      - "6380:6379"
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
@@ -61,17 +61,17 @@ services:
     ports:
       - "8005:8005"
     environment:
-      - MYSQL_HOST=mysql
-      - REDIS_HOST=redis
+      - MYSQL_HOST=mysql_orch
+      - REDIS_HOST=redis_orch
       - RABBITMQ_HOST=rabbitmq
       - ORDER_SERVICE_URL=http://order-service:8001
       - INVENTORY_SERVICE_URL=http://inventory-service:8002
       - PAYMENT_SERVICE_URL=http://payment-service:8003
       - SHIPPING_SERVICE_URL=http://shipping-service:8004
     depends_on:
-      mysql:
+      mysql_orch:
         condition: service_healthy
-      redis:
+      redis_orch:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -85,12 +85,12 @@ services:
     ports:
       - "8011:8001"
     environment:
-      - MYSQL_HOST=mysql
-      - REDIS_HOST=redis
+      - MYSQL_HOST=mysql_orch
+      - REDIS_HOST=redis_orch
     depends_on:
-      mysql:
+      mysql_orch:
         condition: service_healthy
-      redis:
+      redis_orch:
         condition: service_healthy
     restart: unless-stopped
 
@@ -102,12 +102,12 @@ services:
     ports:
       - "8012:8002"
     environment:
-      - MYSQL_HOST=mysql
-      - REDIS_HOST=redis
+      - MYSQL_HOST=mysql_orch
+      - REDIS_HOST=redis_orch
     depends_on:
-      mysql:
+      mysql_orch:
         condition: service_healthy
-      redis:
+      redis_orch:
         condition: service_healthy
     restart: unless-stopped
 
@@ -119,12 +119,12 @@ services:
     ports:
       - "8013:8003"
     environment:
-      - MYSQL_HOST=mysql
-      - REDIS_HOST=redis
+      - MYSQL_HOST=mysql_orch
+      - REDIS_HOST=redis_orch
     depends_on:
-      mysql:
+      mysql_orch:
         condition: service_healthy
-      redis:
+      redis_orch:
         condition: service_healthy
     restart: unless-stopped
 
@@ -136,12 +136,12 @@ services:
     ports:
       - "8014:8004"
     environment:
-      - MYSQL_HOST=mysql
-      - REDIS_HOST=redis
+      - MYSQL_HOST=mysql_orch
+      - REDIS_HOST=redis_orch
     depends_on:
-      mysql:
+      mysql_orch:
         condition: service_healthy
-      redis:
+      redis_orch:
         condition: service_healthy
     restart: unless-stopped
 
