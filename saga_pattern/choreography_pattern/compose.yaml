@@ -35,7 +35,9 @@ services:
     restart: unless-stopped
 
   order-service:
-    build: ./order_service
+    build:
+      context: ..
+      dockerfile: ./choreography_pattern/order_service/Dockerfile
     container_name: choreography-order-service
     ports:
       - "8001:8001"
@@ -50,7 +52,9 @@ services:
     restart: unless-stopped
 
   inventory-service:
-    build: ./inventory_service
+    build:
+      context: ..
+      dockerfile: ./choreography_pattern/inventory_service/Dockerfile
     container_name: choreography-inventory-service
     ports:
       - "8002:8002"
@@ -65,7 +69,9 @@ services:
     restart: unless-stopped
 
   payment-service:
-    build: ./payment_service
+    build:
+      context: ..
+      dockerfile: ./choreography_pattern/payment_service/Dockerfile
     container_name: choreography-payment-service
     ports:
       - "8003:8003"
@@ -80,7 +86,9 @@ services:
     restart: unless-stopped
 
   shipping-service:
-    build: ./shipping_service
+    build:
+      context: ..
+      dockerfile: ./choreography_pattern/shipping_service/Dockerfile
     container_name: choreography-shipping-service
     ports:
       - "8004:8004"
@@ -93,3 +101,7 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  redis_data:
+    name: choreography_pattern_redis_data

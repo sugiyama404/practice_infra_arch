@@ -16,10 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ../../../shared /app/shared
 
 # Copy application code
-COPY ./orchestration_pattern/inventory_service/app.py .
+COPY ./orchestration_pattern/shipping_service/app.py .
 
 # Expose port
-EXPOSE 8002
+EXPOSE 8004
 
 # Run the application
 CMD ["python", "app.py"]

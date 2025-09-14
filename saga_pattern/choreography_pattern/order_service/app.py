@@ -8,11 +8,11 @@ import sys
 import os
 
 # Add shared module to path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
+sys.path.append("/app")
 
-from models import Order, OrderItem, OrderStatus, get_db_session
-from config import settings, get_database_url
-from utils import setup_logging, create_event, json_dumps, generate_order_id
+from shared.models import Order, OrderItem, OrderStatus, get_db_session
+from shared.config import settings, get_database_url
+from shared.utils import setup_logging, create_event, json_dumps, generate_order_id
 
 # Setup logging
 logger = setup_logging("order-service")

@@ -9,11 +9,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
-COPY requirements.txt .
+COPY ./choreography_pattern/order_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy shared modules
+COPY ./shared /app/shared
+
 # Copy application code
-COPY app.py .
+COPY ./choreography_pattern/order_service/app.py .
 
 # Expose port
 EXPOSE 8001

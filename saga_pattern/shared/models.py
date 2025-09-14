@@ -10,9 +10,10 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
     Index,
+    create_engine,
 )
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
 import enum
 import uuid
@@ -286,3 +287,13 @@ Index(
 )
 Index("idx_saga_step_logs_saga_id", SagaStepLog.saga_id)
 Index("idx_saga_step_logs_status", SagaStepLog.status)
+
+
+# Database session factory
+def get_db_session():
+    """Create and return a database session"""
+    from shared.config import get_database_url
+
+    engine = create_engine(get_database_url(), pool_pre_ping=True)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    return SessionLocal()

@@ -9,11 +9,11 @@ import os
 import random
 
 # Add shared module to path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
+sys.path.append("/app")
 
-from models import Payment, PaymentStatus
-from config import settings, get_database_url
-from utils import setup_logging, create_event, generate_payment_id
+from shared.models import Payment, PaymentStatus
+from shared.config import settings, get_database_url
+from shared.utils import setup_logging, create_event, generate_payment_id
 
 # Setup logging
 logger = setup_logging("payment-service")

@@ -16,10 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ../../../shared /app/shared
 
 # Copy application code
-COPY ./orchestration_pattern/inventory_service/app.py .
+COPY ./orchestration_pattern/saga_orchestrator/app.py .
 
 # Expose port
-EXPOSE 8002
+EXPOSE 8005
 
 # Run the application
 CMD ["python", "app.py"]

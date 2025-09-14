@@ -8,11 +8,11 @@ import sys
 import os
 
 # Add shared module to path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
+sys.path.append("/app")
 
-from models import Inventory, OrderStatus
-from config import settings, get_database_url
-from utils import setup_logging, create_event
+from shared.models import Inventory, OrderStatus
+from shared.config import settings, get_database_url
+from shared.utils import setup_logging, create_event
 
 # Setup logging
 logger = setup_logging("inventory-service")
