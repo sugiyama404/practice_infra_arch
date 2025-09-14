@@ -159,6 +159,32 @@ def handle_order_cancelled(event_data: Dict[str, Any], db: Session):
         logger.error(f"Error processing payment cancellation: {str(e)}")
 
 
+def handle_payment_failed(event_data: Dict[str, Any], db: Session):
+    """Handle PaymentFailed event - this is a placeholder for choreography rollback"""
+    order_id = event_data["aggregate_id"]
+
+    logger.info(f"Processing payment failure for order: {order_id}")
+
+    try:
+        # In choreography pattern, payment failure triggers rollback
+        # This would typically publish OrderCancelled event to trigger inventory release
+        event = create_event(
+            event_type="OrderCancelled",
+            aggregate_id=order_id,
+            payload={
+                "order_id": order_id,
+                "reason": "Payment failed",
+            },
+        )
+        event_channel = f"{settings.event_channel_prefix}.order"
+        redis_client.publish(event_channel, json.dumps(event))
+
+        logger.info(f"Order cancelled due to payment failure: {order_id}")
+
+    except Exception as e:
+        logger.error(f"Error processing payment failure: {str(e)}")
+
+
 # Event listener
 @app.on_event("startup")
 async def startup_event():
@@ -183,6 +209,8 @@ async def startup_event():
                         handle_order_created(event_data, db)
                     elif event_type == "OrderCancelled":
                         handle_order_cancelled(event_data, db)
+                    elif event_type == "PaymentFailed":
+                        handle_payment_failed(event_data, db)
 
                     db.close()
 

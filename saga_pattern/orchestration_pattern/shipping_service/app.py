@@ -275,6 +275,40 @@ async def get_shipment(order_id: str, db: Session = Depends(get_db)):
     }
 
 
+@app.post("/shipping/cancel")
+async def cancel_shipping(cancel_data: Dict[str, Any], db: Session = Depends(get_db)):
+    """Cancel shipping arrangement (compensation)"""
+    try:
+        # Handle both direct payload and command structure
+        if "payload" in cancel_data:
+            payload = cancel_data["payload"]
+            order_id = payload["order_id"]
+        else:
+            order_id = cancel_data["order_id"]
+
+        logger.info(f"Cancelling shipping for order: {order_id}")
+
+        # Find the shipment
+        shipment = db.query(Shipment).filter(Shipment.order_id == order_id).first()
+        if not shipment:
+            return {"message": "No shipment found to cancel"}
+
+        if shipment.status == ShipmentStatus.ARRANGED:
+            # Mark as cancelled
+            shipment.status = ShipmentStatus.CANCELLED
+            shipment.updated_at = datetime.utcnow()
+            db.commit()
+
+            return {"message": "Shipping cancelled successfully"}
+        else:
+            # Already cancelled or shipped
+            return {"message": "Shipping already cancelled or shipped"}
+
+    except Exception as e:
+        logger.error(f"Error cancelling shipping: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""

@@ -40,18 +40,21 @@ ORDER_WORKFLOW = {
             "command": "reserve_stock",
             "compensation": "release_stock",
             "endpoint": "/inventory/reserve",
+            "compensation_endpoint": "/inventory/release",
         },
         {
             "service": "payment",
             "command": "process_payment",
             "compensation": "cancel_payment",
             "endpoint": "/payments/process",
+            "compensation_endpoint": "/payments/cancel",
         },
         {
             "service": "shipping",
             "command": "arrange_shipping",
             "compensation": "cancel_shipping",
             "endpoint": "/shipping/arrange",
+            "compensation_endpoint": "/shipping/cancel",
         },
     ]
 }
@@ -198,7 +201,12 @@ async def execute_compensation(
     step_number = step.get("step_number", 0)
     service = step["service"]
     compensation_command = step["compensation"]
-    endpoint = f"/{compensation_command.replace('_', '/')}"
+    endpoint = step.get(
+        "compensation_endpoint", f"/{compensation_command.replace('_', '/')}"
+    )
+
+    logger.info(f"Step data: {step}")
+    logger.info(f"Using endpoint: {endpoint}")
 
     logger.info(
         f"Executing compensation for step {step_number} in saga {saga_id}: {service}.{compensation_command}"
@@ -281,7 +289,8 @@ async def run_saga(saga_id: str, order_data: Dict[str, Any]):
 
                 # Execute compensations in reverse order
                 for j in range(i, -1, -1):
-                    compensation_step = ORDER_WORKFLOW["steps"][j]
+                    compensation_step = ORDER_WORKFLOW["steps"][j].copy()
+                    compensation_step["step_number"] = j + 1
                     await execute_compensation(
                         saga_id, compensation_step, order_data, db
                     )

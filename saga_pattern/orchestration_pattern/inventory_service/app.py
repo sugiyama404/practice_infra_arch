@@ -212,6 +212,42 @@ async def reserve_stock(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/inventory/release")
+async def release_stock(release_data: Dict[str, Any], db: Session = Depends(get_db)):
+    """Release reserved stock (compensation)"""
+    try:
+        # Handle both direct payload and command structure
+        if "payload" in release_data:
+            # Command structure from saga orchestrator
+            payload = release_data["payload"]
+            book_id = payload.get("product_id") or payload.get("book_id")
+            quantity = payload["quantity"]
+        else:
+            # Direct payload - check if it's already flattened
+            book_id = release_data.get("product_id") or release_data.get("book_id")
+            quantity = release_data["quantity"]
+
+        inventory = db.query(Inventory).filter(Inventory.book_id == book_id).first()
+        if not inventory:
+            raise HTTPException(status_code=404, detail="Book not found")
+
+        if inventory.reserved_stock >= quantity:
+            inventory.reserved_stock -= quantity
+            inventory.available_stock += quantity
+            inventory.updated_at = datetime.utcnow()
+            db.commit()
+            return {"message": "Stock released successfully"}
+        else:
+            # Already released or insufficient reserved stock
+            return {"message": "No stock to release or already released"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/inventory/{book_id}")
 async def get_inventory(book_id: str, db: Session = Depends(get_db)):
     """Get inventory details"""

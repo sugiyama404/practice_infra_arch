@@ -273,6 +273,41 @@ async def get_payment(order_id: str, db: Session = Depends(get_db)):
     }
 
 
+@app.post("/payments/cancel")
+async def cancel_payment(cancel_data: Dict[str, Any], db: Session = Depends(get_db)):
+    """Cancel payment (compensation)"""
+    try:
+        # Handle both direct payload and command structure
+        if "payload" in cancel_data:
+            payload = cancel_data["payload"]
+            order_id = payload["order_id"]
+        else:
+            order_id = cancel_data["order_id"]
+
+        logger.info(f"Cancelling payment for order: {order_id}")
+
+        # Find the payment
+        payment = db.query(Payment).filter(Payment.order_id == order_id).first()
+        if not payment:
+            return {"message": "No payment found to cancel"}
+
+        if payment.status == PaymentStatus.COMPLETED:
+            # Mark as cancelled/refunded
+            payment.status = PaymentStatus.CANCELLED
+            payment.failed_reason = "Payment cancelled due to saga rollback"
+            payment.processed_at = datetime.utcnow()
+            db.commit()
+
+            return {"message": "Payment cancelled successfully"}
+        else:
+            # Already cancelled or failed
+            return {"message": "Payment already cancelled or not completed"}
+
+    except Exception as e:
+        logger.error(f"Error cancelling payment: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
