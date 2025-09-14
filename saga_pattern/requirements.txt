@@ -7,3 +7,7 @@ ipykernel
 notebook
 plotly
 matplotlib
+pymysql
+sqlalchemy
+aiohttp
+asyncio
