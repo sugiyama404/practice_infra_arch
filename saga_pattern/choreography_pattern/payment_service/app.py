@@ -11,7 +11,7 @@ import random
 # Add shared module to path
 sys.path.append("/app")
 
-from shared.models import Payment, PaymentStatus
+from shared.models import Payment, PaymentStatus, get_db_session
 from shared.config import settings, get_database_url
 from shared.utils import setup_logging, create_event, generate_payment_id
 
@@ -36,7 +36,7 @@ redis_client = redis.Redis(
 
 
 def get_db():
-    db = Session(engine)
+    db = get_db_session()
     try:
         yield db
     finally:

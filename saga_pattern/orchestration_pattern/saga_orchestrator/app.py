@@ -197,13 +197,15 @@ async def execute_step(
 async def execute_compensation(
     saga_id: str, step: Dict[str, Any], payload: Dict[str, Any], db: Session
 ) -> bool:
-    """Execute compensation for a failed step"""
+    """
+    Execute compensation for a failed step.
+    This is the rollback mechanism for the saga.
+    """
     step_number = step.get("step_number", 0)
     service = step["service"]
     compensation_command = step["compensation"]
-    endpoint = step.get(
-        "compensation_endpoint", f"/{compensation_command.replace('_', '/')}"
-    )
+    # Use the explicitly defined compensation endpoint from the workflow
+    endpoint = step["compensation_endpoint"]
 
     logger.info(f"Step data: {step}")
     logger.info(f"Using endpoint: {endpoint}")

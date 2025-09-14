@@ -35,7 +35,7 @@ redis_client = redis.Redis(
 
 
 def get_db():
-    db = get_db_session(engine)
+    db = get_db_session()
     try:
         yield db
     finally:
@@ -44,7 +44,10 @@ def get_db():
 
 @app.post("/orders")
 async def create_order(order_data: Dict[str, Any], db: Session = Depends(get_db)):
-    """Create new order and publish OrderCreated event"""
+    """
+    Create a new order and initiate the order processing saga
+    by publishing an 'OrderCreated' event.
+    """
     try:
         # Validate required fields
         required_fields = ["customer_id", "items"]
@@ -158,11 +161,20 @@ async def cancel_order(order_id: str, db: Session = Depends(get_db)):
     order.cancelled_at = datetime.utcnow()
     db.commit()
 
-    # Publish OrderCancelled event
+    # Publish OrderCancelled event with item details for compensation
+    order_items = db.query(OrderItem).filter(OrderItem.order_id == order_id).all()
+    items_payload = [
+        {"book_id": item.book_id, "quantity": item.quantity} for item in order_items
+    ]
+
     event = create_event(
         event_type="OrderCancelled",
         aggregate_id=order_id,
-        payload={"order_id": order_id, "reason": "User cancelled"},
+        payload={
+            "order_id": order_id,
+            "reason": "User cancelled",
+            "items": items_payload,
+        },
     )
 
     event_channel = f"{settings.event_channel_prefix}.order"

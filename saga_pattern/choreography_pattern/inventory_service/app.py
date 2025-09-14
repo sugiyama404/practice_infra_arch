@@ -10,7 +10,7 @@ import os
 # Add shared module to path
 sys.path.append("/app")
 
-from shared.models import Inventory, OrderStatus
+from shared.models import Inventory, OrderStatus, get_db_session
 from shared.config import settings, get_database_url
 from shared.utils import setup_logging, create_event
 
@@ -35,7 +35,7 @@ redis_client = redis.Redis(
 
 
 def get_db():
-    db = Session(engine)
+    db = get_db_session()
     try:
         yield db
     finally:
@@ -109,19 +109,49 @@ def handle_order_created(event_data: Dict[str, Any], db: Session):
 
 
 def handle_order_cancelled(event_data: Dict[str, Any], db: Session):
-    """Handle OrderCancelled event - release reserved stock"""
+    """
+    Handle OrderCancelled event - release reserved stock (Compensating Action).
+    This is a compensating action for the 'reserve_stock' step.
+    """
     order_id = event_data["aggregate_id"]
+    payload = event_data.get("payload", {})
+    items_to_release = payload.get("items", [])
 
     logger.info(f"Processing OrderCancelled event for order: {order_id}")
 
     try:
-        # Get order items from database (simplified - in real app, query order_items)
-        # For demo, assume we have the items in the event or query from DB
-        # Here we'll simulate releasing stock
+        # If items are not in the event, we would need to fetch them.
+        # This requires the order_id to be linked to order_items.
+        # For this demo, we assume the compensating event contains necessary data.
+        if not items_to_release:
+            logger.warning(
+                f"No items found in OrderCancelled event for order {order_id}. Cannot release stock."
+            )
+            # In a real-world scenario, you might query the order service or a shared DB
+            # to get the items associated with the order.
+            return
 
-        # In real implementation, you'd query order_items table
-        # For demo, we'll just log the event
-        logger.info(f"Stock released for cancelled order: {order_id}")
+        for item in items_to_release:
+            book_id = item.get("book_id")
+            quantity = item.get("quantity")
+
+            if not book_id or not quantity:
+                continue
+
+            inventory = db.query(Inventory).filter(Inventory.book_id == book_id).first()
+            if inventory and inventory.reserved_stock >= quantity:
+                inventory.reserved_stock -= quantity
+                inventory.available_stock += quantity
+                inventory.updated_at = datetime.utcnow()
+                logger.info(
+                    f"Released {quantity} of book {book_id} back to available stock."
+                )
+            else:
+                logger.warning(
+                    f"Could not release stock for book {book_id}. Reserved stock might be insufficient or item not found."
+                )
+
+        db.commit()
 
         # Publish StockReleased event
         event = create_event(
@@ -131,8 +161,10 @@ def handle_order_cancelled(event_data: Dict[str, Any], db: Session):
         )
         event_channel = f"{settings.event_channel_prefix}.inventory"
         redis_client.publish(event_channel, json.dumps(event))
+        logger.info(f"Stock released for cancelled order: {order_id}")
 
     except Exception as e:
+        db.rollback()
         logger.error(f"Error processing OrderCancelled event: {str(e)}")
 
 
