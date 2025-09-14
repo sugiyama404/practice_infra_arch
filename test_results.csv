@@ -1,6 +1,6 @@
 pattern,scenario,url,status_code,response_time,result
-choreography,success,http://localhost:8001/orders,UNREACHABLE,60.2881760597229,Host localhost:8001 not reachable within timeout
-choreography,stock_failure,http://localhost:8001/orders,UNREACHABLE,60.25196313858032,Host localhost:8001 not reachable within timeout
-choreography,payment_failure,http://localhost:8001/orders,UNREACHABLE,60.26123309135437,Host localhost:8001 not reachable within timeout
-orchestration,orchestrator_submit,http://localhost:8005/orders,UNREACHABLE,60.220661878585815,Host localhost:8005 not reachable within timeout
-orchestration,order_service_direct,http://localhost:8011/orders,UNREACHABLE,60.27199697494507,Host localhost:8011 not reachable within timeout
+choreography,success,http://localhost:8001/orders,UNREACHABLE,60.25601506233215,Host localhost:8001 not reachable within timeout
+choreography,stock_failure,http://localhost:8001/orders,UNREACHABLE,60.26387310028076,Host localhost:8001 not reachable within timeout
+choreography,payment_failure,http://localhost:8001/orders,UNREACHABLE,60.264533042907715,Host localhost:8001 not reachable within timeout
+orchestration,orchestrator_submit,http://localhost:8005/orders,404,0.019062042236328125,{'detail': 'Not Found'}
+orchestration,order_service_direct,http://localhost:8011/orders,500,0.017411231994628906,{'detail': ''}
