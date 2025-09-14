@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
 import aio_pika
+import aiohttp
 import json
 from datetime import datetime
 from typing import Dict, Any, List
@@ -11,9 +12,9 @@ import asyncio
 # Add shared module to path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
 
-from models import SagaInstance, SagaStatus, SagaStepLog, StepStatus
-from config import settings, get_database_url, get_rabbitmq_url
-from utils import setup_logging, create_command, create_response, generate_saga_id
+from shared.models import SagaInstance, SagaStatus, SagaStepLog, StepStatus
+from shared.config import settings, get_database_url, get_rabbitmq_url
+from shared.utils import setup_logging, create_command, create_response, generate_saga_id
 
 # Setup logging
 logger = setup_logging("saga-orchestrator")
@@ -29,12 +30,6 @@ engine = create_engine(get_database_url())
 # Order workflow definition
 ORDER_WORKFLOW = {
     "steps": [
-        {
-            "service": "order",
-            "command": "create_order",
-            "compensation": "cancel_order",
-            "endpoint": "/orders",
-        },
         {
             "service": "inventory",
             "command": "reserve_stock",
@@ -67,7 +62,6 @@ def get_db():
 
 async def send_command(service: str, command: Dict[str, Any]) -> Dict[str, Any]:
     """Send command to service via HTTP"""
-    import aiohttp
 
     service_urls = {
         "order": settings.order_service_url,
@@ -78,13 +72,19 @@ async def send_command(service: str, command: Dict[str, Any]) -> Dict[str, Any]:
 
     url = f"{service_urls[service]}{command['endpoint']}"
 
+    logger.info(f"Sending command to {service} at {url}")
+    logger.info(f"Command payload: {command}")
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, json=command["payload"]) as response:
                 if response.status == 200:
-                    return await response.json()
+                    result = await response.json()
+                    logger.info(f"Command successful, response: {result}")
+                    return result
                 else:
                     error_text = await response.text()
+                    logger.error(f"Command failed with status {response.status}: {error_text}")
                     raise Exception(f"Service error: {response.status} - {error_text}")
         except Exception as e:
             logger.error(f"Error sending command to {service}: {str(e)}")
@@ -284,11 +284,42 @@ async def start_saga(
         # Add saga_id to order_data
         order_data["saga_id"] = saga_id
 
-        # Run saga in background
+        # First, create the order to get the actual order_id
+
+        order_payload = {
+            "customer_id": order_data["customer_id"],
+            "items": [
+                {
+                    "book_id": order_data["product_id"],
+                    "quantity": order_data["quantity"],
+                    "unit_price": order_data["price"]
+                }
+            ],
+            "saga_id": saga_id
+        }
+
+        async with aiohttp.ClientSession() as session:
+            try:
+                url = f"{settings.order_service_url}/orders"
+                async with session.post(url, json=order_payload) as response:
+                    if response.status == 200:
+                        order_response = await response.json()
+                        actual_order_id = order_response.get("order_id")
+                        order_data["order_id"] = actual_order_id
+                        logger.info(f"Created order {actual_order_id} for saga {saga_id}")
+                    else:
+                        error_text = await response.text()
+                        raise Exception(f"Failed to create order: {response.status} - {error_text}")
+            except Exception as e:
+                logger.error(f"Error creating order for saga {saga_id}: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to create order: {str(e)}")
+
+        # Now run the saga with the actual order_id
         background_tasks.add_task(run_saga, saga_id, order_data)
 
         return {
             "saga_id": saga_id,
+            "order_id": actual_order_id,
             "status": "started",
             "message": "Saga started successfully",
         }

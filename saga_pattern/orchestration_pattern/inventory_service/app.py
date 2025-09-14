@@ -10,9 +10,9 @@ import os
 # Add shared module to path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
 
-from models import Inventory, OrderStatus
-from config import settings, get_database_url
-from utils import setup_logging, create_event
+from shared.models import Inventory, OrderStatus
+from shared.config import settings, get_database_url
+from shared.utils import setup_logging, create_event
 
 # Setup logging
 logger = setup_logging("inventory-service")
@@ -178,8 +178,16 @@ async def reserve_stock(
 ):
     """Manually reserve stock (for testing)"""
     try:
-        book_id = reservation_data["book_id"]
-        quantity = reservation_data["quantity"]
+        # Handle both direct payload and command structure
+        if "payload" in reservation_data:
+            # Command structure from saga orchestrator
+            payload = reservation_data["payload"]
+            book_id = payload["product_id"]  # Note: using product_id from order data
+            quantity = payload["quantity"]
+        else:
+            # Direct payload
+            book_id = reservation_data["book_id"]
+            quantity = reservation_data["quantity"]
 
         inventory = db.query(Inventory).filter(Inventory.book_id == book_id).first()
         if not inventory:

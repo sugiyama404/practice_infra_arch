@@ -15,6 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy shared modules
 COPY ./shared /app/shared
 
+# Set PYTHONPATH to include shared modules
+ENV PYTHONPATH=/app
+
 # Copy application code
 COPY ./orchestration_pattern/shipping_service/app.py .
 
