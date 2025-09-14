@@ -9,11 +9,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
-COPY requirements.txt .
+COPY ./orchestration_pattern/payment_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy shared modules
-COPY ../../../shared /app/shared
+COPY ./shared /app/shared
 
 # Copy application code
 COPY ./orchestration_pattern/payment_service/app.py .
