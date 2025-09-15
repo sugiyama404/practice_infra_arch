@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8000"
+    environment:
+      - MYSQL_USER=cloudmart_user
+      - MYSQL_PASSWORD=cloudmart_pass
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=cloudmart_saga
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  db:
+    image: mysql:8.0
+    platform: linux/amd64
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: cloudmart_saga
+      MYSQL_USER: cloudmart_user
+      MYSQL_PASSWORD: cloudmart_pass
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./dbconf/conf:/etc/mysql/conf.d
+      - ./dbconf/init_scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "cloudmart_user", "-pcloudmart_pass" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
