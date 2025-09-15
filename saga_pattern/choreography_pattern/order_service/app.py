@@ -185,6 +185,53 @@ async def cancel_order(order_id: str, db: Session = Depends(get_db)):
     return {"message": "Order cancelled successfully"}
 
 
+@app.put("/orders/{order_id}/confirm")
+async def confirm_order(order_id: str, db: Session = Depends(get_db)):
+    """Confirm an order and update its status"""
+    try:
+        # Get order
+        order = db.query(Order).filter(Order.order_id == order_id).first()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+
+        if order.status != OrderStatus.PENDING:
+            raise HTTPException(
+                status_code=400, detail=f"Order is already {order.status}"
+            )
+
+        # Update order status and confirmed timestamp
+        order.status = OrderStatus.CONFIRMED
+        order.confirmed_at = datetime.now()
+        order.updated_at = datetime.now()
+
+        db.commit()
+
+        # Publish order confirmed event
+        event_data = {
+            "order_id": order_id,
+            "customer_id": order.customer_id,
+            "total_amount": float(order.total_amount),
+            "confirmed_at": order.confirmed_at.isoformat(),
+        }
+
+        # Save OrderConfirmed event to database
+        create_event(
+            event_type="OrderConfirmed",
+            aggregate_id=order_id,
+            payload=event_data,
+            db_session=db,
+        )
+
+        return {"message": "Order confirmed successfully", "order_id": order_id}
+
+    except HTTPException:
+        # Propagate HTTP errors as-is
+        raise
+    except Exception as e:
+        logger.error(f"Error confirming order {order_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""

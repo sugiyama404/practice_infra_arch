@@ -303,6 +303,23 @@ async def reserve_stock(
         inventory.updated_at = datetime.utcnow()
         db.commit()
 
+        # Publish StockReserved event
+        order_id = reservation_data.get("order_id")
+        event_data = {
+            "order_id": order_id,
+            "book_id": book_id,
+            "quantity": quantity,
+            "reserved_at": datetime.utcnow().isoformat(),
+        }
+        event = create_event(
+            event_type="StockReserved",
+            aggregate_id=order_id,
+            payload=event_data,
+            db_session=db,
+        )
+        event_channel = f"{settings.event_channel_prefix}.inventory"
+        redis_client.publish(event_channel, json.dumps(event))
+
         return {"message": "Stock reserved successfully"}
 
     except HTTPException:
