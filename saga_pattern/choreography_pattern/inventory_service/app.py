@@ -6,24 +6,43 @@ from datetime import datetime
 from typing import Dict, Any
 import sys
 import os
+from contextlib import asynccontextmanager
 
 # Add shared module to path
 sys.path.append("/app")
 
-from shared.models import Inventory, OrderStatus, get_db_session
+from shared.models import Inventory, OrderStatus, get_db_session, Event, EventType
 from shared.config import settings, get_database_url
 from shared.utils import setup_logging, create_event
 
 # Setup logging
 logger = setup_logging("inventory-service")
 
+
 # FastAPI app
-app = FastAPI(title="Inventory Service", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Starting inventory service...")
+
+    # Start event listener
+    event_thread = start_event_listener()
+    logger.info(f"Event listener thread started: {event_thread}")
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down inventory service...")
+
+
+app = FastAPI(title="Inventory Service", version="1.0.0", lifespan=lifespan)
 
 # Database setup
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(get_database_url())
+Session = sessionmaker(bind=engine)
 
 # Redis setup
 redis_client = redis.Redis(
@@ -169,30 +188,85 @@ def handle_order_cancelled(event_data: Dict[str, Any], db: Session):
 
 
 # Event listener (simplified - in production, use proper message queue consumer)
-@app.on_event("startup")
-async def startup_event():
-    """Subscribe to events on startup"""
+def start_event_listener():
+    """Start event listener in separate thread"""
     import threading
 
     def event_listener():
+        logger.info("Starting event listener thread...")
         pubsub = redis_client.pubsub()
         pubsub.subscribe(f"{settings.event_channel_prefix}.order")
 
         logger.info("Inventory service listening for events...")
 
         for message in pubsub.listen():
+            logger.info(f"Received raw message: {message}")
             if message["type"] == "message":
+                logger.info("Processing message...")
                 try:
                     event_data = json.loads(message["data"])
                     event_type = event_data["event_type"]
 
-                    # Get database session
-                    db = Session(engine)
+                    logger.info(
+                        f"Processing event: {event_type} for order: {event_data.get('aggregate_id', 'unknown')}"
+                    )
 
-                    if event_type == "OrderCreated":
-                        handle_order_created(event_data, db)
-                    elif event_type == "OrderCancelled":
-                        handle_order_cancelled(event_data, db)
+                    # Get database session
+                    db = Session()
+
+                    # Save event to database for analysis
+                    logger.info(
+                        f"Attempting to save event: {event_type} with ID: {event_data['event_id']}"
+                    )
+                    try:
+                        # Convert camelCase to UPPER_SNAKE_CASE
+                        def camel_to_snake(name):
+                            import re
+
+                            name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+                            return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).upper()
+
+                        event_type_enum = camel_to_snake(event_type)
+                        logger.info(
+                            f"Converted event type: {event_type} -> {event_type_enum}"
+                        )
+
+                        event_record = Event(
+                            event_id=event_data["event_id"],
+                            event_type=EventType(event_type_enum),
+                            aggregate_id=event_data["aggregate_id"],
+                            aggregate_type="order",
+                            version=event_data.get("version", 1),
+                            payload=event_data["payload"],
+                            event_metadata={
+                                "source": "inventory_service",
+                                "channel": f"{settings.event_channel_prefix}.order",
+                            },
+                            processed_at=datetime.utcnow(),
+                        )
+                        logger.info("Created event record object")
+                        db.add(event_record)
+                        logger.info("Added event record to session")
+                        db.commit()
+                        logger.info(
+                            f"Event saved to database successfully: {event_type} -> {event_type_enum} - {event_data['event_id']}"
+                        )
+                    except Exception as save_error:
+                        logger.error(f"Failed to save event to database: {save_error}")
+                        import traceback
+
+                        logger.error(f"Traceback: {traceback.format_exc()}")
+                        db.rollback()
+
+                    # Process the event
+                    try:
+                        if event_type == "OrderCreated":
+                            handle_order_created(event_data, db)
+                        elif event_type == "OrderCancelled":
+                            handle_order_cancelled(event_data, db)
+                    except Exception as process_error:
+                        logger.error(f"Failed to process event: {process_error}")
+                        db.rollback()
 
                     db.close()
 
@@ -202,6 +276,10 @@ async def startup_event():
     # Start event listener in background thread
     thread = threading.Thread(target=event_listener, daemon=True)
     thread.start()
+    return thread
+
+
+app = FastAPI(title="Inventory Service", version="1.0.0", lifespan=lifespan)
 
 
 @app.post("/inventory/reserve")

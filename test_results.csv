@@ -1,6 +1,0 @@
-pattern,scenario,url,status_code,response_time,result
-choreography,success,http://localhost:8011/orders,200,0.04489898681640625,"{'order_id': 'order-eb13f20308b54651a4a60fb2868a4889', 'status': 'created', 'total_amount': 3500.0, 'message': 'Order created successfully'}"
-choreography,stock_failure,http://localhost:8011/orders,200,0.01251077651977539,"{'order_id': 'order-44838860df544e2abdd9c85aaf205a08', 'status': 'created', 'total_amount': 3500.0, 'message': 'Order created successfully'}"
-choreography,payment_failure,http://localhost:8011/orders,200,0.010876178741455078,"{'order_id': 'order-0eeb2628dfd040cf9b00d082e57af17e', 'status': 'created', 'total_amount': 3500.0, 'message': 'Order created successfully'}"
-orchestration,orchestrator_submit,http://localhost:8005/saga/start,200,0.020903825759887695,"{'saga_id': 'saga-13350c3c0c1d49cf981a9968c4212093', 'order_id': 'order-b869c74656dc4726bc2cd09a2c5706fb', 'status': 'started', 'message': 'Saga started successfully'}"
-orchestration,order_service_direct,http://localhost:8011/orders,200,0.006525993347167969,"{'order_id': 'order-b0736f908015416aa451f0b48ecfe02d', 'status': 'created', 'total_amount': 3500.0, 'message': 'Order created successfully'}"

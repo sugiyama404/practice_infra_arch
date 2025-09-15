@@ -70,6 +70,24 @@ class SagaStatus(enum.Enum):
     FAILED = "FAILED"
 
 
+class EventType(enum.Enum):
+    ORDER_CREATED = "ORDER_CREATED"
+    ORDER_CONFIRMED = "ORDER_CONFIRMED"
+    ORDER_CANCELLED = "ORDER_CANCELLED"
+    ORDER_FAILED = "ORDER_FAILED"
+    STOCK_RESERVED = "STOCK_RESERVED"
+    STOCK_RELEASED = "STOCK_RELEASED"
+    STOCK_UNAVAILABLE = "STOCK_UNAVAILABLE"
+    PAYMENT_STARTED = "PAYMENT_STARTED"
+    PAYMENT_COMPLETED = "PAYMENT_COMPLETED"
+    PAYMENT_FAILED = "PAYMENT_FAILED"
+    PAYMENT_REFUNDED = "PAYMENT_REFUNDED"
+    SHIPPING_ARRANGED = "SHIPPING_ARRANGED"
+    SHIPPING_SHIPPED = "SHIPPING_SHIPPED"
+    SHIPPING_DELIVERED = "SHIPPING_DELIVERED"
+    SHIPPING_FAILED = "SHIPPING_FAILED"
+
+
 class StepStatus(enum.Enum):
     STARTED = "STARTED"
     COMPLETED = "COMPLETED"
@@ -255,6 +273,27 @@ class SagaStepLog(Base):
     saga_instance = relationship("SagaInstance", back_populates="step_logs")
 
     __table_args__ = (UniqueConstraint("saga_id", "step_number", name="uk_saga_step"),)
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    event_id = Column(String(36), primary_key=True)
+    event_type = Column(Enum(EventType), nullable=False)
+    aggregate_id = Column(String(50), nullable=False)
+    aggregate_type = Column(String(50), nullable=False, default="order")
+    version = Column(Integer, nullable=False, default=1)
+    payload = Column(JSON, nullable=False)
+    event_metadata = Column(JSON)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    processed_at = Column(DateTime)
+
+    __table_args__ = (
+        Index("idx_events_aggregate_id", aggregate_id),
+        Index("idx_events_event_type", event_type),
+        Index("idx_events_created_at", created_at),
+        Index("idx_events_processed_at", processed_at),
+    )
 
 
 # インデックスの作成

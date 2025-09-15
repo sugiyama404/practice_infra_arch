@@ -22,4 +22,4 @@ COPY ./choreography_pattern/inventory_service/app.py .
 EXPOSE 8002
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8002"]
