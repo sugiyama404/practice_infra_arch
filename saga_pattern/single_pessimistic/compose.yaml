@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8006:8000"
+      - "8000:8000"
     environment:
       - MYSQL_USER=cloudmart_user
       - MYSQL_PASSWORD=cloudmart_pass
