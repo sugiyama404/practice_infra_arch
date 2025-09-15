@@ -59,7 +59,9 @@ def json_loads(s: str) -> Any:
 # ID generation
 def generate_id(prefix: str = "") -> str:
     """Generate unique ID with optional prefix"""
-    return f"{prefix}{uuid.uuid4().hex}"
+    # Generate shorter ID to fit varchar(36)
+    short_uuid = str(uuid.uuid4())[:8]
+    return f"{prefix}{short_uuid}"
 
 
 def generate_order_id() -> str:
@@ -149,10 +151,12 @@ class HTTPClient:
 
 # Event utilities for Choreography
 def create_event(
-    event_type: str, aggregate_id: str, payload: Dict[str, Any]
+    event_type: str, aggregate_id: str, payload: Dict[str, Any], db_session=None
 ) -> Dict[str, Any]:
-    """Create event structure for Choreography pattern"""
-    return {
+    """Create event structure for Choreography pattern and optionally save to DB"""
+    from shared.models import Event
+
+    event_data = {
         "event_id": generate_id("event-"),
         "event_type": event_type,
         "aggregate_id": aggregate_id,
@@ -160,6 +164,46 @@ def create_event(
         "timestamp": datetime.utcnow().isoformat(),
         "version": 1,
     }
+
+    # Save to database if session provided
+    if db_session:
+        try:
+            # Convert event_type to match EventType enum (e.g., "OrderCreated" -> "ORDER_CREATED")
+            event_type_enum = (
+                event_type.replace("Order", "ORDER_")
+                .replace("Stock", "STOCK_")
+                .replace("Payment", "PAYMENT_")
+                .replace("Shipping", "SHIPPING_")
+                .upper()
+            )
+
+            # Get the next version for this aggregate
+            from shared.models import Event
+
+            last_event = (
+                db_session.query(Event)
+                .filter(Event.aggregate_id == aggregate_id)
+                .order_by(Event.version.desc())
+                .first()
+            )
+            next_version = (last_event.version + 1) if last_event else 1
+
+            event_record = Event(
+                event_id=event_data["event_id"],
+                event_type=event_type_enum,
+                aggregate_id=aggregate_id,
+                aggregate_type="order",  # Default to order
+                version=next_version,
+                event_data=payload,
+                created_at=datetime.utcnow(),
+            )
+            db_session.add(event_record)
+            db_session.commit()
+        except Exception as e:
+            db_session.rollback()
+            raise e
+
+    return event_data
 
 
 # Message utilities for Orchestration

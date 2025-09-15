@@ -279,20 +279,17 @@ class Event(Base):
     __tablename__ = "events"
 
     event_id = Column(String(36), primary_key=True)
-    event_type = Column(Enum(EventType), nullable=False)
     aggregate_id = Column(String(50), nullable=False)
     aggregate_type = Column(String(50), nullable=False, default="order")
+    event_type = Column(String(50), nullable=False)
+    event_data = Column(JSON, nullable=True)
     version = Column(Integer, nullable=False, default=1)
-    payload = Column(JSON, nullable=False)
-    event_metadata = Column(JSON)
     created_at = Column(DateTime, default=datetime.utcnow)
-    processed_at = Column(DateTime)
 
     __table_args__ = (
         Index("idx_events_aggregate_id", aggregate_id),
         Index("idx_events_event_type", event_type),
         Index("idx_events_created_at", created_at),
-        Index("idx_events_processed_at", processed_at),
     )
 
 

@@ -5,8 +5,8 @@ CREATE TABLE customers (
     phone VARCHAR(20),
     address TEXT,
     payment_method_default ENUM('CREDIT_CARD', 'DEBIT_CARD', 'BANK_TRANSFER', 'ELECTRONIC_MONEY', 'COD') DEFAULT 'CREDIT_CARD',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
 
     INDEX idx_customers_email (email),
     INDEX idx_customers_created_at (created_at)
@@ -22,8 +22,8 @@ CREATE TABLE books (
     publisher VARCHAR(100),
     publication_date DATE,
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
 
     INDEX idx_books_title (title),
     INDEX idx_books_category (category),
@@ -126,20 +126,12 @@ CREATE TABLE shipments (
 
 CREATE TABLE events (
     event_id VARCHAR(36) PRIMARY KEY,
-    event_type ENUM(
-        'ORDER_CREATED', 'ORDER_CONFIRMED', 'ORDER_CANCELLED', 'ORDER_FAILED',
-        'STOCK_RESERVED', 'STOCK_RELEASED', 'STOCK_UNAVAILABLE',
-        'PAYMENT_STARTED', 'PAYMENT_COMPLETED', 'PAYMENT_FAILED', 'PAYMENT_REFUNDED',
-        'SHIPPING_ARRANGED', 'SHIPPING_SHIPPED', 'SHIPPING_DELIVERED', 'SHIPPING_FAILED'
-    ) NOT NULL,
     aggregate_id VARCHAR(50) NOT NULL,
     aggregate_type VARCHAR(50) NOT NULL,
+    event_type VARCHAR(50) NOT NULL,
+    event_data JSON,
     version INT NOT NULL DEFAULT 1,
-    payload JSON NOT NULL,
-    metadata JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    processed_at TIMESTAMP NULL,
-
+    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
     UNIQUE KEY uk_aggregate_version (aggregate_id, version),
     INDEX idx_events_aggregate_id (aggregate_id),
     INDEX idx_events_event_type (event_type),

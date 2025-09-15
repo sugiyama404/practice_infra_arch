@@ -22,6 +22,7 @@ app = FastAPI(title="Inventory Service", version="1.0.0")
 
 # Database setup
 from sqlalchemy import create_engine
+from shared.models import get_db_session
 
 engine = create_engine(get_database_url())
 
@@ -35,7 +36,7 @@ redis_client = redis.Redis(
 
 
 def get_db():
-    db = Session(engine)
+    db = get_db_session()
     try:
         yield db
     finally:
@@ -72,6 +73,7 @@ def handle_order_created(event_data: Dict[str, Any], db: Session):
                         "requested_quantity": quantity,
                         "available_stock": inventory.available_stock,
                     },
+                    db_session=db,
                 )
                 event_channel = f"{settings.event_channel_prefix}.inventory"
                 redis_client.publish(event_channel, json.dumps(event))
@@ -97,6 +99,7 @@ def handle_order_created(event_data: Dict[str, Any], db: Session):
             event_type="StockReserved",
             aggregate_id=order_id,
             payload={"order_id": order_id, "items": items},
+            db_session=db,
         )
         event_channel = f"{settings.event_channel_prefix}.inventory"
         redis_client.publish(event_channel, json.dumps(event))
@@ -128,6 +131,7 @@ def handle_order_cancelled(event_data: Dict[str, Any], db: Session):
             event_type="StockReleased",
             aggregate_id=order_id,
             payload={"order_id": order_id, "reason": "Order cancelled"},
+            db_session=db,
         )
         event_channel = f"{settings.event_channel_prefix}.inventory"
         redis_client.publish(event_channel, json.dumps(event))

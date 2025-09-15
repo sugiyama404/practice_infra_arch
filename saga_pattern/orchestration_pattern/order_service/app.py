@@ -22,6 +22,7 @@ app = FastAPI(title="Order Service", version="1.0.0")
 
 # Database setup
 from sqlalchemy import create_engine
+from shared.models import get_db_session
 
 engine = create_engine(get_database_url())
 
@@ -106,6 +107,7 @@ async def create_order(order_data: Dict[str, Any], db: Session = Depends(get_db)
                 "items": order_items,
                 "total_amount": total_amount,
             },
+            db_session=db,
         )
 
         event_channel = f"{settings.event_channel_prefix}.order"
@@ -163,6 +165,7 @@ async def cancel_order(order_id: str, db: Session = Depends(get_db)):
         event_type="OrderCancelled",
         aggregate_id=order_id,
         payload={"order_id": order_id, "reason": "User cancelled"},
+        db_session=db,
     )
 
     event_channel = f"{settings.event_channel_prefix}.order"
@@ -171,6 +174,43 @@ async def cancel_order(order_id: str, db: Session = Depends(get_db)):
     logger.info(f"Order cancelled: {order_id}")
 
     return {"message": "Order cancelled successfully"}
+
+
+@app.put("/orders/{order_id}/confirm")
+async def confirm_order(order_id: str, db: Session = Depends(get_db)):
+    """Confirm order and set confirmed_at timestamp"""
+    order = db.query(Order).filter(Order.order_id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.status != OrderStatus.PENDING:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Order status is {order.status.value}, cannot confirm",
+        )
+
+    # Update order status and confirmed_at
+    order.status = OrderStatus.CONFIRMED
+    order.confirmed_at = datetime.utcnow()
+    db.commit()
+
+    # Publish OrderConfirmed event
+    event = create_event(
+        event_type="OrderConfirmed",
+        aggregate_id=order_id,
+        payload={"order_id": order_id, "confirmed_at": order.confirmed_at.isoformat()},
+        db_session=db,
+    )
+
+    event_channel = f"{settings.event_channel_prefix}.order"
+    redis_client.publish(event_channel, json.dumps(event))
+
+    logger.info(f"Order confirmed: {order_id}")
+
+    return {
+        "message": "Order confirmed successfully",
+        "confirmed_at": order.confirmed_at.isoformat(),
+    }
 
 
 @app.get("/health")
