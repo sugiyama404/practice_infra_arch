@@ -20,7 +20,17 @@ DB_HOST = os.getenv("MYSQL_HOST", "db")
 DB_NAME = os.getenv("MYSQL_DATABASE", "cloudmart_saga")
 CONN_STR = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 
-engine = sqlalchemy.create_engine(CONN_STR)
+# Create engine with robust connection pool settings to avoid stale connections
+# - pool_pre_ping: validate connections before using them, recycling dead ones
+# - pool_recycle: proactively recycle connections before MySQL wait_timeout
+# - pool_size/max_overflow: small defaults suitable for a demo app
+engine = sqlalchemy.create_engine(
+    CONN_STR,
+    pool_pre_ping=True,
+    pool_recycle=1800,  # recycle every 30 minutes
+    pool_size=5,
+    max_overflow=10,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Create tables
@@ -50,13 +60,32 @@ def health_check():
     return {"status": "ok"}
 
 
+@app.get("/books")
+def list_books(db: Session = Depends(get_db)):
+    books = (
+        db.query(Book.book_id, Book.title, Book.price, Inventory.available_stock)
+        .join(Inventory, Inventory.book_id == Book.book_id)
+        .all()
+    )
+    return [
+        {
+            "book_id": b[0],
+            "title": b[1],
+            "price": float(b[2]) if b[2] is not None else None,
+            "available_stock": b[3],
+        }
+        for b in books
+    ]
+
+
 @app.post("/orders")
 def create_order(payload: OrderPayload, db: Session = Depends(get_db)):
     order_id = f"order-{uuid.uuid4().hex[:8]}"
     total_amount = 0
 
-    # Retry logic for deadlocks
-    for attempt in range(3):
+    # Retry logic for transient errors (deadlocks, lost connections)
+    MAX_RETRIES = 5
+    for attempt in range(MAX_RETRIES):
         try:
             with db.begin_nested():  # Use nested transaction
                 # 1. Calculate total amount and lock inventory items
@@ -65,7 +94,7 @@ def create_order(payload: OrderPayload, db: Session = Depends(get_db)):
                     book = db.query(Book).filter(Book.book_id == item.book_id).first()
                     if not book:
                         raise HTTPException(
-                            status_code=404, detail=f"Book {item.book_id} not found"
+                            status_code=400, detail=f"Book {item.book_id} not found"
                         )
 
                     inventory_item = (
@@ -142,14 +171,38 @@ def create_order(payload: OrderPayload, db: Session = Depends(get_db)):
             return {"message": "Order created successfully", "order_id": order_id}
 
         except OperationalError as e:
-            if "deadlock" in str(e).lower():
+            message = str(e).lower()
+            # Handle common transient errors: deadlocks and lost connections
+            if "deadlock" in message:
                 db.rollback()
-                if attempt < 2:
-                    time.sleep(random.uniform(0.1, 0.5))
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(random.uniform(0.2, 0.8))
                     continue
                 else:
                     raise HTTPException(
                         status_code=503, detail="Service busy, please try again later."
+                    )
+            # MySQL lost connection / server has gone away
+            # pymysql error codes: 2013 (lost connection), 2006 (server has gone away)
+            if (
+                "2013" in message
+                or "2006" in message
+                or "lost connection" in message
+                or "server has gone away" in message
+            ):
+                db.rollback()
+                # Dispose the pool to force new connections on next attempt
+                try:
+                    engine.dispose()
+                except Exception:
+                    pass
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(random.uniform(0.2, 0.8))
+                    continue
+                else:
+                    raise HTTPException(
+                        status_code=503,
+                        detail="Database connection issue, please try again later.",
                     )
             else:
                 db.rollback()
