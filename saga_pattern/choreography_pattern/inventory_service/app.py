@@ -237,7 +237,7 @@ def start_event_listener():
                             aggregate_id=event_data["aggregate_id"],
                             aggregate_type="order",
                             version=event_data.get("version", 1),
-                            payload=event_data["payload"],
+                            event_data=event_data["payload"],
                             event_metadata={
                                 "source": "inventory_service",
                                 "channel": f"{settings.event_channel_prefix}.order",

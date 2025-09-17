@@ -37,8 +37,11 @@ services:
   order-service:
     build:
       context: ..
-      dockerfile: ./choreography_pattern/order_service/Dockerfile
+      dockerfile: ./order_service/Dockerfile
     container_name: choreography-order-service
+    volumes:
+      - ./order_service:/app
+    command: python app.py
     ports:
       - "8001:8001"
     environment:
@@ -55,10 +58,13 @@ services:
   inventory-service:
     build:
       context: ..
-      dockerfile: ./choreography_pattern/inventory_service/Dockerfile
+      dockerfile: ./inventory_service/Dockerfile
     container_name: choreography-inventory-service
     ports:
       - "8002:8002"
+    volumes:
+      - ./inventory_service:/app
+    command: python app.py
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
@@ -73,10 +79,13 @@ services:
   payment-service:
     build:
       context: ..
-      dockerfile: ./choreography_pattern/payment_service/Dockerfile
+      dockerfile: ./payment_service/Dockerfile
     container_name: choreography-payment-service
     ports:
       - "8003:8003"
+    volumes:
+      - ./payment_service:/app
+    command: python app.py
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
@@ -91,10 +100,13 @@ services:
   shipping-service:
     build:
       context: ..
-      dockerfile: ./choreography_pattern/shipping_service/Dockerfile
+      dockerfile: ./shipping_service/Dockerfile
     container_name: choreography-shipping-service
     ports:
       - "8004:8004"
+    command: python app.py
+    volumes:
+      - ./shipping_service:/app
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306

@@ -20,6 +20,3 @@ COPY ./choreography_pattern/shipping_service/app.py .
 
 # Expose port
 EXPOSE 8004
-
-# Run the application
-CMD ["python", "app.py"]

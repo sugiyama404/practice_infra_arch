@@ -20,6 +20,3 @@ COPY ./choreography_pattern/payment_service/app.py .
 
 # Expose port
 EXPOSE 8003
-
-# Run the application
-CMD ["python", "app.py"]
