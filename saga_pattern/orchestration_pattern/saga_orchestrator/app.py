@@ -10,9 +10,6 @@ import os
 import asyncio
 import uvicorn
 
-# Add shared module to path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
-
 from shared.models import SagaInstance, SagaStatus, SagaStepLog, StepStatus
 from shared.config import settings, get_database_url, get_rabbitmq_url
 from shared.utils import (
