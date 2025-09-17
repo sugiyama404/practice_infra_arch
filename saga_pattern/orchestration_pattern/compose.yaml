@@ -54,9 +54,7 @@ services:
     restart: unless-stopped
 
   saga-orchestrator:
-    build:
-      context: ..
-      dockerfile: ./saga_orchestrator/Dockerfile
+    build: ./saga_orchestrator
     container_name: orchestration-saga-orchestrator
     volumes:
       - ./saga_orchestrator:/app
@@ -81,9 +79,7 @@ services:
     restart: unless-stopped
 
   order-service:
-    build:
-      context: ..
-      dockerfile: ./order_service/Dockerfile
+    build: ./order_service
     container_name: orchestration-order-service
     ports:
       - "8011:8001"
@@ -103,9 +99,7 @@ services:
     restart: unless-stopped
 
   inventory-service:
-    build:
-      context: ..
-      dockerfile: ./inventory_service/Dockerfile
+    build: ./inventory_service
     container_name: orchestration-inventory-service
     volumes:
       - ./inventory_service:/app
@@ -125,9 +119,7 @@ services:
     restart: unless-stopped
 
   payment-service:
-    build:
-      context: ..
-      dockerfile: ./payment_service/Dockerfile
+    build: ./payment_service
     container_name: orchestration-payment-service
     ports:
       - "8013:8003"
@@ -147,9 +139,7 @@ services:
     restart: unless-stopped
 
   shipping-service:
-    build:
-      context: ..
-      dockerfile: ./shipping_service/Dockerfile
+    build: ./shipping_service
     container_name: orchestration-shipping-service
     ports:
       - "8014:8004"

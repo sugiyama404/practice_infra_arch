@@ -9,14 +9,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
-COPY ./orchestration_pattern/shipping_service/requirements.txt .
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set PYTHONPATH to include shared modules
 ENV PYTHONPATH=/app
 
 # Copy application code
-COPY ./orchestration_pattern/shipping_service/app.py .
+COPY . .
 
 # Expose port
 EXPOSE 8004
