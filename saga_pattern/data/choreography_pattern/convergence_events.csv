@@ -1,0 +1,3 @@
+aggregate_id,event_type,processed_at
+order-b57ab77e,ORDER_CONFIRMED,2025-09-15 06:38:48.279305
+order-test123,STOCK_RESERVED,2025-09-15 06:39:49.188098

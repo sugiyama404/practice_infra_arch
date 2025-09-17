@@ -1,0 +1,3 @@
+saga_id,order_id,step_number,step_name,command_type,status,started_at,completed_at,duration_ms
+order-b57ab77e,order-b57ab77e,1,ORDER_CONFIRMED,forward,completed,2025-09-15 06:38:48.279305,2025-09-15 06:38:48.279305,0.0
+order-test123,order-test123,1,STOCK_RESERVED,forward,completed,2025-09-15 06:39:49.188098,2025-09-15 06:39:49.188098,0.0
