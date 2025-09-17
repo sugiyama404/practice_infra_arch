@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Dict, Any
 import sys
 import os
+import uvicorn
 
 # Add shared module to path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
@@ -272,6 +273,4 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    uvicorn.run("app:app", host="0.0.0.0", port=8002, reload=True)

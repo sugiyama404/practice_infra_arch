@@ -8,6 +8,7 @@ from typing import Dict, Any, List
 import sys
 import os
 import asyncio
+import uvicorn
 
 # Add shared module to path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "shared"))
@@ -497,6 +498,4 @@ async def health_check():
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8005)
+    uvicorn.run("app:app", host="0.0.0.0", port=8005, reload=True)

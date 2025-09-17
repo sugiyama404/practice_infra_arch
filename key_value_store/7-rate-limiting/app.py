@@ -10,30 +10,32 @@ REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
+
 # 固定ウィンドウカウンタアルゴリズム
 def is_rate_limited_fixed_window(user_id, limit=10, window=60):
     key = f"rate_limit:fixed:{user_id}"
-    
+
     current_requests = redis_client.get(key)
-    
+
     if current_requests is None:
         redis_client.setex(key, window, 1)
         return False
-        
+
     if int(current_requests) >= limit:
         return True
-        
+
     redis_client.incr(key)
     return False
+
 
 # スライディングウィンドウログアルゴリズム
 def is_rate_limited_sliding_window(user_id, limit=10, window=60):
     key = f"rate_limit:sliding:{user_id}"
     now = time.time()
-    
+
     # トランザクション開始
     pipe = redis_client.pipeline()
-    
+
     # 古いリクエストを削除
     pipe.zremrangebyscore(key, 0, now - window)
     # 新しいリクエストを追加
@@ -42,43 +44,48 @@ def is_rate_limited_sliding_window(user_id, limit=10, window=60):
     pipe.zcard(key)
     # ウィンドウの有効期限を設定
     pipe.expire(key, window)
-    
+
     # トランザクション実行
     results = pipe.execute()
     request_count = results[2]
-    
+
     return request_count > limit
 
-@app.route('/limited_fixed')
+
+@app.route("/limited_fixed")
 def limited_fixed():
-    user_id = request.args.get('user_id', 'default_user')
+    user_id = request.args.get("user_id", "default_user")
     if is_rate_limited_fixed_window(user_id):
         return jsonify({"error": "Rate limit exceeded"}), 429
     return jsonify({"message": "Request successful"})
 
-@app.route('/limited_sliding')
+
+@app.route("/limited_sliding")
 def limited_sliding():
-    user_id = request.args.get('user_id', 'default_user')
+    user_id = request.args.get("user_id", "default_user")
     if is_rate_limited_sliding_window(user_id):
         return jsonify({"error": "Rate limit exceeded"}), 429
     return jsonify({"message": "Request successful"})
 
-@app.route('/health', methods=['GET'])
+
+@app.route("/health", methods=["GET"])
 def health():
     try:
         redis_client.ping()
-        return jsonify({'status': 'ok'}), 200
+        return jsonify({"status": "ok"}), 200
     except Exception as e:
-        return jsonify({'status': 'error', 'detail': str(e)}), 500
+        return jsonify({"status": "error", "detail": str(e)}), 500
 
-@app.route('/check_rate', methods=['GET'])
+
+@app.route("/check_rate", methods=["GET"])
 def check_rate():
-    user_id = request.args.get('user_id', 'default_user')
+    user_id = request.args.get("user_id", "default_user")
     limited = is_rate_limited_fixed_window(user_id)
     if limited:
-        return jsonify({'allowed': False, 'error': 'Rate limit exceeded'}), 429
+        return jsonify({"allowed": False, "error": "Rate limit exceeded"}), 429
     else:
-        return jsonify({'allowed': True, 'message': 'Request allowed'}), 200
+        return jsonify({"allowed": True, "message": "Request allowed"}), 200
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, reload=True)

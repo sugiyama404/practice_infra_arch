@@ -238,10 +238,7 @@ def start_event_listener():
                             aggregate_type="order",
                             version=event_data.get("version", 1),
                             event_data=event_data["payload"],
-                            event_metadata={
-                                "source": "inventory_service",
-                                "channel": f"{settings.event_channel_prefix}.order",
-                            },
+                            # event_metadata argument removed
                             processed_at=datetime.utcnow(),
                         )
                         logger.info("Created event record object")
@@ -353,4 +350,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    uvicorn.run("app.app:app", host="0.0.0.0", port=8002, reload=True)

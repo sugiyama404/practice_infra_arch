@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Dict, Any
 import sys
 import os
+import uvicorn
 
 # Add shared module to path
 sys.path.append("/app")
@@ -239,6 +240,4 @@ async def health_check():
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run("app:app", host="0.0.0.0", port=8001, reload=True)
