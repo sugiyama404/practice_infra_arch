@@ -15,11 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Set PYTHONPATH to include shared modules
 ENV PYTHONPATH=/app
 
-# Copy application code
-COPY ./orchestration_pattern/inventory_service/app.py .
-
+COPY . .
 # Expose port
 EXPOSE 8002
-
-# Run the application
-CMD ["python", "app.py"]

@@ -19,10 +19,7 @@ COPY ./shared /app/shared
 ENV PYTHONPATH=/app
 
 # Copy application code
-COPY ./orchestration_pattern/saga_orchestrator/app.py .
+COPY . .
 
 # Expose port
 EXPOSE 8005
-
-# Run the application
-CMD ["python", "app.py"]

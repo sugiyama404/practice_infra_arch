@@ -90,6 +90,7 @@ services:
     volumes:
       - ./order_service:/app
       - ./shared:/app/shared
+    command: [ "python", "app.py" ]
     environment:
       - MYSQL_HOST=mysql_orch
       - MYSQL_PORT=3306
@@ -111,6 +112,7 @@ services:
       - ./shared:/app/shared
     ports:
       - "8012:8002"
+    command: [ "python", "app.py" ]
     environment:
       - MYSQL_HOST=mysql_orch
       - MYSQL_PORT=3306
@@ -129,6 +131,7 @@ services:
     container_name: orchestration-payment-service
     ports:
       - "8013:8003"
+    command: [ "python", "app.py" ]
     volumes:
       - ./payment_service:/app
       - ./shared:/app/shared
@@ -150,6 +153,7 @@ services:
     container_name: orchestration-shipping-service
     ports:
       - "8014:8004"
+    command: [ "python", "app.py" ]
     volumes:
       - ./shipping_service:/app
       - ./shared:/app/shared
