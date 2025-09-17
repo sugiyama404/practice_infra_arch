@@ -41,6 +41,7 @@ services:
     container_name: choreography-order-service
     volumes:
       - ./order_service:/app
+      - ./shared:/app/shared
     command: python app.py
     ports:
       - "8001:8001"
@@ -64,6 +65,7 @@ services:
       - "8002:8002"
     volumes:
       - ./inventory_service:/app
+      - ./shared:/app/shared
     command: python app.py
     environment:
       - MYSQL_HOST=mysql
@@ -85,6 +87,7 @@ services:
       - "8003:8003"
     volumes:
       - ./payment_service:/app
+      - ./shared:/app/shared
     command: python app.py
     environment:
       - MYSQL_HOST=mysql
@@ -107,6 +110,7 @@ services:
     command: python app.py
     volumes:
       - ./shipping_service:/app
+      - ./shared:/app/shared
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306

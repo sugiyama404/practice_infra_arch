@@ -56,8 +56,11 @@ services:
   saga-orchestrator:
     build:
       context: ..
-      dockerfile: ./orchestration_pattern/saga_orchestrator/Dockerfile
+      dockerfile: ./saga_orchestrator/Dockerfile
     container_name: orchestration-saga-orchestrator
+    volumes:
+      - ./saga_orchestrator:/app
+      - ./shared:/app/shared
     ports:
       - "8005:8005"
     environment:
@@ -80,10 +83,13 @@ services:
   order-service:
     build:
       context: ..
-      dockerfile: ./orchestration_pattern/order_service/Dockerfile
+      dockerfile: ./order_service/Dockerfile
     container_name: orchestration-order-service
     ports:
       - "8011:8001"
+    volumes:
+      - ./order_service:/app
+      - ./shared:/app/shared
     environment:
       - MYSQL_HOST=mysql_orch
       - MYSQL_PORT=3306
@@ -98,8 +104,11 @@ services:
   inventory-service:
     build:
       context: ..
-      dockerfile: ./orchestration_pattern/inventory_service/Dockerfile
+      dockerfile: ./inventory_service/Dockerfile
     container_name: orchestration-inventory-service
+    volumes:
+      - ./inventory_service:/app
+      - ./shared:/app/shared
     ports:
       - "8012:8002"
     environment:
@@ -116,10 +125,13 @@ services:
   payment-service:
     build:
       context: ..
-      dockerfile: ./orchestration_pattern/payment_service/Dockerfile
+      dockerfile: ./payment_service/Dockerfile
     container_name: orchestration-payment-service
     ports:
       - "8013:8003"
+    volumes:
+      - ./payment_service:/app
+      - ./shared:/app/shared
     environment:
       - MYSQL_HOST=mysql_orch
       - MYSQL_PORT=3306
@@ -134,10 +146,13 @@ services:
   shipping-service:
     build:
       context: ..
-      dockerfile: ./orchestration_pattern/shipping_service/Dockerfile
+      dockerfile: ./shipping_service/Dockerfile
     container_name: orchestration-shipping-service
     ports:
       - "8014:8004"
+    volumes:
+      - ./shipping_service:/app
+      - ./shared:/app/shared
     environment:
       - MYSQL_HOST=mysql_orch
       - MYSQL_PORT=3306

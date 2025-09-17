@@ -12,9 +12,6 @@ RUN apt-get update && apt-get install -y \
 COPY ./choreography_pattern/shipping_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy shared modules
-COPY ./shared /app/shared
-
 # Copy application code
 COPY ./choreography_pattern/shipping_service/app.py .
 

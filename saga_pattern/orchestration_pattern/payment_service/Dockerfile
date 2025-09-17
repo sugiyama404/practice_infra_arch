@@ -12,9 +12,6 @@ RUN apt-get update && apt-get install -y \
 COPY ./orchestration_pattern/payment_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy shared modules
-COPY ./shared /app/shared
-
 # Set PYTHONPATH to include shared modules
 ENV PYTHONPATH=/app
 
