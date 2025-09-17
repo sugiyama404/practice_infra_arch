@@ -36,8 +36,8 @@ services:
 
   order-service:
     build:
-      context: ..
-      dockerfile: ./order_service/Dockerfile
+      context: ./order_service
+      dockerfile: Dockerfile
     container_name: choreography-order-service
     volumes:
       - ./order_service:/app
@@ -58,8 +58,8 @@ services:
 
   inventory-service:
     build:
-      context: ..
-      dockerfile: ./inventory_service/Dockerfile
+      context: ./inventory_service
+      dockerfile: Dockerfile
     container_name: choreography-inventory-service
     ports:
       - "8002:8002"
@@ -80,8 +80,8 @@ services:
 
   payment-service:
     build:
-      context: ..
-      dockerfile: ./payment_service/Dockerfile
+      context: ./payment_service
+      dockerfile: Dockerfile
     container_name: choreography-payment-service
     ports:
       - "8003:8003"
@@ -102,8 +102,8 @@ services:
 
   shipping-service:
     build:
-      context: ..
-      dockerfile: ./shipping_service/Dockerfile
+      context: ./shipping_service
+      dockerfile: Dockerfile
     container_name: choreography-shipping-service
     ports:
       - "8004:8004"
