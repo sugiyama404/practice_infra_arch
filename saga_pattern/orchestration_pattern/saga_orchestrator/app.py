@@ -128,12 +128,68 @@ async def execute_step(
     try:
         # Prepare payload based on service
         if service == "inventory":
-            # Extract first item for inventory service
+            # Handle all items in the order for inventory service
             if "items" in payload and len(payload["items"]) > 0:
-                first_item = payload["items"][0]
+                # For now, handle each item individually to maintain compatibility
+                # with the current inventory API that expects single items
+                reserved_items = []
+
+                for item in payload["items"]:
+                    item_payload = {
+                        "book_id": item["book_id"],
+                        "quantity": item["quantity"],
+                        "order_id": payload.get("order_id"),
+                        "saga_id": saga_id,
+                    }
+
+                    # Create individual command for each item
+                    item_command = create_command(command_type, saga_id, item_payload)
+                    item_command["endpoint"] = endpoint
+
+                    try:
+                        item_response = await send_command(service, item_command)
+                        reserved_items.append(
+                            {
+                                "book_id": item["book_id"],
+                                "quantity": item["quantity"],
+                                "response": item_response,
+                            }
+                        )
+                    except Exception as e:
+                        # If any item fails, we need to compensate already reserved items
+                        logger.error(
+                            f"Failed to reserve item {item['book_id']}: {str(e)}"
+                        )
+
+                        # Compensate already reserved items
+                        for reserved_item in reserved_items:
+                            try:
+                                compensate_payload = {
+                                    "book_id": reserved_item["book_id"],
+                                    "quantity": reserved_item["quantity"],
+                                    "order_id": payload.get("order_id"),
+                                    "saga_id": saga_id,
+                                }
+                                compensate_command = create_command(
+                                    "release_stock", saga_id, compensate_payload
+                                )
+                                compensate_command["endpoint"] = step[
+                                    "compensation_endpoint"
+                                ]
+                                await send_command(service, compensate_command)
+                                logger.info(
+                                    f"Compensated reserved item {reserved_item['book_id']}"
+                                )
+                            except Exception as comp_e:
+                                logger.error(
+                                    f"Failed to compensate item {reserved_item['book_id']}: {str(comp_e)}"
+                                )
+
+                        raise e  # Re-raise the original exception
+
+                # All items successfully reserved
                 command_payload = {
-                    "book_id": first_item["book_id"],
-                    "quantity": first_item["quantity"],
+                    "reserved_items": reserved_items,
                     "order_id": payload.get("order_id"),
                     "saga_id": saga_id,
                 }
@@ -161,15 +217,17 @@ async def execute_step(
         else:
             command_payload = payload
 
-        # Send command to service
-        command = create_command(command_type, saga_id, command_payload)
-        command["endpoint"] = endpoint
-
-        response = await send_command(service, command)
+        # Send command to service (skip for inventory as it's handled above)
+        if service != "inventory":
+            command = create_command(command_type, saga_id, command_payload)
+            command["endpoint"] = endpoint
+            response = await send_command(service, command)
 
         # Update step log
         step_log.status = StepStatus.COMPLETED
-        step_log.response_payload = response
+        step_log.response_payload = (
+            command_payload if service == "inventory" else response
+        )
         step_log.completed_at = datetime.utcnow()
         step_log.duration_ms = int(
             (datetime.utcnow() - step_log.started_at).total_seconds() * 1000
@@ -216,15 +274,35 @@ async def execute_compensation(
     try:
         # Prepare compensation payload based on service
         if service == "inventory":
-            # Extract first item for inventory compensation
+            # Handle multi-item compensation for inventory service
             if "items" in payload and len(payload["items"]) > 0:
-                first_item = payload["items"][0]
-                compensation_payload = {
-                    "book_id": first_item["book_id"],
-                    "quantity": first_item["quantity"],
-                    "order_id": payload.get("order_id"),
-                    "saga_id": saga_id,
-                }
+                # Compensate each item individually
+                for item in payload["items"]:
+                    try:
+                        item_compensation_payload = {
+                            "book_id": item["book_id"],
+                            "quantity": item["quantity"],
+                            "order_id": payload.get("order_id"),
+                            "saga_id": saga_id,
+                        }
+
+                        # Send individual compensation command
+                        comp_command = create_command(
+                            compensation_command, saga_id, item_compensation_payload
+                        )
+                        comp_command["endpoint"] = endpoint
+                        await send_command(service, comp_command)
+                        logger.info(
+                            f"Compensated inventory item {item['book_id']} (quantity: {item['quantity']})"
+                        )
+                    except Exception as item_e:
+                        logger.error(
+                            f"Failed to compensate inventory item {item['book_id']}: {str(item_e)}"
+                        )
+                        # Continue with other items even if one fails
+
+                # Skip the general compensation logic since we handled items individually
+                return True
             else:
                 compensation_payload = payload
         elif service == "payment":
@@ -294,21 +372,19 @@ async def run_saga(saga_id: str, order_data: Dict[str, Any]):
         for i, step in enumerate(ORDER_WORKFLOW["steps"]):
             step["step_number"] = i + 1
 
-            # Update saga status
-            if i == 0:
-                saga.status = SagaStatus.ORDER_CREATED
-            elif i == 1:
-                saga.status = SagaStatus.STOCK_RESERVED
-            elif i == 2:
-                saga.status = SagaStatus.PAYMENT_COMPLETED
-            elif i == 3:
-                saga.status = SagaStatus.SHIPPING_ARRANGED
-            db.commit()
-
             # Execute step
             success = await execute_step(saga_id, step, order_data, db)
 
-            if not success:
+            if success:
+                # Update saga status after successful step completion
+                if i == 0:
+                    saga.status = SagaStatus.STOCK_RESERVED
+                elif i == 1:
+                    saga.status = SagaStatus.PAYMENT_COMPLETED
+                elif i == 2:
+                    saga.status = SagaStatus.SHIPPING_ARRANGED
+                db.commit()
+            else:
                 # Start compensation
                 logger.warning(
                     f"Saga {saga_id} failed at step {i + 1}, starting compensation"
@@ -316,13 +392,26 @@ async def run_saga(saga_id: str, order_data: Dict[str, Any]):
                 saga.status = SagaStatus.COMPENSATION_STARTED
                 db.commit()
 
-                # Execute compensations in reverse order
-                for j in range(i, -1, -1):
+                # Execute compensations in reverse order for completed steps only
+                for j in range(i - 1, -1, -1):
                     compensation_step = ORDER_WORKFLOW["steps"][j].copy()
                     compensation_step["step_number"] = j + 1
-                    await execute_compensation(
-                        saga_id, compensation_step, order_data, db
+
+                    # Only compensate if the step was actually completed
+                    step_log = (
+                        db.query(SagaStepLog)
+                        .filter(
+                            SagaStepLog.saga_id == saga_id,
+                            SagaStepLog.step_number == j + 1,
+                            SagaStepLog.status == StepStatus.COMPLETED,
+                        )
+                        .first()
                     )
+
+                    if step_log:
+                        await execute_compensation(
+                            saga_id, compensation_step, order_data, db
+                        )
 
                 # Mark saga as failed
                 saga.status = SagaStatus.FAILED
