@@ -285,6 +285,7 @@ class Event(Base):
     event_data = Column(JSON, nullable=True)
     version = Column(Integer, nullable=False, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
+    processed_at = Column(DateTime)
 
     __table_args__ = (
         Index("idx_events_aggregate_id", aggregate_id),
