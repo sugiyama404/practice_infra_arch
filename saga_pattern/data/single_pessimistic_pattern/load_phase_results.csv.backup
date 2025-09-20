@@ -1,0 +1,10 @@
+load_phase,scenario,count,mean_rt,std_rt,min_rt,max_rt,p95_rt,p99_rt,success_count,success_rate
+heavy,load_payment_failure,195,0.01,0.023,0.002,0.192,0.012,0.132,0,0.0
+heavy,load_stock_failure,558,0.008,0.013,0.002,0.165,0.011,0.017,0,0.0
+heavy,load_success,6040,0.01,0.021,0.001,0.198,0.012,0.152,0,0.0
+light,load_payment_failure,44,0.012,0.015,0.004,0.095,0.012,0.082,0,0.0
+light,load_stock_failure,116,0.011,0.012,0.003,0.095,0.013,0.083,0,0.0
+light,load_success,1202,0.013,0.012,0.002,0.121,0.021,0.09,273,22.7
+medium,load_payment_failure,138,0.009,0.011,0.003,0.127,0.013,0.048,0,0.0
+medium,load_stock_failure,395,0.009,0.012,0.002,0.126,0.012,0.056,0,0.0
+medium,load_success,4281,0.009,0.013,0.001,0.131,0.012,0.102,0,0.0

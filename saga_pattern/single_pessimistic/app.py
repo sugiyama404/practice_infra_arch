@@ -8,8 +8,13 @@ import uuid
 from datetime import datetime
 import time
 import random
+import logging
 
 from models import Base, Order, OrderItem, Inventory, Book, Event
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -83,16 +88,25 @@ def create_order(payload: OrderPayload, db: Session = Depends(get_db)):
     order_id = f"order-{uuid.uuid4().hex[:8]}"
     total_amount = 0
 
+    logger.info(f"Creating order {order_id} for customer {payload.customer_id}")
+
     # Retry logic for transient errors (deadlocks, lost connections)
     MAX_RETRIES = 5
     for attempt in range(MAX_RETRIES):
         try:
             with db.begin_nested():  # Use nested transaction
+                logger.info(f"Attempt {attempt + 1} for order {order_id}")
+
                 # 1. Calculate total amount and lock inventory items
                 order_items_to_create = []
                 for item in payload.items:
+                    logger.info(
+                        f"Processing item: {item.book_id}, quantity: {item.quantity}"
+                    )
+
                     book = db.query(Book).filter(Book.book_id == item.book_id).first()
                     if not book:
+                        logger.error(f"Book {item.book_id} not found")
                         raise HTTPException(
                             status_code=400, detail=f"Book {item.book_id} not found"
                         )
@@ -105,12 +119,18 @@ def create_order(payload: OrderPayload, db: Session = Depends(get_db)):
                     )
 
                     if inventory_item.available_stock < item.quantity:
+                        logger.warning(
+                            f"Not enough stock for book {item.book_id}: available {inventory_item.available_stock}, requested {item.quantity}"
+                        )
                         raise HTTPException(
                             status_code=400,
                             detail=f"Not enough stock for book {item.book_id}",
                         )
 
                     inventory_item.available_stock -= item.quantity
+                    logger.info(
+                        f"Updated stock for {item.book_id}: {inventory_item.available_stock + item.quantity} -> {inventory_item.available_stock}"
+                    )
 
                     item_total = book.price * item.quantity
                     total_amount += item_total
@@ -125,7 +145,11 @@ def create_order(payload: OrderPayload, db: Session = Depends(get_db)):
                     )
 
                 # 2. Simulate payment (can fail)
+                logger.info(f"Total amount for order {order_id}: {total_amount}")
                 if total_amount > 5000:  # Simulate payment failure for high amounts
+                    logger.warning(
+                        f"Payment failed for order {order_id}: amount {total_amount} > 5000"
+                    )
                     new_order = Order(
                         order_id=order_id,
                         customer_id=payload.customer_id,
