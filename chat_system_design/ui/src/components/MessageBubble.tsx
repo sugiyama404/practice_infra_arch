@@ -12,11 +12,11 @@ export const MessageBubble: React.FC<Props> = ({ message, self, onResend }) => {
     const statusIcon = () => {
         switch (message.status) {
             case 'sending':
-                return <FaClock className="uk-text-muted" size={10} />;
+                return <FaClock className="w-3 h-3 text-slate-400" />;
             case 'sent':
-                return <FaCheck className="uk-text-primary" size={10} />;
+                return <FaCheck className="w-3 h-3 text-slate-400" />;
             case 'read':
-                return <FaCheckDouble className="uk-text-success" size={10} />;
+                return <FaCheckDouble className="w-3 h-3 text-green-400" />;
             default:
                 return null;
         }
@@ -29,52 +29,40 @@ export const MessageBubble: React.FC<Props> = ({ message, self, onResend }) => {
         if (now - sentTime < 5000) return null; // 5 seconds
         return (
             <button
-                className="uk-button uk-button-text uk-text-warning uk-padding-small uk-margin-remove"
+                className="p-1 rounded hover:bg-slate-700 transition-colors"
                 onClick={() => onResend?.(message)}
                 type="button"
             >
-                <FaRedo size={10} />
+                <FaRedo className="w-3 h-3 text-orange-400" />
             </button>
         );
     };
+
     return (
-        <div className={clsx('uk-flex', self ? 'uk-flex-right' : 'uk-flex-left')}>
+        <div className={clsx('flex', self ? 'justify-end' : 'justify-start')}>
             <div
                 className={clsx(
-                    'uk-border-rounded uk-padding-small uk-width-auto uk-text-small',
-                    self ? 'uk-background-primary uk-light' : 'uk-background-default uk-box-shadow-small',
+                    'max-w-xs lg:max-w-md px-4 py-2 rounded-2xl text-sm',
+                    self
+                        ? 'bg-gradient-accent text-white rounded-br-md'
+                        : 'bg-slate-700 text-slate-100 rounded-bl-md',
                 )}
-                style={{ maxWidth: 320 }}
             >
                 <div>{message.content}</div>
-                <div
-                    className="uk-text-xxsmall uk-flex uk-flex-middle uk-flex-right uk-margin-small-top"
-                    style={{ gap: 6 }}
-                >
+                <div className="flex items-center justify-end gap-1 mt-1 text-xs text-slate-300">
                     <span>{new Date(message.timestamp).toLocaleTimeString()}</span>
                     {statusIcon()}
                     {resendIcon()}
                     {message.read_by && message.read_by.length > 0 && (
-                        <div className="uk-inline">
+                        <div className="relative">
                             <button
-                                className="uk-button uk-button-text uk-text-muted uk-padding-small uk-margin-remove"
+                                className="p-1 rounded hover:bg-slate-600 transition-colors"
                                 type="button"
-                                uk-toggle="target: #read-by-dropdown-{message.message_id}"
+                                title={`Read by: ${message.read_by.join(', ')}`}
                             >
-                                <span className="uk-flex uk-flex-middle" style={{ gap: 2 }}>
-                                    <FaUser size={9} />
-                                    {message.read_by.length}
-                                </span>
+                                <FaUser className="w-3 h-3" />
+                                <span className="ml-1">{message.read_by.length}</span>
                             </button>
-                            <div id={`read-by-dropdown-${message.message_id}`} uk-dropdown="mode: click">
-                                <ul className="uk-nav uk-dropdown-nav">
-                                    {message.read_by.map((user) => (
-                                        <li key={user}>
-                                            <a href="#">{user}</a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
                         </div>
                     )}
                 </div>

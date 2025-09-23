@@ -17,10 +17,7 @@ export const MessageList: React.FC<Props> = ({
     onResend,
 }) => {
     return (
-        <div
-            className="uk-flex-1 uk-overflow-auto uk-padding-small uk-flex uk-flex-column"
-            style={{ rowGap: 8 }}
-        >
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((m) => (
                 <MessageBubble
                     key={m.message_id + String(m.optimistic || '')}
@@ -30,7 +27,9 @@ export const MessageList: React.FC<Props> = ({
                 />
             ))}
             {typingUsers.size > 0 && (
-                <div className="uk-text-meta">{Array.from(typingUsers).join(', ')} is typing...</div>
+                <div className="text-slate-400 text-sm italic">
+                    {Array.from(typingUsers).join(', ')} is typing...
+                </div>
             )}
             <div ref={bottomRef} />
         </div>

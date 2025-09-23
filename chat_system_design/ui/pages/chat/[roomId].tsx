@@ -9,6 +9,7 @@ import { notify, withErrorNotify } from '../../src/lib/notify';
 import { Sidebar } from '../../src/components/Sidebar';
 import { MessageList } from '../../src/components/MessageList';
 import { MessageInput } from '../../src/components/MessageInput';
+import { Wifi, WifiOff, Search, Settings, MessageSquare } from 'lucide-react';
 
 interface ChatPageProps {
     initialRoomId: string;
@@ -31,6 +32,7 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
     const { typingUsers, setTyping } = useTypingStore();
     const wsRef = useRef<{ send: (o: any) => void; close: () => void } | null>(null);
     const [status, setStatus] = useState('connecting');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const bottomRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -93,7 +95,20 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
         });
         wsRef.current = client;
         return () => client.close();
-    }, [userId, deviceId, roomId, addMessage, setPresence, setTyping, updateMessageStatus, addMessageReader, addMessageReaders, messages]); useEffect(() => {
+    }, [
+        userId,
+        deviceId,
+        roomId,
+        addMessage,
+        setPresence,
+        setTyping,
+        updateMessageStatus,
+        addMessageReader,
+        addMessageReaders,
+        messages,
+    ]);
+
+    useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
@@ -133,16 +148,61 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
     };
 
     return (
-        <div className="uk-flex uk-height-viewport">
-            <Sidebar currentRoom={roomId} userId={userId} deviceId={deviceId} />
-            <div className="uk-flex uk-flex-column uk-flex-1">
+        <div className="h-screen bg-slate-900 text-slate-100 flex">
+            {/* Sidebar */}
+            <div
+                className={`fixed inset-y-0 left-0 z-50 w-80 bg-slate-800 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
+            >
+                <Sidebar
+                    currentRoom={roomId}
+                    userId={userId}
+                    deviceId={deviceId}
+                    onToggle={() => setSidebarOpen(false)}
+                />
+            </div>
+
+            {/* Overlay for mobile */}
+            {sidebarOpen && (
                 <div
-                    className="uk-padding-small uk-box-shadow-small uk-background-default uk-flex uk-flex-middle uk-text-small"
-                    style={{ gap: 8 }}
-                >
-                    <span className="uk-text-bold">Room: {roomId}</span>
-                    <span className="uk-badge">{status}</span>
-                </div>
+                    className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            {/* Main content */}
+            <div className="flex-1 flex flex-col min-w-0">
+                {/* Header */}
+                <header className="glass border-b border-slate-700 px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="lg:hidden p-2 rounded-lg hover:bg-slate-700 transition-colors"
+                        >
+                            <MessageSquare className="w-5 h-5" />
+                        </button>
+                        <div>
+                            <h1 className="text-lg font-semibold">#{roomId}</h1>
+                            <div className="flex items-center gap-2 text-sm text-slate-400">
+                                {status === 'connected' ? (
+                                    <Wifi className="w-4 h-4 text-green-400" />
+                                ) : (
+                                    <WifiOff className="w-4 h-4 text-red-400" />
+                                )}
+                                <span>{status}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button className="p-2 rounded-lg hover:bg-slate-700 transition-colors">
+                            <Search className="w-5 h-5" />
+                        </button>
+                        <button className="p-2 rounded-lg hover:bg-slate-700 transition-colors">
+                            <Settings className="w-5 h-5" />
+                        </button>
+                    </div>
+                </header>
+
+                {/* Messages */}
                 <MessageList
                     messages={messages}
                     currentUser={userId}
@@ -150,7 +210,9 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
                     bottomRef={bottomRef}
                     onResend={(msg) => handleSend(msg.content)}
                 />
-                <div className="uk-padding-small uk-background-muted uk-border-top">
+
+                {/* Input */}
+                <div className="glass border-t border-slate-700 p-4">
                     <MessageInput
                         onSend={(text: string) => handleSend(text)}
                         onTyping={() => wsRef.current?.send({ event: 'typing', room_id: roomId, typing: true })}
