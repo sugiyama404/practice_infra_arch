@@ -1,0 +1,66 @@
+{
+    "timestamp": "2025-09-22T21:02:59.096646",
+    "api_endpoint": "http://localhost:8000",
+    "basic_checks": {
+        "health_check_ok": true,
+        "single_request_ok": true,
+        "single_request_response_time_ms": 15.426874160766602
+    },
+    "load_test_summary": {
+        "10req_2threads": {
+            "requests": 10,
+            "threads": 2,
+            "total_time_sec": 0.06536602973937988,
+            "throughput_req_per_sec": 152.98466252074482,
+            "success_rate_percent": 100.0,
+            "avg_response_time_ms": 12.127423286437988,
+            "p95_response_time_ms": 15.378034114837645,
+            "p99_response_time_ms": 15.727622509002686
+        },
+        "50req_5threads": {
+            "requests": 50,
+            "threads": 5,
+            "total_time_sec": 0.4584519863128662,
+            "throughput_req_per_sec": 109.06267502978594,
+            "success_rate_percent": 100.0,
+            "avg_response_time_ms": 45.181779861450195,
+            "p95_response_time_ms": 70.37266492843627,
+            "p99_response_time_ms": 186.06366395950292
+        },
+        "100req_10threads": {
+            "requests": 100,
+            "threads": 10,
+            "total_time_sec": 0.7444090843200684,
+            "throughput_req_per_sec": 134.33473893099847,
+            "success_rate_percent": 100.0,
+            "avg_response_time_ms": 73.17014932632446,
+            "p95_response_time_ms": 125.58168172836304,
+            "p99_response_time_ms": 156.12023115158087
+        },
+        "200req_20threads": {
+            "requests": 200,
+            "threads": 20,
+            "total_time_sec": 1.2329001426696777,
+            "throughput_req_per_sec": 162.21913931076946,
+            "success_rate_percent": 100.0,
+            "avg_response_time_ms": 121.5008807182312,
+            "p95_response_time_ms": 204.29146289825437,
+            "p99_response_time_ms": 231.71908617019645
+        },
+        "500req_50threads": {
+            "requests": 500,
+            "threads": 50,
+            "total_time_sec": 2.97969388961792,
+            "throughput_req_per_sec": 167.8024718385129,
+            "success_rate_percent": 100.0,
+            "avg_response_time_ms": 295.0693168640137,
+            "p95_response_time_ms": 462.40061521530146,
+            "p99_response_time_ms": 695.8012986183162
+        }
+    },
+    "overall_summary": {
+        "max_throughput_req_per_sec": 167.8024718385129,
+        "min_success_rate_percent": 100.0,
+        "avg_p95_response_time_ms": 175.60489177703857
+    }
+}
