@@ -65,7 +65,7 @@ services:
       - chat-network
   pn_server:
     build: ./pn
-      command: ["python", "main.py"]
+    command: ["python", "main.py"]
     networks:
       - chat-network
   rabbitmq:
