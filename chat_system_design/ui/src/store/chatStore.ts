@@ -6,6 +6,11 @@ interface ChatState {
     addMessage: (m: ChatMessage) => void;
     setMessages: (ms: ChatMessage[]) => void;
     updateMessageStatus: (id: number, status: NonNullable<ChatMessage['status']>) => void;
+    addMessageReader: (id: number, userId: string, currentUserId?: string) => void;
+    addMessageReaders: (
+        reads: { message_id: number; user_id: string }[],
+        currentUserId?: string,
+    ) => void;
 }
 
 export const useChatStore = create<ChatState>(
@@ -35,6 +40,33 @@ export const useChatStore = create<ChatState>(
                 messages: s.messages.map((m) =>
                     m.message_id === id ? { ...m, status, optimistic: false } : m,
                 ),
+            })),
+        addMessageReader: (id: number, userId: string, currentUserId?: string) =>
+            set((s: ChatState) => ({
+                messages: s.messages.map((m) => {
+                    if (m.message_id !== id) return m;
+                    const existing = m.read_by || [];
+                    if (existing.includes(userId)) return m;
+                    const next: ChatMessage = { ...m, read_by: [...existing, userId] };
+                    if (currentUserId && m.user_id === currentUserId) {
+                        next.status = 'read';
+                    }
+                    return next;
+                }),
+            })),
+        addMessageReaders: (reads: { message_id: number; user_id: string }[], currentUserId?: string) =>
+            set((s: ChatState) => ({
+                messages: s.messages.map((m) => {
+                    const read = reads.find((r) => r.message_id === m.message_id);
+                    if (!read) return m;
+                    const existing = m.read_by || [];
+                    if (existing.includes(read.user_id)) return m;
+                    const next: ChatMessage = { ...m, read_by: [...existing, read.user_id] };
+                    if (currentUserId && m.user_id === currentUserId) {
+                        next.status = 'read';
+                    }
+                    return next;
+                }),
             })),
     }),
 );

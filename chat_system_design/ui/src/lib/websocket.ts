@@ -1,8 +1,10 @@
+import type { WSInboundEvent, WSOutboundEvent } from '../types/events';
+
 interface WSOptions {
   userId: string;
   deviceId: string;
   roomId: string;
-  onEvent: (payload: any) => void;
+  onEvent: (payload: WSInboundEvent) => void;
   onStatus?: (s: 'connecting' | 'open' | 'closed' | 'reconnecting' | 'failed') => void;
   maxRetries?: number;
 }
@@ -36,7 +38,7 @@ export function createWebSocket(opts: WSOptions) {
   };
   connect();
   return {
-    send: (obj: any) => {
+    send: (obj: WSOutboundEvent) => {
       if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
     },
     close: () => ws && ws.close(),

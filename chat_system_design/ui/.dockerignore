@@ -9,3 +9,13 @@ coverage
 .vscode
 *.local
 .env*
+.git
+.gitignore
+README.md
+NOTICE_PENDING_SETUP.md
+.hadolint.yaml
+.prettierrc
+jest.config.js
+jest.setup.ts
+tsconfig.tsbuildinfo
+.eslintrc.json

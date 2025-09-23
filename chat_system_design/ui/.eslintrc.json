@@ -1,23 +1,16 @@
 {
-    "extends": [
-        "next",
-        "next/core-web-vitals"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-        "@typescript-eslint"
-    ],
-    "overrides": [
-        {
-            "files": [
-                "src/types/shims-temp.d.ts"
-            ],
-            "rules": {
-                "@typescript-eslint/no-explicit-any": "off"
-            }
-        }
-    ],
-    "rules": {
-        "@next/next/no-html-link-for-pages": "off"
+  "extends": ["next", "next/core-web-vitals"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "overrides": [
+    {
+      "files": ["src/types/shims-temp.d.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
     }
+  ],
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off"
+  }
 }
