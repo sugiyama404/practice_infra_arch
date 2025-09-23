@@ -175,7 +175,7 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
                         <div>
                             <h1 className="text-lg font-semibold">#{roomId}</h1>
                             <div className="flex items-center gap-2 text-sm text-slate-400">
-                                {status === 'connected' ? (
+                                {status === 'open' ? (
                                     <Wifi className="w-4 h-4 text-green-400" />
                                 ) : (
                                     <WifiOff className="w-4 h-4 text-red-400" />
