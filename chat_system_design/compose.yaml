@@ -9,6 +9,15 @@ services:
       - api
       - ws1
       - ws2
+      - ui
+    networks:
+      - chat-network
+  ui:
+    build: ./ui
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nginx
     networks:
       - chat-network
   api:
