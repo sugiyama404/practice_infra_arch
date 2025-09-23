@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from typing import Dict, Set, Optional
 from fastapi import WebSocket
-import aioredis
+import redis.asyncio as redis
 
 from config import config
 
@@ -27,7 +27,7 @@ class ConnectionInfo:
 class ConnectionManager:
     """Manages WebSocket connections (stateful)"""
 
-    def __init__(self, redis_pool: aioredis.Redis):
+    def __init__(self, redis_pool: redis.Redis):
         # user_id -> Set[ConnectionInfo]
         self.user_connections: Dict[str, Set[ConnectionInfo]] = {}
         # websocket -> ConnectionInfo
@@ -271,5 +271,5 @@ class ConnectionManager:
             await self.disconnect(websocket)
             try:
                 await websocket.close(code=1000, reason="Connection timeout")
-            except:
+            except Exception:
                 pass  # Connection might already be closed

@@ -1,9 +1,8 @@
-import json
 import logging
 from datetime import datetime
 from typing import List, Optional, Dict
 import aiohttp
-import aioredis
+import redis.asyncio as redis
 import asyncpg
 from pydantic import BaseModel
 
@@ -28,7 +27,7 @@ class MessageData(BaseModel):
 class MessageProcessor:
     """Handles message processing logic"""
 
-    def __init__(self, db_pool: asyncpg.Pool, redis_pool: aioredis.Redis):
+    def __init__(self, db_pool: asyncpg.Pool, redis_pool: redis.Redis):
         self.db_pool = db_pool
         self.redis = redis_pool
         self.http_session: Optional[aiohttp.ClientSession] = None

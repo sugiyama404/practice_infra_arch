@@ -4,10 +4,9 @@ import logging
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Optional
-import uvicorn
 
 
-import aioredis
+import redis.asyncio as redis
 import aio_pika
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Global connections
-redis_pool: Optional[aioredis.Redis] = None
+redis_pool: Optional[redis.Redis] = None
 rabbitmq_connection: Optional[aio_pika.Connection] = None
 manager: Optional[ConnectionManager] = None
 
@@ -118,7 +117,7 @@ async def lifespan(app: FastAPI):
 
     try:
         # Redis connection
-        redis_pool = aioredis.from_url(config.REDIS_URL)
+        redis_pool = redis.from_url(config.REDIS_URL)
         logger.info("Connected to Redis")
 
         # Initialize connection manager
@@ -309,14 +308,3 @@ async def get_user_connections(user_id: str):
         "connections": connections,
         "total": len(connections),
     }
-
-
-if __name__ == "__main__":
-    uvicorn.run(
-        app,
-        host=config.HOST,
-        port=config.PORT,
-        log_level="info",
-        reload=True,
-        **config.websocket_config,
-    )

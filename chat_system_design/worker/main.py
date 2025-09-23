@@ -3,7 +3,7 @@ import asyncio
 import logging
 from typing import Optional
 
-import aioredis
+import redis.asyncio as redis
 import aio_pika
 import asyncpg
 
@@ -20,7 +20,7 @@ class MessageWorker:
 
     def __init__(self):
         self.db_pool: Optional[asyncpg.Pool] = None
-        self.redis_pool: Optional[aioredis.Redis] = None
+        self.redis_pool: Optional[redis.Redis] = None
         self.rabbitmq_connection: Optional[aio_pika.Connection] = None
         self.rabbitmq_channel: Optional[aio_pika.Channel] = None
         self.ws_exchange: Optional[aio_pika.Exchange] = None
@@ -39,7 +39,7 @@ class MessageWorker:
             logger.info("Connected to PostgreSQL")
 
             # Redis connection
-            self.redis_pool = aioredis.from_url(config.REDIS_URL)
+            self.redis_pool = redis.from_url(config.REDIS_URL)
             logger.info("Connected to Redis")
 
             # RabbitMQ connection

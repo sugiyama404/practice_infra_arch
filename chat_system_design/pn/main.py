@@ -329,21 +329,3 @@ async def reset_stats():
 
     logger.info("📊 Push notification statistics reset")
     return {"status": "success", "message": "Statistics reset"}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    logger.info(
-        f"🚀 Starting Push Notification Mock Server on {config.HOST}:{config.PORT}"
-    )
-    logger.info(f"📊 Stats enabled: {config.ENABLE_STATS}")
-    logger.info(f"📝 Detailed logs: {config.ENABLE_DETAILED_LOGS}")
-
-    uvicorn.run(
-        app,
-        host=config.HOST,
-        port=config.PORT,
-        log_level=config.LOG_LEVEL.lower(),
-        reload=True,
-    )

@@ -10,8 +10,6 @@ import asyncio
 import aiohttp
 import websockets
 import json
-import time
-from datetime import datetime
 
 BASE_URL = "http://localhost:8080"
 WS_URL = "ws://localhost:8080"

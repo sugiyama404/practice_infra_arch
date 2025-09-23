@@ -3,9 +3,8 @@ import logging
 from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Optional
-import uvicorn
 
-import aioredis
+import redis.asyncio as redis
 import aio_pika
 import asyncpg
 from fastapi import FastAPI, HTTPException, Depends, Query
@@ -15,12 +14,10 @@ from config import config
 from models import (
     SendMessageRequest,
     SendMessageResponse,
-    SyncMessagesRequest,
     SyncMessagesResponse,
     MessageData,
     PresenceData,
     HealthResponse,
-    ErrorResponse,
     MessageQueuePayload,
 )
 
@@ -29,7 +26,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Global connections
-redis_pool: Optional[aioredis.Redis] = None
+redis_pool: Optional[redis.Redis] = None
 rabbitmq_connection: Optional[aio_pika.Connection] = None
 rabbitmq_channel: Optional[aio_pika.Channel] = None
 db_pool: Optional[asyncpg.Pool] = None
@@ -45,7 +42,7 @@ async def lifespan(app: FastAPI):
 
     try:
         # Redis connection
-        redis_pool = aioredis.from_url(config.REDIS_URL)
+        redis_pool = redis.from_url(config.REDIS_URL)
         logger.info("Connected to Redis")
 
         # RabbitMQ connection
@@ -105,7 +102,7 @@ app.add_middleware(
 
 
 # Dependency injection
-async def get_redis() -> aioredis.Redis:
+async def get_redis() -> redis.Redis:
     if redis_pool is None:
         raise HTTPException(status_code=503, detail="Redis connection not available")
     return redis_pool
@@ -126,7 +123,7 @@ async def get_db() -> asyncpg.Pool:
 @app.post(f"{config.API_PREFIX}/messages/send", response_model=SendMessageResponse)
 async def send_message(
     request: SendMessageRequest,
-    redis: aioredis.Redis = Depends(get_redis),
+    redis: redis.Redis = Depends(get_redis),
     channel: aio_pika.Channel = Depends(get_rabbitmq_channel),
 ):
     """
@@ -176,7 +173,7 @@ async def sync_messages(
     last_message_id: int = Query(0, ge=0, description="Last received message ID"),
     limit: int = Query(50, ge=1, le=100, description="Maximum messages to return"),
     db_pool: asyncpg.Pool = Depends(get_db),
-    redis: aioredis.Redis = Depends(get_redis),
+    redis: redis.Redis = Depends(get_redis),
 ):
     """
     Multi-device sync API
@@ -232,7 +229,7 @@ async def sync_messages(
 
 
 @app.get(f"{config.API_PREFIX}/users/{{user_id}}/presence", response_model=PresenceData)
-async def get_presence(user_id: str, redis: aioredis.Redis = Depends(get_redis)):
+async def get_presence(user_id: str, redis: redis.Redis = Depends(get_redis)):
     """Get user presence information"""
     try:
         presence_data = await redis.get(f"presence:{user_id}")
@@ -269,7 +266,7 @@ async def health_check():
 
 @app.get(f"{config.API_PREFIX}/stats")
 async def get_stats(
-    redis: aioredis.Redis = Depends(get_redis), db_pool: asyncpg.Pool = Depends(get_db)
+    redis: redis.Redis = Depends(get_redis), db_pool: asyncpg.Pool = Depends(get_db)
 ):
     """Get system statistics"""
     try:
@@ -295,7 +292,3 @@ async def get_stats(
     except Exception as e:
         logger.error(f"Failed to get stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to get statistics")
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host=config.HOST, port=config.PORT, log_level="info", reload=True)
