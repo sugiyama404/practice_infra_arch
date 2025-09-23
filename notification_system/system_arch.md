@@ -1,21 +1,25 @@
 ```mermaid
+
+%%{init: {'theme': 'base', 'themeVariables': { 'background': '#ffffff' }}}%%
+
 graph TD;
 
     subgraph Client
-        A["API (Flask)\n(POST /send)"]
+        A["API (Flask)<br>(POST /send)"]
     end
 
     subgraph Backend
-        B["Message Queue\n(Redis)"]
-        C["Worker\n(Celery)"]
+        B["Message Queue<br>(Redis)"]
+        C["Worker<br>(Celery)"]
     end
 
     subgraph Delivery
-        D["Email Server\n(MailHog)"]
+        D["Email Server<br>(MailHog)"]
     end
 
     %% 矢印の流れ (縦方向)
-    A -->|enqueue| B -->|consume| C -->|send| D
+    A -->|enqueue| Backend -->|send| Delivery
+    B -->|task| C
 
     %% 色指定
     style A fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px
