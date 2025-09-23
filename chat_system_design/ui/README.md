@@ -14,4 +14,5 @@ npm run test     # jest
 ```
 
 ## Environment
+
 Set `NEXT_PUBLIC_API_BASE` if backend gateway differs (default: http://localhost:8080).

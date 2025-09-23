@@ -5,5 +5,5 @@ import 'uikit/dist/js/uikit.min.js';
 import 'uikit/dist/js/uikit-icons.min.js';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-    return <Component {...pageProps} />;
+  return <Component {...pageProps} />;
 }

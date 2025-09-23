@@ -13,9 +13,16 @@ services:
     networks:
       - chat-network
   ui:
-    build: ./ui
+    build:
+      context: ./ui
+      target: dev
     ports:
       - "3000:3000"
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_API_BASE=http://nginx:80
     networks:
       - chat-network
   api:

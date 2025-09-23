@@ -2,3 +2,10 @@ node_modules
 .next
 npm-debug.log
 yarn-error.log
+pnpm-lock.yaml
+coverage
+.DS_Store
+.idea
+.vscode
+*.local
+.env*

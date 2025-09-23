@@ -14,9 +14,9 @@ RUN apk add --no-cache bash
 FROM base AS deps
 COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
 RUN \
-	if [ -f yarn.lock ]; then yarn install --frozen-lockfile && yarn cache clean; \
-	elif [ -f package-lock.json ]; then npm ci; \
-	else npm install --no-save next react react-dom typescript @types/react @types/node; fi
+    if [ -f yarn.lock ]; then yarn install --frozen-lockfile && yarn cache clean; \
+    elif [ -f package-lock.json ]; then npm ci; \
+    else npm install --no-save next react react-dom typescript @types/react @types/node; fi
 
 ############################################
 # Builder (for prod build) – also used for typecheck
