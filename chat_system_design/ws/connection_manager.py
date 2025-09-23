@@ -77,7 +77,7 @@ class ConnectionManager:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to connect user {user_id}: {e}")
+            logger.error(f"Failed to connect user {user_id}: {e}", exc_info=True)
             return False
 
     async def disconnect(self, websocket: WebSocket):
