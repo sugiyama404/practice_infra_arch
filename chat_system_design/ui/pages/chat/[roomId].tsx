@@ -58,17 +58,20 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
             roomId,
             onStatus: setStatus,
             onEvent: (payload: WSInboundEvent) => {
+                const {
+                    addMessage,
+                    setPresence,
+                    setTyping,
+                    updateMessageStatus,
+                    addMessageReader,
+                    addMessageReaders,
+                } = useChatStore.getState();
                 switch (payload.event) {
                     case 'message':
                         addMessage(payload.data);
                         break;
                     case 'ack':
                         if (payload.data.message_id) updateMessageStatus(payload.data.message_id, 'sent');
-                        // Set sent_at for reliability indicator
-                        const msg = messages.find((m) => m.message_id === payload.data.message_id);
-                        if (msg) {
-                            addMessage({ ...msg, sent_at: new Date().toISOString() });
-                        }
                         break;
                     case 'read':
                         if (payload.data.message_id) {
@@ -95,18 +98,7 @@ export default function ChatPage({ initialRoomId, userId, deviceId }: ChatPagePr
         });
         wsRef.current = client;
         return () => client.close();
-    }, [
-        userId,
-        deviceId,
-        roomId,
-        addMessage,
-        setPresence,
-        setTyping,
-        updateMessageStatus,
-        addMessageReader,
-        addMessageReaders,
-        messages,
-    ]);
+    }, [userId, deviceId, roomId]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
