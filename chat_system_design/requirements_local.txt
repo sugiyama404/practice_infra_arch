@@ -2,3 +2,6 @@ aiohttp
 websockets
 ipykernel
 notebook
+numpy
+matplotlib
+pika
