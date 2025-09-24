@@ -1,9 +1,4 @@
-了解です！
-いただいたスクショ（図12-11〜12-13）と要件を踏まえて、**チャットシステムの解説用 README.md** のひな形を作りました。
-
----
-
-# README.md（解説用）
+# Chat System Design
 
 ## 📌 プロジェクト概要
 
@@ -106,30 +101,41 @@
 ## 🚀 起動方法
 
 ```bash
-git clone <repo_url>
-cd chat-system
-docker-compose up --build
+cd chat_system_design
+docker compose up --build
 ```
 
 ---
 
-## 📂 ディレクトリ構成（例）
+## 📂 ディレクトリ構成
 
 ```
-chat-system/
-├── docker-compose.yml
-├── nginx/
-│   └── nginx.conf
+chat_system_design/
+├── compose.yaml
+├── init.sql
+├── Makefile
+├── nginx.conf
+├── README.md
+├── requirements_local.txt
+├── test_client.py
+├── ui_prompt.md
 ├── api/
-│   └── main.py
-├── ws/
-│   └── main.py
+│   ├── config.py
+│   ├── Dockerfile
+│   ├── main.py
+│   ├── models.py
+│   └── requirements.txt
+├── pn/
+│   ├── config.py
+│   ├── Dockerfile
+│   ├── main.py
+│   └── requirements.txt
+├── ui/
+│   ├── Dockerfile
+│   ├── jest.config.js
+│   └── ...
 ├── worker/
-│   └── worker.py
-├── pn_server/
-│   └── main.py
-└── docs/
-    └── architecture.png
+│   └── ws/
 ```
 
 ---
