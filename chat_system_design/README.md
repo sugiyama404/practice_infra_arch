@@ -25,6 +25,11 @@
        │ WebSocket / HTTP        │
        ▼                         ▼
  ┌─────────────┐     ┌─────────────┐
+ │ UI Server   │  ...│ UI Server   │
+ │ (Next.js)   │     │ (Next.js)   │
+ └─────┬───────┘     └─────┬───────┘
+       │                         │
+ ┌─────────────┐     ┌─────────────┐
  │   Nginx LB   │  ...│   Nginx LB   │
  └─────┬────────┘     └─────┬───────┘
        │                         │
@@ -54,45 +59,51 @@
 
 ## 🔑 コンポーネント解説
 
-### 1. **Nginx (Load Balancer)**
+### 1. **UI Server (Next.js)**
+
+* クライアントにチャットUIを提供（SSRモード）
+* APIサーバーへのHTTPリクエスト、WebSocket接続を仲介
+* リアルタイムチャットインターフェースを実装
+
+### 2. **Nginx (Load Balancer)**
 
 * クライアントからの接続を WebSocket サーバへ振り分ける
 * API サーバへのリクエストもプロキシ
 
-### 2. **API Server (FastAPI)**
+### 3. **API Server (FastAPI)**
 
 * ユーザー登録、認証、履歴取得 API を提供
 * デバイスごとの `cur_max_message_id` を管理
 
-### 3. **WebSocket Server (FastAPI + WS)**
+### 4. **WebSocket Server (FastAPI + WS)**
 
 * クライアントと常時接続
 * メッセージ送信を RabbitMQ に流し、Worker からの配信を待つ
 * Redis でセッション管理
 
-### 4. **Worker (Python, aio\_pika)**
+### 5. **Worker (Python, aio\_pika)**
 
 * RabbitMQ からメッセージを受信
 * Postgres に保存
 * Redis を更新（`message_id`, プレゼンス情報）
 * WebSocket サーバへ配信
 
-### 5. **Redis**
+### 6. **Redis**
 
 * プレゼンス（オンライン/オフライン状態）
 * セッション管理（`user_id:device_id → ws_server`）
 * ID 発行（`INCR message_id`）
 * デバイスごとの `cur_max_message_id`
 
-### 6. **Postgres**
+### 7. **Postgres**
 
 * メッセージ履歴、ユーザー情報を永続化
 
-### 7. **RabbitMQ**
+### 8. **RabbitMQ**
 
 * 非同期メッセージ処理のためのキュー
 
-### 8. **Push Notification Server (Mock)**
+### 9. **Push Notification Server (Mock)**
 
 * Worker から通知を受け取り、ログに出力（実サービスに置き換え可能）
 
