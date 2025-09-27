@@ -1,0 +1,7 @@
+ignored:
+  - DL3008 # pin versions (dev container ok)
+  - DL3018 # apk add no version pin (dev)
+  - DL3059 # multiple consecutive RUN not critical here
+  - SC2086 # word splitting not risky in our simple conditional
+
+failure-threshold: warning
