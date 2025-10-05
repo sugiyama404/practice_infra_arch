@@ -11,6 +11,10 @@ REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 RATE_LIMIT = int(os.getenv("RATE_LIMIT", 5))
 WINDOW_SECONDS = int(os.getenv("WINDOW_SECONDS", 60))
 
+
+# レート制限チェックをスキップするエンドポイント
+RATE_LIMIT_EXCLUDED_PATHS = {"/health", "/api/reset"}
+
 # Redis接続
 redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
 
@@ -79,7 +83,7 @@ def check_rate_limit(client_ip):
 def rate_limit_check():
     """全リクエスト前にレート制限をチェック"""
     # ヘルスチェックエンドポイントは除外
-    if request.path == "/health":
+    if request.path in RATE_LIMIT_EXCLUDED_PATHS:
         return None
 
     client_ip = get_client_ip()
@@ -145,17 +149,30 @@ def test_endpoint():
 def reset_rate_limit():
     """レート制限をリセット（テスト用）"""
     client_ip = get_client_ip()
-    pattern = f"rate_limit:{client_ip}:*"
+    base_key = f"rate_limit:{client_ip}"
+    pattern = f"{base_key}:*"
 
     try:
-        keys = redis_client.keys(pattern)
-        if keys:
-            redis_client.delete(*keys)
-            return jsonify(
-                {"message": "Rate limit reset successfully", "deleted_keys": len(keys)}
-            ), 200
-        else:
-            return jsonify({"message": "No rate limit data found"}), 200
+        keys_to_delete = set(redis_client.keys(pattern))
+        keys_to_delete.add(base_key)
+
+        # Redis.delete は存在しないキーを無視しつつ削除数を返す
+        deleted_count = 0
+        if keys_to_delete:
+            deleted_count = redis_client.delete(*keys_to_delete)
+
+        if deleted_count:
+            return (
+                jsonify(
+                    {
+                        "message": "Rate limit reset successfully",
+                        "deleted_keys": deleted_count,
+                    }
+                ),
+                200,
+            )
+
+        return jsonify({"message": "No rate limit data found"}), 200
     except redis.RedisError as e:
         return jsonify({"error": "Failed to reset rate limit", "details": str(e)}), 500
 
