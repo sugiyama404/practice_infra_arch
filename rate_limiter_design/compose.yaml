@@ -14,8 +14,4 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
-    networks:
-      - rate_limiter_network
     command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data

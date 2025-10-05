@@ -24,7 +24,7 @@ def get_client_ip():
 
 def check_rate_limit(client_ip):
     """
-    固定ウィンドウカウンター方式でレート制限をチェック
+    スライディングウィンドウログ方式でレート制限をチェック
 
     Args:
         client_ip: クライアントのIPアドレス
@@ -32,26 +32,37 @@ def check_rate_limit(client_ip):
     Returns:
         tuple: (is_allowed, remaining, reset_time)
     """
-    # 現在のタイムスタンプから固定ウィンドウを計算
-    current_time = int(time.time())
-    window_start = current_time - (current_time % WINDOW_SECONDS)
+    current_time = time.time()
+    window_start_timestamp = current_time - WINDOW_SECONDS
 
-    # Redisキー: rate_limit:{client_ip}:{window_start}
-    key = f"rate_limit:{client_ip}:{window_start}"
+    # Redisキー: rate_limit:{client_ip}
+    key = f"rate_limit:{client_ip}"
 
     try:
-        # INCRコマンドでカウントアップ（キーが存在しない場合は1から開始）
-        current_count = redis_client.incr(key)
+        with redis_client.pipeline() as pipe:
+            # 1. ウィンドウ外の古いタイムスタンプを削除
+            pipe.zremrangebyscore(key, 0, window_start_timestamp)
 
-        # 初回アクセス時にEXPIREを設定
-        if current_count == 1:
-            redis_client.expire(key, WINDOW_SECONDS)
+            # 2. 現在のリクエストのタイムスタンプを追加
+            #    ユニークなメンバーにするため、タイムスタンプとナノ秒を組み合わせる
+            pipe.zadd(key, {f"{current_time}": current_time})
+
+            # 3. 現在のウィンドウ内のリクエスト数を取得
+            pipe.zcard(key)
+
+            # 4. キーにTTLを設定して自動クリーンアップ
+            pipe.expire(key, WINDOW_SECONDS)
+
+            # トランザクション実行
+            results = pipe.execute()
+
+        current_count = results[2]
 
         # 残りリクエスト数を計算
         remaining = max(0, RATE_LIMIT - current_count)
 
-        # ウィンドウリセット時刻
-        reset_time = window_start + WINDOW_SECONDS
+        # 次のリセットは常に1秒後（最も古いリクエストがウィンドウから外れるため）
+        reset_time = int(current_time + 1)
 
         # レート制限チェック
         is_allowed = current_count <= RATE_LIMIT
@@ -61,7 +72,7 @@ def check_rate_limit(client_ip):
     except redis.RedisError as e:
         app.logger.error(f"Redis error: {e}")
         # Redisエラー時は通過させる（フェイルオープン）
-        return True, RATE_LIMIT, current_time + WINDOW_SECONDS
+        return True, RATE_LIMIT, int(current_time + WINDOW_SECONDS)
 
 
 @app.before_request
