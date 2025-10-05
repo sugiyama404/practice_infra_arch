@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RATE_LIMIT=5
+      - WINDOW_SECONDS=60
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - rate_limiter_network
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
