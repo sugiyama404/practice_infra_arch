@@ -1,0 +1,17 @@
+
+# Local / Notebook dependencies for testing and visualization
+# Use these in your local Python environment (macOS) before running the notebook
+jupyter>=1.0.0
+notebook>=6.5.4
+ipykernel>=6.22.0
+
+requests>=2.28.2
+pandas>=1.5.3
+numpy>=1.24.3
+matplotlib>=3.7.1
+seaborn>=0.12.2
+
+# Helpful extras
+python-dotenv>=1.0.0  # optional: load environment variables from .env when running locally
+
+
