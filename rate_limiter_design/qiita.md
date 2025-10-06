@@ -4,8 +4,6 @@
 Flask・Redis・Docker Composeを用い、**固定ウィンドウカウンター方式**を構築。
 さらに、Jupyter Notebookで可視化検証を行い、**バースト制御の限界と改善策**を学びます。
 
-> ゴール：採用担当が「この人と一緒に設計したい」と思うような、実践的で説明力のある記事にする。
-
 ## 技術選定理由
 
 | 技術                   | 理由                                        |
@@ -33,6 +31,10 @@ Flask・Redis・Docker Composeを用い、**固定ウィンドウカウンター
 
 # 3. アーキテクチャ概要
 
+本稿のレートリミッターは、**固定ウィンドウカウンター方式**を採用し、Flask APIとRedisを組み合わせたシンプルな構成です。以下に、アーキテクチャの全体像と処理フローを図示します。
+
+## 処理フロー図（フローチャート）
+
 ```mermaid
 flowchart LR
     Client[Client<br/>Browser/API] -->|HTTP Request| FlaskApp[Flask API<br/>:8000]
@@ -42,10 +44,39 @@ flowchart LR
     FlaskApp -->|200 OK / 429 Too Many Requests| Client
 ```
 
-* **Flask**: APIエンドポイントを提供（`/api/test`, `/api/reset`）
-* **Redis**: カウントとTTLを保持
-* **Docker Compose**: FlaskとRedisを同時に起動
-* **クライアント**: curlやNotebookからHTTPリクエストを送信
+## 時系列処理図（シーケンス図）
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant FlaskApp
+    participant Redis
+
+    Client->>FlaskApp: HTTP Request
+    FlaskApp->>Redis: INCR count
+    FlaskApp->>Redis: EXPIRE TTL (if first request)
+    Redis-->>FlaskApp: count value
+    alt count <= RATE_LIMIT
+        FlaskApp-->>Client: 200 OK
+    else
+        FlaskApp-->>Client: 429 Too Many Requests
+    end
+```
+
+## 図表解説
+
+- **フローチャート**: システム全体のデータフローを示しています。クライアントからのリクエストがFlask APIを経由してRedisに到達し、カウンタの更新とTTL設定が行われた後、レスポンスが返却される流れを簡潔に表現しています。この図は、コンポーネント間の関係性を把握するのに適しています。
+
+- **シーケンス図**: リクエスト処理の時系列を詳細に示しており、Redisとのやり取りとレート制限の条件分岐（カウンタ値が閾値を超えた場合の429エラー）を明確にしています。固定ウィンドウ方式の特性として、ウィンドウ開始時にカウンタがリセットされるため、境界付近でのバースト発生に注意が必要です。
+
+このアーキテクチャの利点は、Redisの原子性操作（`INCR`と`EXPIRE`）により、高速かつ分散環境で動作可能な点です。一方で、固定ウィンドウ方式の欠点として、ウィンドウ境界でのリクエスト集中（バースト）が発生しやすいため、実運用ではスライディングウィンドウへの移行を検討してください。
+
+## 各コンポーネントの役割
+
+* **Flask**: APIエンドポイントを提供（`/api/test`, `/api/reset`）。リクエストの受付とRedis操作、レスポンス生成を担当。軽量フレームワークのため、拡張性が高く、FastAPIなどへの移行も容易。
+* **Redis**: カウントとTTLを保持。分散カウンタとして機能し、`INCR`による原子性インクリメントと`EXPIRE`による自動削除を実現。メモリベースのため高速。
+* **Docker Compose**: FlaskとRedisを同時に起動。ローカル開発環境を簡単に構築可能。環境変数でレート制限パラメータ（`RATE_LIMIT`, `WINDOW_SECONDS`）を調整可能。
+* **クライアント**: curlやNotebookからHTTPリクエストを送信。レスポンスヘッダ（`X-RateLimit-*`）を活用してリトライタイミングを制御。
 
 ---
 
@@ -71,6 +102,8 @@ flowchart LR
    X-RateLimit-Reset: リセット時刻
    ```
 
+   **図表解説**: RFC 6585で定義されたレート制限ヘッダーを使用しています。これにより、クライアントは現在の制限状態を把握し、適切なリトライタイミングを決定できます。`X-RateLimit-Reset`はUNIXタイムスタンプ形式で返却され、ウィンドウのリセット時刻を示します。
+
 4. **例外パス**
    `/health` や `/api/reset` は制限対象外。
 
@@ -81,7 +114,6 @@ flowchart LR
 # 5. ローカル環境構築（Docker Compose）
 
 ```yaml
-version: "3.8"
 services:
   app:
     build: ./app
@@ -97,18 +129,7 @@ services:
     ports: ["6379:6379"]
 ```
 
-起動（macOS/zsh）:
-
-```bash
-cd rate_limiter_design
-docker compose up --build -d
-```
-
-ヘルスチェック:
-
-```bash
-curl http://localhost:8000/health
-```
+**図表解説**: Docker Compose設定により、ローカル開発環境を簡単に構築できます。`app`サービスはFlaskアプリケーションをコンテナ化し、`redis`サービスはRedisデータベースを提供します。環境変数によりレート制限の設定を柔軟に変更可能で、`depends_on`によりRedisの起動を待機してからFlaskを起動します。
 
 # 6. 検証：Notebookで挙動を可視化
 
@@ -120,6 +141,8 @@ Jupyter Notebook（`rate_limiter_test.ipynb`）で自動的に連続リクエス
 * 最初の5回：HTTP 200
 * 6回目以降：HTTP 429
 * ウィンドウリセット後：再び許可
+
+**図表解説**: Notebookでは、matplotlibとseabornを用いてレートリミッターの挙動をグラフ化します。左側のグラフは各リクエストのHTTPステータスコードを示し、右側のグラフは残りリクエスト数の推移をプロットします。これにより、固定ウィンドウ方式の境界問題（バースト現象）を視覚的に確認できます。
 
 これにより、**固定ウィンドウ方式の境界問題（バースト現象）**を実際に観測可能です。
 
