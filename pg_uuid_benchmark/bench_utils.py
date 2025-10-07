@@ -1,4 +1,5 @@
 """Utility helpers for the cross-database ID lookup benchmarking suite."""
+
 from __future__ import annotations
 
 import json
@@ -131,7 +132,9 @@ def uuid7() -> uuid.UUID:
     version = 0x7000 | (rand_a & 0x0FFF)
     variant = 0x8000 | ((rand_b >> 48) & 0x3FFF)
     node = rand_b & 0xFFFFFFFFFFFF
-    return uuid.UUID(fields=(time_low, time_mid, version, variant >> 8, variant & 0xFF, node))
+    return uuid.UUID(
+        fields=(time_low, time_mid, version, variant >> 8, variant & 0xFF, node)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -177,7 +180,9 @@ def build_connections() -> ConnectionBundle:
     redis_url = os.getenv("REDIS_URL")
 
     if not all([pg_mixed_dsn, pg_uuid_dsn, mysql_dsn, redis_url]):
-        raise RuntimeError("Missing DSN(s). Please configure .env or environment variables.")
+        raise RuntimeError(
+            "Missing DSN(s). Please configure .env or environment variables."
+        )
 
     redis_client = redis.from_url(redis_url, decode_responses=False)
     return ConnectionBundle(
@@ -509,7 +514,10 @@ def seed_redis(
     redis_datasets: List[DatasetInfo] = []
     for dataset in datasets:
         samples: List[str] = []
-        for key in tqdm(dataset.samples[: config.lookup_iterations], desc=f"Redis load {dataset.id_type}"):
+        for key in tqdm(
+            dataset.samples[: config.lookup_iterations],
+            desc=f"Redis load {dataset.id_type}",
+        ):
             redis_key = f"{dataset.id_type}:{key}"
             pipeline.set(redis_key, "payload")
             samples.append(redis_key)
@@ -568,7 +576,9 @@ def fetch_function(engine: Engine, table: str, id_column: str) -> Callable[[Any]
     return _fetch
 
 
-def fetch_with_prepared(engine: Engine, table: str, id_column: str) -> Callable[[Any], None]:
+def fetch_with_prepared(
+    engine: Engine, table: str, id_column: str
+) -> Callable[[Any], None]:
     def _fetch(value: Any) -> None:
         with engine.connect() as conn:
             result = conn.execute(
