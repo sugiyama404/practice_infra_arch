@@ -8,8 +8,6 @@ services:
       POSTGRES_PASSWORD: benchpass
     ports:
       - "5433:5432"
-    volumes:
-      - pg_mixed_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -24,8 +22,6 @@ services:
       POSTGRES_PASSWORD: benchpass
     ports:
       - "5434:5432"
-    volumes:
-      - pg_uuid_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -42,8 +38,6 @@ services:
     command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
     ports:
       - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -54,17 +48,9 @@ services:
     container_name: redis-bench
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     command: ["redis-server", "--save", "", "--appendonly", "no"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-volumes:
-  pg_mixed_data:
-  pg_uuid_data:
-  mysql_data:
-  redis_data:

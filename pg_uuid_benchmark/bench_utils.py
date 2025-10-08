@@ -546,18 +546,38 @@ def measure_operation(
     config: BenchmarkConfig,
     show_progress: bool = True,
 ) -> ResultRow:
+    # Parse label once to avoid repeated splitting inside loops
+    parts = label.split("::")
+    database = parts[0] if len(parts) > 0 else ""
+    id_type = parts[1] if len(parts) > 1 else ""
+    operation = parts[2] if len(parts) > 2 else "lookup"
+
     timings: List[float] = []
     iterator = inputs
-    progress = tqdm(iterator, desc=label) if show_progress else inputs
+    progress = tqdm(iterator, desc=label) if show_progress else iterator
     for item in progress:
         start = time.perf_counter()
         func(item)
         timings.append((time.perf_counter() - start) * 1000)
+
+    if not timings:
+        # No timings recorded; return a zeroed result row to avoid numpy errors
+        return ResultRow(
+            database=database,
+            id_type=id_type,
+            operation=operation,
+            avg_ms=0.0,
+            p95_ms=0.0,
+            min_ms=0.0,
+            max_ms=0.0,
+            lookups=0,
+        )
+
     arr = np.array(timings, dtype=float)
     return ResultRow(
-        database=label.split("::")[0],
-        id_type=label.split("::")[1],
-        operation=label.split("::")[2] if len(label.split("::")) > 2 else "lookup",
+        database=database,
+        id_type=id_type,
+        operation=operation,
         avg_ms=float(np.mean(arr)),
         p95_ms=float(np.percentile(arr, 95)),
         min_ms=float(np.min(arr)),
