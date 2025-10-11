@@ -11,3 +11,6 @@ python-dotenv>=1.0
 nbformat>=5.9
 nbconvert>=7.8
 ipykernel
+plotly>=5.0
+pymongo>=4.5
+python-dateutil>=2.8
