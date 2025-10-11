@@ -1,6 +1,6 @@
 # PostgreSQL UUID & Cross-Database ID Benchmark
 
-This project benchmarks ID lookup latency across PostgreSQL, MySQL, and Redis for several identifier strategies, and drills into UUIDv4 vs UUIDv7 behaviour on PostgreSQL 18.
+This project benchmarks ID lookup latency across PostgreSQL, MySQL, Redis, MongoDB, and SQLite for several identifier strategies, and drills into UUIDv4 vs UUIDv7 behaviour on PostgreSQL 18.
 
 ## Prerequisites
 
@@ -22,6 +22,15 @@ Bring up the data stores:
 ```bash
 docker compose up -d --remove-orphans
 ```
+
+Services and connection details:
+
+- PostgreSQL (mixed): localhost:5433, db: benchdb, user: bench, pass: benchpass
+- PostgreSQL (uuid18): localhost:5434, db: benchdb, user: bench, pass: benchpass
+- MySQL: localhost:3307, db: benchdb, user: bench, pass: benchpass (root: benchpass)
+- Redis: localhost:6379
+- MongoDB: localhost:27017, user: bench, pass: benchpass (auth DB: admin)
+- SQLite: use the mounted folder inside the container at /db (via `docker exec -it sqlite-bench sh`), or mount your own path if needed.
 
 ## Running the benchmark notebook
 
