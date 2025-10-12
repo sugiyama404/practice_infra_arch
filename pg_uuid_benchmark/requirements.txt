@@ -14,3 +14,4 @@ ipykernel
 plotly>=5.0
 pymongo>=4.5
 python-dateutil>=2.8
+pyarrow
