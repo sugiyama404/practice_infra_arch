@@ -70,12 +70,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  sqlite:
-    image: keinos/sqlite3:latest
-    container_name: sqlite-bench
-    command: ["sleep", "infinity"]
-    healthcheck:
-      test: ["CMD", "sqlite3", "-version"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
