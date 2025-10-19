@@ -10,6 +10,7 @@ from pydantic import BaseModel, HttpUrl
 
 from .core.base62 import encode
 from .core.id_generator import SnowflakeGenerator
+import hashlib
 from .core.redis_client import base_url, create_client
 
 app = FastAPI(title="shortify", version="0.1.0", debug=True)
@@ -53,11 +54,25 @@ async def shorten_url(
     request: Request,
     redis=Depends(get_redis),
 ) -> ShortenResponse:
+    long_url = str(payload.url)
+    url_hash = hashlib.sha256(long_url.encode()).hexdigest()
+    reverse_key = f"reverse-url:{url_hash}"
+
+    existing_slug = await redis.get(reverse_key)
+    service_base = base_url(str(request.base_url))
+    if existing_slug:
+        return ShortenResponse(
+            short_url=f"{service_base}/{existing_slug}", slug=existing_slug
+        )
+
     identifier = _id_generator.generate_id()
     slug = encode(identifier)
     key = f"url:{slug}"
-    await redis.set(key, str(payload.url))
-    service_base = base_url(str(request.base_url))
+
+    # Store both forward and reverse mappings
+    await redis.set(key, long_url)
+    await redis.set(reverse_key, slug)
+
     return ShortenResponse(short_url=f"{service_base}/{slug}", slug=slug)
 
 
