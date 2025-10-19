@@ -1,0 +1,6 @@
+# Utility
+requests
+
+# Notebook tooling (keep these for analysis notebooks)
+ipykernel
+notebook
