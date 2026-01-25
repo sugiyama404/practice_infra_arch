@@ -1,120 +1,191 @@
-# インフラ設計練習プロジェクト
+# Practice Infrastructure Architecture
 
-このリポジトリは、様々なシステムのインフラ設計を学習・練習するためのプロジェクトです。実際のユースケースを想定したアーキテクチャ設計と実装例を提供します。
+**実務レベルのインフラ設計・システム設計を検証するための設計演習プロジェクト集**
 
-## 📁 プロジェクト構成
+---
 
-### 🎯 システム設計事例
+## 概要
 
-#### 1. ML Trading System (`ml_trading_system/`)
-機械学習を活用したトレーディングシステムの設計パターン
+このリポジトリは、**実務で通用するインフラ設計・システム設計力の習得と検証**を目的とした設計演習プロジェクト集です。
 
-- **Simple Architecture**: プロトタイプ向けの最小構成
-- **Cost Optimized Architecture**: コスト最適化重視の構成
-- **High Availability Architecture**: 高可用性重視の構成
-- **Resilient by Design Architecture**: 障害耐性重視の構成
-- **MLOps Pipeline Architecture**: MLOps パイプライン構成
+単なる構築手順の学習ではなく、以下を重視しています。
 
-対応クラウド: AWS, Azure, GCP
+* 要件・前提条件の整理
+* アーキテクチャ選定の理由とトレードオフ
+* スケーラビリティ / 可用性 / コストのバランス
+* 実装・ベンチマークによる設計仮説の検証
 
-#### 2. Search Autocomplete System (`search_autocomplete_system/`)
-高速検索オートコンプリート機能の実装
+各プロジェクトは **「想定ユースケース → 設計 → 実装 → 学び」** の流れで構成されており、
+**設計思考そのものを成果物として残す** ことを目的としています。
 
-**目標**: P95 < 200ms / 月額 < $150
+---
 
-**特徴**:
-- 多層キャッシュ戦略 (Browser/CloudFront/Redis/OpenSearch)
-- 実際に動作するDocker構成付き
-- フロントエンド (Next.js) + バックエンド (Python/Flask) の完全な実装
+## このリポジトリで示したいこと
 
-**技術スタック**:
-- Frontend: Next.js, TypeScript, React
-- Backend: Python, Flask
-- Database: PostgreSQL, Redis, OpenSearch
-- Infrastructure: AWS (CloudFront, ALB, ECS, RDS, ElastiCache)
+* 単一クラウド・単一構成に依存しない設計思考
+* スモールスタートからスケールまでの設計判断
+* 分散システムにおける失敗パターンと回避策
+* 実務では検証しづらい設計案の比較・検証
 
-#### 3. Cache Strategy (`cache_strategy/`)
-動画配信サイトを題材にしたキャッシュ戦略の学習
+👉 **「なぜこの構成なのか」を説明できること** を最重要視しています。
 
-**学習ポイント**:
-- CloudFront を活用した CDN キャッシュ
-- 静的/動的コンテンツの適切なキャッシュ設定
-- Cache-Control ヘッダーの実践的な使い方
+---
 
-#### 4. Distributed ID Generation (`distributed_id_generation_design/`)
-分散システムでのID生成システム設計
+## 📁 プロジェクト一覧（設計事例）
 
-**実装内容**:
-- Snowflake アルゴリズムの実装
-- Ticket Server パターンの実装
-- Docker Compose による動作確認環境
+### 1. ML Trading System
 
-## 🛠️ 使用方法
+`ml_trading_system/`
+
+機械学習（強化学習）を用いたトレーディングシステムを題材に、
+**MLOps 観点を含む複数のインフラ構成パターン** を設計・比較します。
+
+#### 設計テーマ
+
+* 学習・推論・評価を分離したアーキテクチャ
+* 再現性・コスト・障害耐性のバランス
+* 実運用を想定した MLOps パイプライン設計
+
+#### 提供する構成パターン
+
+* Simple Architecture（プロトタイプ向け）
+* Cost Optimized Architecture
+* High Availability Architecture
+* Resilient by Design Architecture
+* MLOps Pipeline Architecture
+
+**対応クラウド**: AWS / Azure / GCP
+
+---
+
+### 2. Search Autocomplete System
+
+`search_autocomplete_system/`
+
+高速検索オートコンプリート機能を題材に、
+**レイテンシ要件とコスト制約を満たす設計** を検証します。
+
+* **目標要件**
+
+  * P95 レイテンシ < 200ms
+  * 月額コスト < $150
+
+#### 設計ポイント
+
+* 多層キャッシュ戦略（Browser / CDN / Redis / OpenSearch）
+* スケール時のボトルネック分析
+* 実運用を想定した構成のシンプル化
+
+#### 技術スタック
+
+* Frontend: Next.js, TypeScript, React
+* Backend: Python, Flask
+* Database: PostgreSQL, Redis, OpenSearch
+* Infrastructure: AWS（CloudFront, ALB, ECS, RDS, ElastiCache）
+
+Docker Compose により **ローカルで動作確認可能**。
+
+---
+
+### 3. Cache Strategy
+
+`cache_strategy/`
+
+動画配信サービスを題材に、
+**CDN・アプリケーションキャッシュの設計判断** を学習・検証します。
+
+#### 主な検証内容
+
+* CDN キャッシュとオリジン負荷の関係
+* 静的 / 動的コンテンツのキャッシュ戦略
+* Cache-Control ヘッダー設計の実践
+
+---
+
+### 4. Distributed ID Generation
+
+`distributed_id_generation_design/`
+
+分散システムにおける **ID生成方式の設計と実装比較** を行います。
+
+#### 実装・検証内容
+
+* Snowflake アルゴリズム
+* Ticket Server パターン
+* スケール・衝突・運用面の比較
+
+Docker Compose による動作確認・検証環境を含みます。
+
+---
+
+## 🛠️ 実行方法（例）
 
 ### 前提条件
-- Docker & Docker Compose
-- Node.js (フロントエンド開発時)
-- Python 3.x (バックエンド開発時)
 
-### クイックスタート
+* Docker / Docker Compose
+* Node.js（フロントエンド実行時）
+* Python 3.x（バックエンド実行時）
 
-1. **リポジトリのクローン**
 ```bash
 git clone https://github.com/sugiyama404/practice_infra_arch.git
 cd practice_infra_arch
 ```
 
-2. **検索オートコンプリートシステムの起動例**
+### Search Autocomplete System
+
 ```bash
 cd search_autocomplete_system
 docker-compose up -d
 ```
 
-3. **分散ID生成システムの起動例**
+### Distributed ID Generation
+
 ```bash
 cd distributed_id_generation_design
 docker-compose up -d
 ```
 
-## 📖 設計ドキュメント
+---
 
-各プロジェクトには以下のドキュメントが含まれています：
+## 📖 設計ドキュメント構成
 
-- `infrastructure.md`: システム構成とアーキテクチャの詳細
-- `initial_assumptions.md`: 設計の前提条件と要件
-- `README.md`: プロジェクト固有の説明とセットアップ手順
+各プロジェクトには以下の設計資料を含みます。
 
-## 🎨 アーキテクチャ図
+* `initial_assumptions.md`
 
-各プロジェクトにはDraw.ioファイル（`.drawio`）と画像ファイル（`.png`, `.svg`）が含まれており、視覚的にアーキテクチャを理解できます。
+  * 想定ユースケース / 要件 / 制約条件
+* `infrastructure.md`
 
-## 📚 学習リソース
+  * アーキテクチャ構成と設計意図
+* `README.md`
 
-### 設計テンプレート
-`infra_design_template.md` - インフラ設計時に使用できる統一テンプレート
-
-### カバーする技術領域
-- **クラウドサービス**: AWS, Azure, GCP
-- **コンテナ技術**: Docker, ECS, Kubernetes
-- **データベース**: RDS, DynamoDB, Redis, OpenSearch
-- **キャッシュ戦略**: CDN, アプリケーションレベルキャッシュ
-- **監視・ログ**: CloudWatch, Application Performance Monitoring
-- **セキュリティ**: IAM, VPC, セキュリティグループ
-- **負荷分散**: ALB, CloudFront, Route53
-
-## 🤝 コントリビューション
-
-新しいシステム設計例や改善案は歓迎します！
-
-1. Issue で提案内容を議論
-2. Fork & ブランチ作成
-3. 設計ドキュメント & 実装を追加
-4. Pull Request を作成
-
-## 📄 ライセンス
-
-This project is open source and available under the [MIT License](LICENSE).
+  * プロジェクト固有の説明と検証方法
 
 ---
 
-**🎯 学習目標**: 実践的なインフラ設計スキルの習得と、スケーラブル・コスト効率的・可用性の高いシステム構築の理解
+## 🎨 アーキテクチャ図
+
+* Draw.io（`.drawio`）
+* PNG / SVG
+
+を含め、**視覚的に設計判断を追える構成**になっています。
+
+---
+
+## 📚 カバーする技術領域
+
+* **クラウド**: AWS / Azure / GCP
+* **コンテナ**: Docker, ECS, Kubernetes
+* **データストア**: RDS, DynamoDB, Redis, OpenSearch
+* **キャッシュ**: CDN, Application Cache
+* **可観測性**: CloudWatch, APM
+* **セキュリティ**: IAM, VPC, Security Group
+* **トラフィック制御**: ALB, CloudFront, Route53
+
+---
+
+## 🎯 このリポジトリのゴール
+
+* 実務で「なぜその設計にしたか」を説明できる状態になること
+* スケーラブル・可用性・コストを意識した設計判断ができること
+* クラウド / 分散システム設計の引き出しを増やすこと
