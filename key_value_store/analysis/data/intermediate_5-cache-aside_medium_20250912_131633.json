@@ -1,0 +1,54 @@
+[
+  {
+    "total_requests": 10000,
+    "successful_requests": 10000,
+    "error_rate": 0.0,
+    "qps": 124.20610577420733,
+    "avg_response_time": 7.9767505645751955,
+    "median_response_time": 8.641958236694336,
+    "p95_response_time": 10.263979434967041,
+    "p99_response_time": 11.81082010269165,
+    "min_response_time": 1.233816146850586,
+    "max_response_time": 37.47200965881348,
+    "initial_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.029850746268656716,
+        "memory_usage": 82006016,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.05901394422310757,
+        "memory_usage": 20934656,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.008743768693918245,
+        "memory_usage": 55836672,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "5-cache-aside-app-1": {
+        "cpu_percent": 0.029155908639523335,
+        "memory_usage": 70115328,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-redis-1": {
+        "cpu_percent": 0.06399201596806386,
+        "memory_usage": 31301632,
+        "memory_limit": 16810717184
+      },
+      "5-cache-aside-db-1": {
+        "cpu_percent": 0.0,
+        "memory_usage": 73830400,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "5-cache-aside",
+    "pattern_name": "medium",
+    "pattern_description": "中負荷",
+    "timestamp": "2025-09-12T13:48:38.719442",
+    "clients": 50,
+    "duration": 80.51133990287781
+  }
+]

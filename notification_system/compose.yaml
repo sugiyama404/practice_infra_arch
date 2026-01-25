@@ -1,0 +1,51 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: notification-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - notification-network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: notification-mailhog
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    networks:
+      - notification-network
+
+  api:
+    build: ./api
+    container_name: notification-api
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+    depends_on:
+      - redis
+      - mailhog
+    networks:
+      - notification-network
+    command: python app.py
+
+  worker:
+    build: ./worker
+    container_name: notification-worker
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+    depends_on:
+      - redis
+      - mailhog
+    networks:
+      - notification-network
+    command: celery -A worker.celery worker --loglevel=info
+
+networks:
+  notification-network:
+    driver: bridge

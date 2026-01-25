@@ -1,0 +1,12 @@
+requests>=2.28.0
+# `asyncio` and `concurrent` are part of the Python standard library; remove from requirements.
+# Keep `aiohttp` as the async HTTP client (install a modern, Python 3.11+ compatible version).
+aiohttp>=3.8.4
+# Use pandas/matplotlib/seaborn/numpy versions compatible with Python 3.11+.
+pandas>=2.0.3
+matplotlib>=3.7.1
+seaborn>=0.12.2
+numpy>=1.24.3
+psutil>=5.9.5
+ipykernel>=6.23.1
+notebook>=6.5.4

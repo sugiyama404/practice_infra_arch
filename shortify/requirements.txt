@@ -1,0 +1,10 @@
+# Utility
+requests
+matplotlib
+pandas
+plotly
+seaborn
+
+# Notebook tooling (keep these for analysis notebooks)
+ipykernel
+notebook

@@ -1,0 +1,44 @@
+[
+  {
+    "total_requests": 1000,
+    "successful_requests": 1000,
+    "error_rate": 0.0,
+    "qps": 262.378270998718,
+    "avg_response_time": 3.7773406505584717,
+    "median_response_time": 3.940463066101074,
+    "p95_response_time": 5.227088928222656,
+    "p99_response_time": 6.372959613800049,
+    "min_response_time": 1.146078109741211,
+    "max_response_time": 10.0860595703125,
+    "initial_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.04199602780536246,
+        "memory_usage": 61927424,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.060129740518962076,
+        "memory_usage": 23556096,
+        "memory_limit": 16810717184
+      }
+    },
+    "final_stats": {
+      "8-line-streams-app-1": {
+        "cpu_percent": 0.025347222222222222,
+        "memory_usage": 62693376,
+        "memory_limit": 16810717184
+      },
+      "8-line-streams-redis-1": {
+        "cpu_percent": 0.0687363184079602,
+        "memory_usage": 23400448,
+        "memory_limit": 16810717184
+      }
+    },
+    "service_name": "8-line-streams",
+    "pattern_name": "light",
+    "pattern_description": "軽負荷",
+    "timestamp": "2025-09-12T14:10:26.089511",
+    "clients": 10,
+    "duration": 3.811291217803955
+  }
+]

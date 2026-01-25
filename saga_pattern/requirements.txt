@@ -1,0 +1,13 @@
+requests
+pandas
+numpy
+seaborn
+docker
+ipykernel
+notebook
+plotly
+matplotlib
+pymysql
+sqlalchemy
+aiohttp
+asyncio
