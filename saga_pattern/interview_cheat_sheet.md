@@ -19,32 +19,7 @@
 
 ### 図解フロー
 
-```mermaid
-flowchart TD
-    %% ノード定義
-    Client[📱 Client]
-    Order[📦 注文]
-    Stock[🏭 在庫]
-    Pay[💳 決済]
-    EventBus{📣 Event Bus}
-
-    %% 正常系 (実線)
-    Client --> Order
-    Order -->|1. OrderCreated| EventBus
-    EventBus -->|Sub| Stock
-    Stock -->|2. StockReserved| EventBus
-    EventBus -->|Sub| Pay
-    Pay -->|3. PaymentSuccess| EventBus
-
-    %% 異常系 (破線)
-    Pay -- ❌ 失敗 --> EventBus
-    EventBus -.->|4. PayFailed| Stock
-    Stock -.->|5. 在庫戻し| EventBus
-    EventBus -.->|6. 注文取消| Order
-
-    style EventBus fill:#f9f,stroke:#333
-    linkStyle default stroke-width:2px
-```
+![Choreography Pattern Diagram](Choreography.png)
 
 ### ✅ メリット
 
@@ -67,35 +42,7 @@ flowchart TD
 
 ### 図解フロー
 
-```mermaid
-flowchart TD
-    %% クラス定義
-    classDef orch fill:#ff9,stroke:#333,stroke-width:2px;
-
-    O[👮 オーケストレーター]:::orch
-
-    %% サービス
-    S1[📦 注文]
-    S2[🏭 在庫]
-    S3[💳 決済]
-
-    %% フロー
-    O -->|1. 指示| S1
-    S1 -- OK --> O
-
-    O -->|2. 指示| S2
-    S2 -- OK --> O
-
-    O -->|3. 指示| S3
-    S3 -- ❌ 失敗 --> O
-
-    %% 補償
-    O -.->|4. 補償コマンド| S2
-    S2 -.->|在庫戻し完了| O
-
-    O -.->|5. 補償コマンド| S1
-    S1 -.->|注文却下完了| O
-```
+![Orchestration Pattern Diagram](Orchestration.png)
 
 ### ✅ メリット
 
